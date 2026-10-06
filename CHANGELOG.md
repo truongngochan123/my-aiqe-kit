@@ -10,6 +10,13 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 - `.gitattributes`: LF cho file văn bản, CRLF cho `.ps1`, binary cho Excel/ảnh/zip.
 - `docs/BUILD_PLAN.md`: quyết định #14 (Codex viết đáp án golden), #18 (Codex dùng trước 10/10 chỉ để test routing và viết golden), #25–#28; thêm `sql_oracle.md`; thêm ai-product-testing vào "Để sau".
 
+- Đợt 1 Bước 1: 3 skill mẫu (`bug-reporting`, `test-design-rbt`, `incident-triage`) + references; 6 prompt FULL RBT; 4 template; script `md_to_xlsx`, `redact`, `to-external`, `lib/config`.
+
+### Sửa (phát hiện khi kiểm tra Đợt 1 Bước 1)
+- `redact.js --check` trên file đã che vẫn báo còn dữ liệu (khớp lại chữ `[REDACTED]`) → bỏ qua chỗ đã che.
+- `install.js` không chép `scripts/node_modules` vào bản cài → `md_to_xlsx` chạy từ bản cài báo thiếu thư viện. Sửa: chép kèm, cảnh báo nếu chưa `npm install`.
+- `exceljs` kéo theo `uuid@8` có cảnh báo bảo mật → ép `uuid@11.1.1` (`overrides`).
+
 ### Sửa (phát hiện khi kiểm tra Đợt 0)
 - Hook: input có BOM (PowerShell 5.1 thêm khi pipe) làm hook không đọc được JSON và cho qua → bỏ BOM trước khi đọc.
 - install.js: cài lại lần 2 làm mất danh sách permission do kit thêm, nên gỡ cài đặt không xóa được → cộng dồn qua các lần cài.

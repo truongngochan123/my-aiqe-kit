@@ -56,7 +56,11 @@ Nếu tool không tự nạp skill, đọc file `SKILL.md` tương ứng trong b
 Bảng do `scripts/install/gen-routing.js` sinh từ frontmatter, **không sửa tay**.
 
 <!-- aiqe:routing:start -->
-_(Chưa có skill. Bảng sẽ được sinh khi có skill ở Đợt 1.)_
+| Skill | Dùng khi / Không dùng khi | File |
+|---|---|---|
+| `bug-reporting` | Viết, review hoặc retest bug report có evidence và expected có nguồn; xuất bản internal và bản gửi khách. Dùng khi "viết bug", "log bug", "retest bug", soát bug người khác. Không dùng khi chưa rõ lỗi do test hay sản phẩm → incident-triage; báo cáo cả lần chạy → evidence-reporting. | `{{KIT}}/skills/bug-reporting/SKILL.md` |
+| `incident-triage` | Phân loại vì sao test fail hoặc chạy lỗi (môi trường, code test, sản phẩm, data/policy), kể cả test flaky; tách quan sát khỏi giả thuyết, quyết định chạy lại hay dừng. Dùng khi "test fail", "test đỏ", "lúc pass lúc fail", "chạy lỗi". Không dùng để viết bug → bug-reporting. | `{{KIT}}/skills/incident-triage/SKILL.md` |
+| `test-design-rbt` | Viết hoặc review manual test case theo EP, BVA, Decision Table, State Transition, Risk-Based Testing; mode quick, full, maintain (requirement đổi). Dùng khi "viết test case", "sinh TC", "review bộ TC". Không dùng khi requirement còn mơ hồ → requirement-analysis; cần dataset cụ thể → test-data. | `{{KIT}}/skills/test-design-rbt/SKILL.md` |
 <!-- aiqe:routing:end -->
 
 ## An toàn thao tác

@@ -10,7 +10,7 @@
 | Đợt | Trạng thái | Ngày |
 |---|---|---|
 | 0: Nền móng | ✅ Đã duyệt | 06/10 |
-| 1: Manual | ⏳ Chưa | 07/10 |
+| 1: Manual | 🔄 Bước 1 xong (3 skill mẫu) · chờ pilot trên Codex | 06/10 |
 | 2: Automation + CI | ⏳ Chưa | 08/10 |
 | 3: Lead, tích hợp, đa stack | ⏳ Chưa | 09/10 |
 | Agent 0.2.0 | ⏳ Chưa | 08–10/10 |
@@ -91,7 +91,7 @@
 
 ---
 
-## 4. Cấu trúc repo (đầy đủ, 170 file kit)
+## 4. Cấu trúc repo (đầy đủ, 172 file kit)
 
 Ký hiệu: `[Đ0]`…`[Đ3]` = đợt; ✅ = đã có.
 
@@ -143,7 +143,7 @@ my-aiqe-kit/
 │   ├── install/{install.ps1, install.js, gen-routing.js}                [Đ0] ✅
 │   ├── verify/{grep-clean.js, grep-exempt.txt, check-skills.js}         [Đ0] ✅
 │   ├── verify/aiqe-verify.js                                            [Đ2]
-│   ├── package.json  convert/md_to_xlsx.js  redact/{redact.js, patterns.json}
+│   ├── package.json  package-lock.json  lib/config.js  convert/md_to_xlsx.js  redact/{redact.js, patterns.json}
 │   │   export/to-external.js  evals/{prepare-isolated.ps1, grade.js}    [Đ1]
 │   ├── jira/{jira_fetcher.js, xray_importer.js, utils.js, xray_auth.js, .env.example}  [Đ3]
 │   └── trace/build-trace-index.js                                       [Đ3]
@@ -204,6 +204,14 @@ my-aiqe-kit/
 2. **Bước 2 — DỪNG:** Han chạy `install.ps1 -Tool codex -DryRun` rồi cài thật; test 9 prompt trên Codex; báo kết quả. Skill gọi sai thì sửa description trước.
 3. **Bước 3:** 5 skill còn lại + script, template, prompt, eval.
 4. **Bước 4:** đề bài golden `bug-reporting` (có bẫy). Han đưa đề cho Codex viết đáp án.
+
+**Tiến độ Bước 1 (06/10) ✅**
+- 3 skill mẫu + references: `bug-reporting`, `test-design-rbt` (4 references, có `sql_oracle.md`), `incident-triage` (`flaky_catalog.md`).
+- **Làm sớm từ Bước 3** (vì 3 skill mẫu gọi tới, thiếu thì pilot trên Codex sẽ trỏ vào file không tồn tại): 6 prompt `prompts/manual/`, 4 template (`bug_report`, `test_case_table`, `incident_card`, `retry_matrix`), `md_to_xlsx.js`, `redact.js` + `patterns.json`, `to-external.js`, `scripts/package.json`.
+- **Phát sinh +2 file:** `scripts/lib/config.js` (đọc `project.aiqe.yml`, dùng chung cho các script) và `scripts/package-lock.json` (khóa version thư viện).
+- `md_to_xlsx` viết lại bằng `exceljs` (bản gốc dùng `xlsx` 0.18.5 không còn cập nhật trên npm, và lấy cột theo vị trí). `uuid` ép lên 11.1.1 qua `overrides` để hết cảnh báo GHSA-w5hq-g745-h8pq (`npm audit`: 0 lỗ hổng).
+- Kiểm chứng: `check-skills` 3 skill 0 lỗi · `grep-clean` sạch · chạy thử 3 script với file mẫu · cài thử vào home giả: 16/16 đường dẫn trong skill tồn tại, script chạy được từ bản cài.
+- Bảng `field_validation_15.md` có **bản sao** trong `prompts/manual/05_…md` (để dán sang AI khác). Sửa bảng thì sửa cả hai (có comment `sync` đánh dấu). Câu hỏi mở Q9.
 
 | File | Chức năng | Phải có / Nghiệm thu |
 |---|---|---|
@@ -335,6 +343,7 @@ agent/
 | Q3 | `adapters/codex/config.toml` | Codex trên Windows có cần `npx.cmd` cho MCP không | Chạy MCP Playwright trong Codex |
 | Q4 | Toàn kit | Extension VS Code của Codex có dùng chung `~/.codex/config.toml` và hook không (nguồn hiện là bên thứ ba) | Hỏi Codex đọc `.env`, xem hook chặn không |
 | ~~Q5~~ | ~~Lệnh tắt Claude~~ | Đã chốt: bỏ cả 15 (quyết định #25) | — |
+| Q9 | `prompts/manual/05_…md` | Bảng field bị chép 2 nơi; có cần script kiểm tra 2 bản khớp nhau không | Thêm vào `check-skills.js` ở Đợt 2 nếu thấy lệch |
 | Q6 | `test-strategy` | Ước lượng theo phương pháp nào; metric nào được ghi `UNKNOWN` | Đợt 3 |
 | Q7 | `regression-selection` | Ai lập coverage map lần đầu | Đợt 3 |
 | Q8 | `jira-xray` | Công ty dùng TestRail hoặc Excel thì sao | Đợt 3 |
@@ -344,12 +353,12 @@ agent/
 | Phần | Số file |
 |---|---|
 | Đợt 0 | 36 |
-| Đợt 1 | 51 |
+| Đợt 1 | 53 |
 | Đợt 2 | 34 |
 | Đợt 3 | 49 |
-| **Kit 0.1.0** | **170** |
+| **Kit 0.1.0** | **172** |
 | Agent 0.2.0 (30 trong `agent/` + `docs/agent_design.md`) | 31 |
-| **Tổng** | **201** |
+| **Tổng** | **203** |
 
 Thay đổi so với plan v4.2 (194 file kit):
 - −15: bỏ lệnh tắt Codex (quyết định #21)
@@ -358,4 +367,5 @@ Thay đổi so với plan v4.2 (194 file kit):
 - +1: `.gitattributes` (#26)
 - +1: `test-design-rbt/references/sql_oracle.md` (#27)
 - +1: `evals/golden/bug-reporting.task.md` (tách đề bài khỏi đáp án)
-- = **170**
+- +2: `scripts/lib/config.js`, `scripts/package-lock.json` (phát sinh ở Bước 1)
+- = **172**

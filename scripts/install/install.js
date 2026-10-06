@@ -205,7 +205,9 @@ function mergeJsonFile(file, kitObj, withPermissions) {
 const SNAP_DIRS = ['rules', 'skills', 'prompts', 'templates', 'scripts', 'adapters', 'docs'];
 const SNAP_FILES = ['AGENTS.md', 'CLAUDE.md', 'VERSION', 'project.aiqe.example.yml'];
 const TEXT_EXT = /\.(md|json|toml|js|ts|yml|yaml|ps1|txt)$/i;
-const SKIP = /(^|[\\/])(node_modules|_draft|\.git)([\\/]|$)/;
+// Bỏ qua node_modules, TRỪ scripts/node_modules (thư viện của md_to_xlsx, cần để bản cài chạy được offline).
+const SKIP = (rel) => /(^|[\\/])(_draft|\.git)([\\/]|$)/.test(rel)
+  || (/(^|[\\/])node_modules([\\/]|$)/.test(rel) && !/^scripts[\\/]node_modules([\\/]|$)/.test(rel));
 
 function buildSnapshot() {
   log(`• Tạo snapshot ${SNAPSHOT}`);
@@ -215,11 +217,14 @@ function buildSnapshot() {
   for (const f of SNAP_FILES) if (fs.existsSync(path.join(KIT_SRC, f))) fs.copyFileSync(path.join(KIT_SRC, f), path.join(SNAPSHOT, f));
   for (const d of SNAP_DIRS) {
     const src = path.join(KIT_SRC, d);
-    if (fs.existsSync(src)) fs.cpSync(src, path.join(SNAPSHOT, d), { recursive: true, filter: (s) => !SKIP.test(path.relative(KIT_SRC, s)) });
+    if (fs.existsSync(src)) fs.cpSync(src, path.join(SNAPSHOT, d), { recursive: true, filter: (s) => !SKIP(path.relative(KIT_SRC, s)) });
+  }
+  if (!fs.existsSync(path.join(KIT_SRC, 'scripts', 'node_modules'))) {
+    warn('Chưa có scripts/node_modules: md_to_xlsx sẽ không chạy. Chạy "cd scripts; npm install" trong repo kit rồi cài lại.');
   }
   genRouting(path.join(SNAPSHOT, 'AGENTS.md'), SNAPSHOT);
   for (const f of walk(SNAPSHOT)) {
-    if (!TEXT_EXT.test(f)) continue;
+    if (!TEXT_EXT.test(f) || /[\\/]node_modules[\\/]/.test(f)) continue;
     const t = fs.readFileSync(f, 'utf8');
     if (t.includes('{{KIT}}')) fs.writeFileSync(f, t.split('{{KIT}}').join(SNAP_FWD), 'utf8');
   }
