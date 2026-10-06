@@ -1,0 +1,9 @@
+# Thống nhất ký tự xuống dòng: repo làm trên Windows, script chạy bằng Node, CI chạy trên Linux.
+* text=auto eol=lf
+# PowerShell 5.1 trên Windows chạy ổn nhất với CRLF.
+*.ps1 text eol=crlf
+# File nhị phân: git không đụng vào.
+*.xlsx binary
+*.png binary
+*.jpg binary
+*.zip binary

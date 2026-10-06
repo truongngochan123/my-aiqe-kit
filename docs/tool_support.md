@@ -26,7 +26,7 @@
 - Codex tìm skill ở: `$CWD/.agents/skills`, các thư mục cha tới gốc repo, `$REPO_ROOT/.agents/skills`, `$HOME/.agents/skills`, `/etc/codex/skills`, và skill có sẵn. Skill được gọi tường minh (`$` trong Codex CLI) hoặc tự kích hoạt khi prompt khớp `description`. Nguồn: https://learn.chatgpt.com/docs/build-skills
 - Codex: *"Custom prompts are deprecated. Use skills for reusable instructions that Codex can invoke explicitly or implicitly."* Trước đây lưu ở `~/.codex/prompts/`. Nguồn: https://learn.chatgpt.com/docs/custom-prompts.md
 - Claude: skill cá nhân ở `~/.claude/skills/<skill-name>/SKILL.md`; file trong `.claude/commands/` vẫn chạy như skill; gọi tay bằng `/skill-name`. Nguồn: https://code.claude.com/docs/en/skills
-- **Hệ quả cho kit:** bỏ 15 file `adapters/codex/prompts/`. Trên Codex gọi `$bug-reporting`. Lệnh tắt của Claude giữ lại vì ngắn hơn tên skill (`/bug` thay vì `/bug-reporting`).
+- **Hệ quả cho kit:** bỏ 15 file `adapters/codex/prompts/`. Trên Codex gọi `$bug-reporting`. Lệnh tắt của Claude cũng bỏ (quyết định #25): cả hai tool gọi skill bằng tên đầy đủ.
 
 ### 3. AGENTS.md
 - Thứ tự Codex đọc: `AGENTS.override.md` toàn cục → `~/.codex/AGENTS.md` → các file trong repo từ gốc tới thư mục hiện tại. Dừng khi tổng kích thước đạt `project_doc_max_bytes` (32 KiB mặc định). Không nhắc tới `@import`. Nguồn: https://learn.chatgpt.com/docs/agent-configuration/agents-md

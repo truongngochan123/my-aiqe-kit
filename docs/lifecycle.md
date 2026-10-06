@@ -9,7 +9,7 @@
                          ▲                                                    │
                          └──────────── requirement đổi: test-design-rbt (maintain) ◀───┘
 
- Mọi giai đoạn: ai-output-review (soát output của AI) · qe-coach (chỉ khi học, /coach)
+ Mọi giai đoạn: ai-output-review (soát output của AI) · qe-coach (chỉ khi học)
  Agent tự chạy test: agent-architecture
 ```
 
@@ -31,4 +31,4 @@
 | Report | `jira-xray` | 3 | File kết quả | Payload + dry-run | → người push (G4) |
 | Mọi lúc | `ai-output-review` | 1 | Output của AI | Decision log | — |
 | Agent | `agent-architecture` | 3 | Yêu cầu agent | Thiết kế, state machine | → agent 0.2.0 |
-| Học | `qe-coach` | 3 | `/coach` | Câu hỏi gợi mở | — |
+| Học | `qe-coach` | 3 | User gọi `$qe-coach` / `/qe-coach` | Câu hỏi gợi mở | — |

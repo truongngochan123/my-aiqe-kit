@@ -31,19 +31,23 @@ cd D:\fpt-inform\my-aiqe-kit
 .\scripts\install\install.ps1 -Uninstall  # gỡ, giữ backup
 ```
 
+> **Lưu ý khi gỡ:** `~/.claude/settings.json` và `~/.codex/hooks.json` được ghi lại bằng định dạng JSON chuẩn (thụt lề 2 dấu cách, xuống dòng LF). **Nội dung giữ nguyên**, nhưng cách trình bày có thể khác bản bạn tự viết. Bản gốc luôn có trong `~/.aiqe/backup/`.
+
 Cài vào đâu:
 | Tool | Vị trí |
 |---|---|
 | Bản kit dùng thật | `~/.aiqe/kit/<version>/` (snapshot; sửa repo kit không ảnh hưởng cho tới khi cài lại) |
 | Codex | `~/.codex/AGENTS.md` (chèn khối), `~/.codex/config.toml` (ghép), `~/.codex/hooks.json` (ghép), `~/.agents/skills/` |
-| Claude Code | `~/.claude/CLAUDE.md` (chèn khối), `~/.claude/settings.json` (ghép), `~/.claude/skills/`, `~/.claude/commands/` |
+| Claude Code | `~/.claude/CLAUDE.md` (chèn khối), `~/.claude/settings.json` (ghép), `~/.claude/skills/` |
 
 Script **không ghi đè** file có sẵn của bạn: chỉ chèn/ghép phần của kit, backup trước vào `~/.aiqe/backup/`. Gặp trùng khóa cấu hình thì dừng và báo.
 
 ## Dùng
 
 - **Codex:** nói việc cần làm ("viết bug report cho lỗi login"), Codex tự chọn skill. Gọi thẳng skill: `$bug-reporting`.
-- **Claude Code:** tương tự; gọi thẳng bằng `/bug-reporting` hoặc lệnh tắt `/bug`.
+- **Claude Code:** tương tự; gọi thẳng skill bằng `/bug-reporting`.
+- Chọn mode bằng cách ghi thẳng vào câu, ví dụ: `/bug-reporting retest BUG-CUS-012`.
+- Che dữ liệu nhạy cảm, dựng khung dự án: nói bằng lời ("redact file X", "dựng scaffold Playwright").
 - Output ghi vào `~/aiqe-output/<project>/`, **không** vào repo của khách.
 
 ## Mức hỗ trợ

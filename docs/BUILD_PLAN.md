@@ -9,7 +9,7 @@
 
 | Đợt | Trạng thái | Ngày |
 |---|---|---|
-| 0: Nền móng | ✅ Xong, chờ duyệt | 06/10 |
+| 0: Nền móng | ✅ Đã duyệt | 06/10 |
 | 1: Manual | ⏳ Chưa | 07/10 |
 | 2: Automation + CI | ⏳ Chưa | 08/10 |
 | 3: Lead, tích hợp, đa stack | ⏳ Chưa | 09/10 |
@@ -34,28 +34,32 @@
 | 11 | Thiếu `project.aiqe.yml` → chạy ở mức chặt nhất |
 | 12 | `ai_policy` = `UNKNOWN`: chỉ dùng với `practices/` và dự án cá nhân cho tới khi lead xác nhận |
 | 13 | `practices/testcases/` là **AI sinh** (`antigravity-testing-kit-main/practices/testcases/crm/test_cases_crm_login.md:8` và `test_cases_customers.md:8` ghi "AI-RBT — FULL 6 bước"), gắn `PROVIDED`, không dùng làm golden |
-| 14 | Golden: **Claude viết nháp** (`DRAFT-BY-AI`), người dùng duyệt (`REVIEWED-BY`). Ghi rõ golden này yếu hơn golden do người viết |
+| 14 | Golden: **Claude viết đề bài**, **Codex viết đáp án** (khác model với bên dựng skill), Han duyệt. Ghi `DRAFT-BY: Codex` → `REVIEWED-BY: Han`. Golden do AI viết vẫn yếu hơn golden do người viết; ghi rõ trong `evals/README.md` |
 | 15 | Có nhãn `MANUAL-RUN` (build/version, env, người chạy, thời điểm; `failed` bắt buộc evidence) |
 | 16 | Eval khoảng 55 prompt × 3 lần; cách ly golden bằng thư mục tạm |
 | 17 | Bản cài là snapshot theo version `~/.aiqe/kit/<version>/` |
-| 18 | **Claude làm toàn bộ tới 10/10.** Codex chỉ dùng sau 10/10 (eval trên Codex, làm tiếp, bảo trì) |
+| 18 | **Claude dựng toàn bộ kit tới 10/10. Codex dùng trước 10/10 chỉ để test routing và viết golden.** Codex không dựng file nào của kit trước 10/10. Sau 10/10 Codex tiếp quản (eval, làm tiếp, bảo trì) |
 | 19 | Agent 0.2.0 dùng **planner giả lập** (chưa có API key); có chỗ cắm LLM thật |
 | 20 | Demo agent trên **app giả chạy local** (khớp `OBS-PACKET-01`), không dùng site công khai |
 | 21 🆕 | **Bỏ 15 file `adapters/codex/prompts/`**: Codex đã deprecated custom prompts; gọi skill bằng `$tên-skill` (`docs/tool_support.md` câu 2) |
 | 22 🆕 | **Hook dùng chung** cho Claude và Codex ở `adapters/hooks/`; Codex có hook `PreToolUse` nhưng mặc định tắt → `config.toml` bật `[features] hooks = true` |
 | 23 🆕 | Codex đọc skill ở `~/.agents/skills/` (không phải `~/.codex/skills/`) |
 | 24 🆕 | Logic cài đặt viết bằng Node (`install.js`); `install.ps1` chỉ là lớp vỏ |
+| 25 🆕 | **Bỏ cả 15 lệnh tắt của Claude.** Gọi skill bằng tên đầy đủ: `/tên-skill` (Claude), `$tên-skill` (Codex). Tham số mode ghi thẳng vào câu: `/bug-reporting retest BUG-CUS-012`. Sanitize và scaffold: nói bằng lời, `AGENTS.md` mục "Việc không có skill riêng" hướng dẫn |
+| 26 🆕 | `.gitattributes`: văn bản dùng LF, `.ps1` dùng CRLF, Excel/ảnh/zip là binary |
+| 27 🆕 | Test database: `test-design-rbt/references/sql_oracle.md` (oracle đọc lại dữ liệu bằng SQL, **chỉ SELECT**, chỉ trên env sandbox) ở Đợt 1 |
+| 28 🆕 | Đợt 1 làm theo thứ tự **pilot**: 3 skill mẫu → dừng → Han cài kit thật cho Codex và test 9 prompt → ổn mới làm 5 skill còn lại |
 
 ## 1. Lịch
 
-| Ngày | Claude | Người dùng |
-|---|---|---|
-| 1 · 06/10 | `BUILD_PLAN.md` + Đợt 0 | Duyệt Đợt 0 theo `docs/review_checklist_dot0.md` |
-| 2 · 07/10 | 3 skill mẫu → hết Đợt 1 + nháp golden | Thử 9 prompt (3 skill mẫu × 3) trước 13h; duyệt Đợt 1 và golden |
-| 3 · 08/10 | Đợt 2 + `docs/agent_design.md` + lõi agent | Eval Đợt 1 (bằng `claude -p`) |
-| 4 · 09/10 | Đợt 3 (cả phần beta Selenium/Appium, Gemini) + tool, planner, kịch bản, test của agent | Eval Đợt 2; duyệt Đợt 3 |
-| 5 · 10/10 | Sáng: test agent + demo 5 kịch bản. Chiều: sửa theo eval, chốt 0.1.0 và 0.2.0 | Routing eval; chạy demo; duyệt cuối |
-| Sau 10/10 | — (Codex tiếp quản) | Eval trên Codex; lỗi còn tồn ghi ở mục 9 |
+| Ngày | Claude | Codex (Han giao việc) | Han |
+|---|---|---|---|
+| 1 · 06/10 | `BUILD_PLAN.md` + Đợt 0 ✅ | — | Duyệt Đợt 0 ✅ |
+| 2 · 07/10 | **Bước 1:** 3 skill mẫu → **dừng**. **Bước 3:** 5 skill còn lại + script, template, prompt, eval. **Bước 4:** đề bài golden | Test routing 9 prompt (Bước 2); viết đáp án golden | Cài kit thật cho Codex; báo kết quả 9 prompt; duyệt Đợt 1 và golden |
+| 3 · 08/10 | Đợt 2 + `docs/agent_design.md` + lõi agent | Eval routing Đợt 1 | Duyệt Đợt 2 |
+| 4 · 09/10 | Đợt 3 (cả beta Selenium/Appium, Gemini) + tool, planner, kịch bản, test của agent | Eval Đợt 2 | Duyệt Đợt 3 |
+| 5 · 10/10 | Sáng: test agent + demo 5 kịch bản. Chiều: sửa theo eval, chốt 0.1.0 và 0.2.0 | Routing eval toàn bộ | Chạy demo; duyệt cuối |
+| Sau 10/10 | — | Tiếp quản: làm tiếp, bảo trì | Lỗi còn tồn ghi ở mục 9 |
 
 **Duyệt mỗi đợt** = chạy lệnh trong checklist + soát kỹ 3 file, không đọc lướt toàn bộ.
 
@@ -87,13 +91,14 @@
 
 ---
 
-## 4. Cấu trúc repo (đầy đủ, 182 file kit)
+## 4. Cấu trúc repo (đầy đủ, 170 file kit)
 
 Ký hiệu: `[Đ0]`…`[Đ3]` = đợt; ✅ = đã có.
 
 ```
 my-aiqe-kit/
 ├── AGENTS.md  CLAUDE.md  README.md  VERSION  CHANGELOG.md  .gitignore   [Đ0] ✅
+├── .gitattributes                                                       [Đ0] ✅
 ├── project.aiqe.example.yml                                             [Đ0] ✅
 ├── docs/
 │   ├── BUILD_PLAN.md  SKILL_SPEC.md  threat_model.md  tool_support.md   [Đ0] ✅
@@ -106,7 +111,7 @@ my-aiqe-kit/
 │                id_conventions  automation_standards  reporting_and_data  bug_report   [Đ0] ✅
 ├── skills/
 │   ├── bug-reporting/SKILL.md                                           [Đ1] ⭐
-│   ├── test-design-rbt/SKILL.md + references/{field_validation_15, advanced_scenarios, mobile_scenarios}.md  [Đ1] ⭐
+│   ├── test-design-rbt/SKILL.md + references/{field_validation_15, advanced_scenarios, mobile_scenarios, sql_oracle}.md  [Đ1] ⭐
 │   ├── incident-triage/SKILL.md + references/flaky_catalog.md           [Đ1] ⭐
 │   ├── requirement-analysis/SKILL.md + references/reverse_spec_format.md  [Đ1]
 │   ├── test-data/SKILL.md + references/data_registry_format.md          [Đ1]
@@ -146,7 +151,6 @@ my-aiqe-kit/
 │   ├── hooks/{lib.js, block-secret-read.js, block-assertion-edit.js}    [Đ0] ✅ (dùng chung)
 │   ├── codex/{config.toml, hooks.json}                                  [Đ0] ✅
 │   ├── claude/settings.json                                             [Đ0] ✅
-│   ├── claude/commands/ (15 lệnh: 9 ở Đ1, 3 ở Đ2, 3 ở Đ3)
 │   ├── claude/agents/qe-reviewer.md                                     [Đ3]
 │   └── gemini/{GEMINI.md, settings.json}                                [Đ3]
 ├── ci/{CODEOWNERS.example, github/aiqe-check.yml, gitlab/aiqe-check.gitlab-ci.yml}  [Đ2]
@@ -154,7 +158,8 @@ my-aiqe-kit/
 │   ├── hooks/test-hooks.md                                              [Đ0] ✅
 │   ├── README.md                                                        [Đ1]
 │   ├── <16 skill>/cases.md  (8 ở Đ1, 2 ở Đ2, 6 ở Đ3)
-│   ├── golden/bug-reporting.md                                          [Đ1]
+│   ├── golden/bug-reporting.task.md  (đề bài, Claude viết)              [Đ1]
+│   ├── golden/bug-reporting.md       (đáp án, Codex viết, Han duyệt)    [Đ1]
 │   ├── golden/{selenium-java, appium-java}.md                           [Đ3]
 │   └── routing.md                                                       [Đ3]
 └── agent/  (30 file, xem mục 6)                                         [Agent]
@@ -165,7 +170,7 @@ my-aiqe-kit/
 ~/.aiqe/        installed.json · kit/<version>/ (bản dùng thật) · backup/<thời điểm>/
 ~/.codex/       AGENTS.md (khối của kit) · config.toml (khối top + tables) · hooks.json (ghép)
 ~/.agents/      skills/<16>/ (bản chép, có .aiqe-version)
-~/.claude/      CLAUDE.md (khối @import) · settings.json (ghép) · skills/<16>/ · commands/<15> · agents/
+~/.claude/      CLAUDE.md (khối @import) · settings.json (ghép) · skills/<16>/ · agents/
 ~/aiqe-output/<project>/  project.aiqe.yml · requirements/ analysis/ testcases/ data/ exploratory/
                           bugs/ runs/<RUN-ID>/ decisions/ external/ · traceability_index.md
 ```
@@ -174,7 +179,7 @@ my-aiqe-kit/
 
 ## 5. File theo đợt: chức năng và nghiệm thu
 
-### ĐỢT 0 ✅ (35 file)
+### ĐỢT 0 ✅ (36 file, gồm `.gitattributes` thêm sau khi duyệt)
 
 | File | Chức năng | Trạng thái |
 |---|---|---|
@@ -192,7 +197,13 @@ my-aiqe-kit/
 
 **Khác plan v4.2:** +3 file (`adapters/codex/hooks.json`, `adapters/hooks/lib.js`, `scripts/install/install.js`). Lý do ở quyết định #22, #24.
 
-### ĐỢT 1: Manual (58 file: 49 + 9 lệnh tắt Claude)
+### ĐỢT 1: Manual (51 file)
+
+**Thứ tự (pilot):**
+1. **Bước 1:** 3 skill mẫu `bug-reporting`, `test-design-rbt` (kèm references, có `sql_oracle.md`), `incident-triage` (kèm `flaky_catalog.md`). Chạy `check-skills` + `grep-clean`.
+2. **Bước 2 — DỪNG:** Han chạy `install.ps1 -Tool codex -DryRun` rồi cài thật; test 9 prompt trên Codex; báo kết quả. Skill gọi sai thì sửa description trước.
+3. **Bước 3:** 5 skill còn lại + script, template, prompt, eval.
+4. **Bước 4:** đề bài golden `bug-reporting` (có bẫy). Han đưa đề cho Codex viết đáp án.
 
 | File | Chức năng | Phải có / Nghiệm thu |
 |---|---|---|
@@ -201,6 +212,7 @@ my-aiqe-kit/
 | `…/references/field_validation_15.md` | Checklist validation 15 loại field | Lấy từ `rbt_manual_testing` (đã làm sạch); XSS/SQLi gắn `@Security`, cần G1 |
 | `…/references/advanced_scenarios.md` | Race condition, session, l10n | — |
 | `…/references/mobile_scenarios.md` | Cuộc gọi đến, mất mạng, background, xoay màn hình, quyền | — |
+| `…/references/sql_oracle.md` 🆕 | Oracle đọc lại dữ liệu bằng SQL | **Chỉ SELECT**, chỉ trên env thuộc `sandbox_urls`, tài khoản DB chỉ đọc; không có thì ghi `UNKNOWN` |
 | `skills/incident-triage/SKILL.md` ⭐ | Mẫu nặng về gate: phân loại test fail (manual + auto) | Retry matrix, `OUTCOME_UNKNOWN`, G2; output chỉ skill tiếp theo |
 | `…/references/flaky_catalog.md` | Nguyên nhân flaky + cách phân biệt | Lấy từ `flaky_test_analyzer`, bỏ phần tự fix |
 | `prompts/manual/01…06.md` | 6 bước FULL RBT dán vào AI bất kỳ | Cảnh báo đầu file: chỉ dùng khi `ai_policy` cho phép và đã redact; soát từ `plans/manual/` |
@@ -216,14 +228,14 @@ my-aiqe-kit/
 | `skills/ai-output-review/SKILL.md` | Soát output AI theo claim | Sửa dòng 24 như mục 3 |
 | `skills/evidence-reporting/SKILL.md` | Báo cáo 1 lần chạy; mode `manual-run` | Nhãn LOCAL/CI/MANUAL/RUN; `Enforcement` |
 | `evals/<8 skill>/cases.md` | 3 case dương, 2 case âm, checklist | Chấm bằng `produced_by` + mục bắt buộc |
-| `evals/README.md`, `scripts/evals/prepare-isolated.ps1`, `grade.js` | Cách chạy eval (`claude -p` trước 10/10, `codex exec` sau), cách ly golden, chấm điểm | — |
-| `evals/golden/bug-reporting.md` | Đáp án (Claude nháp, người duyệt) | `DRAFT-BY-AI` → `REVIEWED-BY` |
-| `adapters/claude/commands/` (9) | `/analyze-req /gen-testcases /gen-data /explore /bug /review-ai /triage /report /sanitize` | Mỗi file < 10 dòng, có chữ `my-aiqe-kit` (install dùng để nhận diện) |
+| `evals/README.md`, `scripts/evals/prepare-isolated.ps1`, `grade.js` | Cách chạy eval (`codex exec`, `claude -p`), cách ly golden, chấm điểm | — |
+| `evals/golden/bug-reporting.task.md` 🆕 | **Đề bài** golden (Claude viết), có bẫy: thiếu evidence; requirement không rõ → đáp án đúng là không tạo bug mà đặt câu hỏi | Không chứa đáp án |
+| `evals/golden/bug-reporting.md` | **Đáp án** (Codex viết, Han duyệt) | `DRAFT-BY: Codex` → `REVIEWED-BY: Han` |
 | `docs/review_checklist_dot1.md` | Checklist duyệt | — |
 
-**Nghiệm thu:** `check-skills` + `grep-clean` sạch; routing smoke 3 prompt/skill đúng 100%; golden đạt checklist; người dùng duyệt.
+**Nghiệm thu:** `check-skills` + `grep-clean` sạch; 9 prompt pilot trên Codex đúng skill; routing smoke 3 prompt/skill đúng 100%; chạy thử `md_to_xlsx`/`redact`/`to-external` với file mẫu; golden đạt checklist; Han duyệt.
 
-### ĐỢT 2: Automation + CI (37 file: 34 + 3 lệnh tắt)
+### ĐỢT 2: Automation + CI (34 file)
 
 | File | Chức năng | Phải có / Nghiệm thu |
 |---|---|---|
@@ -237,12 +249,11 @@ my-aiqe-kit/
 | `prompts/automation/01…06.md` | Prompt automation cho mọi AI | Soát `plans/automation/`, grep sạch |
 | `evals/ui-automation/cases.md` | Case Playwright, case "2 stack → hỏi", case âm | Case Java thêm ở Đợt 3 |
 | `evals/api-testing/cases.md` | Mode code, mode Postman, không có Swagger, case âm | — |
-| `adapters/claude/commands/` (3) | `/automate /api-test /scaffold` | — |
 | `docs/review_checklist_dot2.md` | Checklist duyệt | — |
 
 **Nghiệm thu:** scaffold chạy `npx playwright test --list`; YAML CI hợp lệ; `plans/automation` đã soát; eval Đợt 2 đạt.
 
-### ĐỢT 3: Lead, tích hợp, đa stack (52 file: 49 + 3 lệnh tắt)
+### ĐỢT 3: Lead, tích hợp, đa stack (49 file)
 
 | File | Chức năng | Phải có / Nghiệm thu |
 |---|---|---|
@@ -257,10 +268,9 @@ my-aiqe-kit/
 | `adapters/gemini/GEMINI.md`, `settings.json` | Adapter Gemini (`context.fileName = AGENTS.md`) | Thêm `-Tool gemini` vào install.js |
 | `templates/` (6) | test_plan, test_summary_report, regression_selection, run_contract, tool_manifest, state_machine | — |
 | `evals/<6 skill>/cases.md`, `golden/selenium-java.md`, `appium-java.md`, `routing.md` | Eval Đợt 3 | Routing ≥ 90%, mỗi prompt 3 lần |
-| `adapters/claude/commands/` (3) | `/plan /regression /coach` | — |
 | `docs/review_checklist_dot3.md` | Checklist duyệt | — |
 
-**Nghiệm thu:** đã đọc toàn bộ script Jira; routing ≥ 90% (Claude trước 10/10, Codex sau); người dùng duyệt.
+**Nghiệm thu:** đã đọc toàn bộ script Jira; routing ≥ 90% trên Codex; Han duyệt.
 
 ---
 
@@ -301,9 +311,10 @@ agent/
 | JSON/TOML/YAML hợp lệ, `grep-clean`, `check-skills`, self-test hook, cài/gỡ thử | Claude (tới 10/10) |
 | Tra tài liệu tool → `tool_support.md` | Claude; tra lại khi tool cập nhật |
 | Chạy script với file mẫu, `npm test` của agent, `npx playwright test --list` | Claude |
-| Eval routing + cases: bằng `claude -p` trước 10/10 | Người dùng chạy, Claude chuẩn bị |
-| **Eval trên Codex** | Người dùng, sau 10/10 |
-| Duyệt golden, duyệt từng đợt | Người dùng |
+| **Test routing pilot và eval trên Codex** (cả trước 10/10) | Han chạy, Claude chuẩn bị prompt và cách chấm |
+| **Đáp án golden** | Codex viết, Han duyệt |
+| Cài kit vào máy thật | Han chạy `install.ps1` |
+| Duyệt từng đợt | Han |
 | Hỏi lead về `ai_policy`; đề xuất CI/CODEOWNERS (`proposal_for_lead.md`) | Người dùng |
 
 ## 8. Để sau
@@ -313,6 +324,7 @@ agent/
 | Security chuyên sâu | Cần văn bản cho phép và scope pháp lý | Giấy phép, env cô lập, người chuyên security |
 | Accessibility đầy đủ | Phần lớn cần người kiểm tra bằng tay | Chuẩn WCAG mục tiêu, thiết bị, người có kinh nghiệm |
 | UAT | Do người dùng nghiệp vụ thực hiện | Mẫu UAT của khách, tiêu chí chấp nhận |
+| **ai-product-testing** (test sản phẩm có AI: hallucination, prompt injection, RAG, eval model) | Phương pháp khác hẳn test phần mềm thường: oracle là thống kê, cần bộ dữ liệu eval và ngưỡng chấp nhận | Sản phẩm AI thật cần test, bộ câu hỏi/đáp án tham chiếu, ngưỡng do PO đặt, công cụ eval |
 
 ## 9. Câu hỏi mở và lỗi còn tồn
 
@@ -322,21 +334,28 @@ agent/
 | Q2 | `adapters/codex/hooks.json` | Định dạng `tool_input` của `Edit`/`Write` trong Codex | Cho hook ghi stdin ra file khi chạy Codex thật |
 | Q3 | `adapters/codex/config.toml` | Codex trên Windows có cần `npx.cmd` cho MCP không | Chạy MCP Playwright trong Codex |
 | Q4 | Toàn kit | Extension VS Code của Codex có dùng chung `~/.codex/config.toml` và hook không (nguồn hiện là bên thứ ba) | Hỏi Codex đọc `.env`, xem hook chặn không |
-| Q5 | `adapters/claude/commands/` | Claude gọi được skill bằng `/tên-skill`; 15 lệnh tắt chỉ còn tác dụng rút ngắn tên. Có giữ cả 15 không? | Người dùng quyết định ở Đợt 1 |
+| ~~Q5~~ | ~~Lệnh tắt Claude~~ | Đã chốt: bỏ cả 15 (quyết định #25) | — |
 | Q6 | `test-strategy` | Ước lượng theo phương pháp nào; metric nào được ghi `UNKNOWN` | Đợt 3 |
 | Q7 | `regression-selection` | Ai lập coverage map lần đầu | Đợt 3 |
 | Q8 | `jira-xray` | Công ty dùng TestRail hoặc Excel thì sao | Đợt 3 |
 
 ## 10. Bảng đếm file
 
-| Phần | Không tính lệnh tắt | Lệnh tắt Claude | Tổng |
-|---|---|---|---|
-| Đợt 0 | 35 | 0 | 35 |
-| Đợt 1 | 49 | 9 | 58 |
-| Đợt 2 | 34 | 3 | 37 |
-| Đợt 3 | 49 | 3 | 52 |
-| **Kit 0.1.0** | **167** | **15** | **182** |
-| Agent 0.2.0 | 31 (30 trong `agent/` + `docs/agent_design.md`) | — | 31 |
-| **Tổng** | | | **213** |
+| Phần | Số file |
+|---|---|
+| Đợt 0 | 36 |
+| Đợt 1 | 51 |
+| Đợt 2 | 34 |
+| Đợt 3 | 49 |
+| **Kit 0.1.0** | **170** |
+| Agent 0.2.0 (30 trong `agent/` + `docs/agent_design.md`) | 31 |
+| **Tổng** | **201** |
 
-So với plan v4.2 (194 kit): −15 (bỏ lệnh tắt Codex) +3 (Đợt 0: `codex/hooks.json`, `hooks/lib.js`, `install.js`) = 182.
+Thay đổi so với plan v4.2 (194 file kit):
+- −15: bỏ lệnh tắt Codex (quyết định #21)
+- +3: Đợt 0 thêm `codex/hooks.json`, `hooks/lib.js`, `install.js` (#22, #24)
+- −15: bỏ lệnh tắt Claude (#25)
+- +1: `.gitattributes` (#26)
+- +1: `test-design-rbt/references/sql_oracle.md` (#27)
+- +1: `evals/golden/bug-reporting.task.md` (tách đề bài khỏi đáp án)
+- = **170**

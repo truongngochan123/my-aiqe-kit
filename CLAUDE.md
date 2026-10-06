@@ -9,6 +9,6 @@ Luật chung nằm trong `AGENTS.md`. Khi cài, `scripts/install/install.js` ch�
 File này **không chép lại luật**. Chỉ ghi phần riêng của Claude:
 
 - Skill nằm ở `~/.claude/skills/<tên>/` (bản chép từ kit, có file `.aiqe-version`). Không sửa trực tiếp ở đó; sửa trong repo kit rồi cài lại.
-- Lệnh tắt nằm ở `~/.claude/commands/` (ví dụ `/bug`, `/gen-testcases`).
+- Gọi skill bằng tên đầy đủ: `/bug-reporting`, `/test-design-rbt`. Kit không có lệnh tắt riêng.
 - Hook dùng chung với Codex: `{{KIT}}/adapters/hooks/`. Hook chỉ là lớp **chống sai sót**.
 - Trên **Windows native**, Claude Code **không có sandbox** cho lệnh shell (chỉ có trên macOS, Linux, WSL2). Xem `docs/threat_model.md`.

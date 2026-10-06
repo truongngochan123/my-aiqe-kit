@@ -7,6 +7,8 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 
 ### Thêm
 - Đợt 0 (06/10/2026): nền móng — `AGENTS.md`, `CLAUDE.md`, 8 rules, docs (BUILD_PLAN, SKILL_SPEC, threat model, tool support, checklist), adapter cho Codex và Claude, 2 hook dùng chung, script cài/gỡ/kiểm tra.
+- `.gitattributes`: LF cho file văn bản, CRLF cho `.ps1`, binary cho Excel/ảnh/zip.
+- `docs/BUILD_PLAN.md`: quyết định #14 (Codex viết đáp án golden), #18 (Codex dùng trước 10/10 chỉ để test routing và viết golden), #25–#28; thêm `sql_oracle.md`; thêm ai-product-testing vào "Để sau".
 
 ### Sửa (phát hiện khi kiểm tra Đợt 0)
 - Hook: input có BOM (PowerShell 5.1 thêm khi pipe) làm hook không đọc được JSON và cho qua → bỏ BOM trước khi đọc.
@@ -16,4 +18,5 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 - settings.json (Claude): đổi pattern sang `//**/.env` (áp dụng mọi ổ đĩa trên Windows), thêm luật `PowerShell(...)`.
 
 ### Bỏ
+- 15 lệnh tắt của Claude (`adapters/claude/commands/`): gọi skill bằng tên đầy đủ trên cả hai tool, đỡ bảo trì và đỡ trùng trong danh sách skill.
 - 15 file `adapters/codex/prompts/` có trong plan v4.1: Codex đã đánh dấu custom prompts là deprecated, dùng skill thay thế (xem `docs/tool_support.md`).
