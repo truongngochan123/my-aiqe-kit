@@ -1,0 +1,66 @@
+# project.aiqe.yml — khai báo cho MỘT dự án.
+#
+# Cách dùng: chép file này thành
+#   ~/aiqe-output/<tên thư mục repo>/project.aiqe.yml   (mặc định, ngoài repo khách)
+#   hoặc <repo>/.aiqe/project.aiqe.yml                  (chỉ khi dự án cho phép)
+#
+# NGƯỜI viết file này, AI không sửa.
+# Đây là KHAI BÁO, không phải cơ chế bảo vệ: AI đọc nó để biết luật,
+# nhưng file không chặn được việc AI làm sai (xem docs/threat_model.md).
+#
+# Thiếu file này, hoặc thiếu một field → kit dùng giá trị mặc định CHẶT NHẤT ghi bên cạnh.
+
+project_name: "demo-crm"            # tên ngắn, dùng trong đường dẫn output
+
+# ---------- Chính sách AI (trả lời theo docs/before_you_use.md) ----------
+ai_policy: UNKNOWN                  # allowed | not_allowed | UNKNOWN. Mặc định: UNKNOWN
+                                    # UNKNOWN/not_allowed: không đưa code/data thật của khách vào AI
+allowed_ai_tools: []                # ví dụ [codex, claude]. Mặc định: [] (chưa xác nhận tool nào)
+cross_model_review: false           # cho AI khác review chéo? Chỉ true khi allowed_ai_tools có ≥ 2 tool
+data_classification: confidential   # public | internal | confidential. Mặc định: confidential
+
+# ---------- Môi trường ----------
+sandbox_urls: []                    # env được phép chạy test/ghi data. Mặc định: [] (không env nào)
+                                    # ví dụ ["http://localhost:3000", "https://qa-sandbox.example.com"]
+server_review: UNKNOWN              # yes | no | UNKNOWN: có CI + người thứ hai review PR không?
+                                    # no/UNKNOWN → báo cáo ghi "Enforcement: local-only",
+                                    # kết quả cao nhất là CI-RUN, không có RUN-PASSED
+sms_gateway_disabled: UNKNOWN       # yes | no | UNKNOWN: env test đã tắt gửi SMS/email thật chưa?
+
+# ---------- Output ----------
+output_language: vi                 # vi | en. Mặc định: vi
+output_dir: "~/aiqe-output/demo-crm"  # Mặc định: ~/aiqe-output/<project_name>
+retention_days: 90                  # sau bao lâu xóa output. Mặc định: 90
+
+# ---------- Quy ước ID (regex xem rules/id_conventions.md) ----------
+id_prefix: "QA"                     # prefix cho data test và run ID. Mặc định: QA
+module_codes: [LOGIN, CUS]          # mã module dùng trong AC-/TC-/BUG-, chữ in hoa
+
+# ---------- Bug ----------
+severity_scale: [S1, S2, S3, S4]    # Mặc định
+priority_scale: [P1, P2, P3, P4]    # Mặc định. Priority do AI chỉ ĐỀ XUẤT
+severity_mapping:                   # quy đổi sang thang của tool quản lý bug của dự án
+  S1: Blocker
+  S2: Critical
+  S3: Major
+  S4: Minor
+  # Trivial: không dùng trong thang mặc định
+
+# ---------- Test case xuất Excel ----------
+tc_id_format: "TC-{MODULE}-{NNN}"   # ví dụ TC-LOGIN-001
+excel_columns:                      # thứ tự cột khi chạy md_to_xlsx. Đổi theo template của khách
+  - TC ID
+  - Source
+  - Scenario
+  - Pre-condition
+  - Steps
+  - Expected
+  - Test Data
+  - Priority
+  - Risk
+  - Automatable
+  - Tags
+
+# ---------- Automation ----------
+stack: UNKNOWN                      # playwright-ts | selenium-java | appium-java | UNKNOWN (kit tự nhận diện)
+fixture_dirs: [fixtures, testdata, test-data]   # hook coi sửa ở đây là sửa oracle

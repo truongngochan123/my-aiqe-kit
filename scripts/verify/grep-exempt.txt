@@ -1,0 +1,9 @@
+# File được miễn trừ khỏi grep-clean.js.
+# Mỗi dòng: <đường dẫn tương đối từ gốc kit> | <lý do>
+# Chỉ miễn trừ file CẦN nhắc tới mẫu cấm để mô tả hoặc kiểm tra nó. Mỗi lần thêm dòng phải có lý do.
+# grep-clean.js in ra số chỗ khớp trong từng file miễn trừ để dễ soát lạm dụng.
+
+docs/BUILD_PLAN.md | Liệt kê lỗi trong file nguồn của bộ gốc, phải trích nguyên văn
+scripts/verify/grep-clean.js | Chứa chính các mẫu cần quét
+scripts/verify/grep-exempt.txt | File danh sách miễn trừ
+rules/reporting_and_data.md | Giải thích vì sao cấm @test.com (ví dụ ❌)

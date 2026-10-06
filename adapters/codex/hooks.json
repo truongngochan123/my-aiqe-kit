@@ -1,0 +1,27 @@
+{
+  "description": "my-aiqe-kit: hook chống sai sót (xem docs/threat_model.md). Do scripts/install/install.js ghép vào ~/.codex/hooks.json.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Bash|PowerShell|shell|local_shell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{KIT}}/adapters/hooks/block-secret-read.js\"",
+            "statusMessage": "my-aiqe-kit: kiểm tra secret"
+          }
+        ]
+      },
+      {
+        "matcher": "apply_patch|Edit|Write|MultiEdit|Bash|PowerShell|shell|local_shell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{KIT}}/adapters/hooks/block-assertion-edit.js\"",
+            "statusMessage": "my-aiqe-kit: kiểm tra sửa oracle"
+          }
+        ]
+      }
+    ]
+  }
+}

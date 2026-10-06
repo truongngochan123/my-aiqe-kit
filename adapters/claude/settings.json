@@ -1,0 +1,73 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(//**/.env)",
+      "Read(//**/.env.local)",
+      "Read(//**/.env.development)",
+      "Read(//**/.env.production)",
+      "Read(//**/.env.staging)",
+      "Read(//**/.env.test)",
+      "Read(//**/*.har)",
+      "Read(//**/storageState*.json)",
+      "Read(~/.codex/auth.json)",
+      "Read(~/.claude/.credentials.json)",
+      "Edit(~/.claude/settings.json)",
+      "Edit(~/.claude/settings.local.json)",
+      "Edit(~/.codex/config.toml)",
+      "Edit(~/.codex/hooks.json)",
+      "Edit(~/.aiqe/**)",
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git checkout *)",
+      "Bash(git rebase *)",
+      "Bash(rm -rf *)",
+      "PowerShell(git push *)",
+      "PowerShell(git reset *)",
+      "PowerShell(git checkout *)",
+      "PowerShell(git rebase *)",
+      "PowerShell(Remove-Item -Recurse *)"
+    ],
+    "ask": [
+      "Bash(npx playwright test *)",
+      "Bash(npm test *)",
+      "Bash(npm run test *)",
+      "Bash(npx newman *)",
+      "Bash(newman run *)",
+      "Bash(mvn test *)",
+      "Bash(curl -X POST *)",
+      "Bash(curl -X PUT *)",
+      "Bash(curl -X PATCH *)",
+      "Bash(curl -X DELETE *)",
+      "PowerShell(npx playwright test *)",
+      "PowerShell(npm test *)",
+      "PowerShell(npm run test *)",
+      "PowerShell(npx newman *)",
+      "PowerShell(mvn test *)",
+      "PowerShell(Invoke-RestMethod *)",
+      "PowerShell(Invoke-WebRequest *)",
+      "mcp__playwright__browser_evaluate"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{KIT}}/adapters/hooks/block-secret-read.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|MultiEdit|Write|Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"{{KIT}}/adapters/hooks/block-assertion-edit.js\""
+          }
+        ]
+      }
+    ]
+  }
+}

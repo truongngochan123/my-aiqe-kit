@@ -1,0 +1,41 @@
+# Cấu hình Codex của my-aiqe-kit.
+# scripts/install/install.js GHÉP 2 khối dưới đây vào ~/.codex/config.toml, không ghi đè file:
+#   - khối "top" đặt ĐẦU file (khóa cấp gốc trong TOML phải đứng trước mọi [bảng])
+#   - khối "tables" đặt CUỐI file
+# Nếu file của bạn đã có cùng khóa hoặc cùng [bảng], script DỪNG và chỉ chỗ trùng để bạn tự gộp.
+# Nguồn từng khóa: docs/tool_support.md (tra ngày 06/10/2026).
+
+# >>> my-aiqe-kit:top
+# Codex được đọc file, sửa file TRONG workspace, chạy lệnh thường; ra ngoài phạm vi thì hỏi.
+sandbox_mode = "workspace-write"
+# Hỏi người dùng trước khi vượt ra ngoài sandbox (gate G1/G2 ở rules/agent_safety.md).
+approval_policy = "on-request"
+# <<< my-aiqe-kit:top
+
+# >>> my-aiqe-kit:tables
+[sandbox_workspace_write]
+# Mặc định TẮT mạng cho lệnh shell. Muốn chạy test lên env sandbox:
+#   cách 1 (đơn giản): đặt true khi cần, đặt lại false khi xong;
+#   cách 2 (allowlist theo domain, cần chạy thử để xác nhận, xem docs/tool_support.md câu 5):
+#     network_access = true
+#     [features.network_proxy]
+#     enabled = true
+#     [features.network_proxy.domains]
+#     "localhost" = "allow"
+#     "qa-sandbox.example.com" = "allow"
+network_access = false
+
+[features]
+# Hook mặc định TẮT trong Codex. Bật để dùng adapters/hooks/ (khai báo ở ~/.codex/hooks.json).
+hooks = true
+
+[mcp_servers.playwright]
+# Playwright MCP để xem DOM thật (skill ui-automation, Đợt 2).
+# Trên Windows, nếu Codex không chạy được "npx", đổi thành "npx.cmd" (chưa kiểm chứng: UNKNOWN).
+command = "npx"
+args = ["-y", "@playwright/mcp@latest"]
+
+[mcp_servers.playwright.tools.browser_evaluate]
+# browser_evaluate chạy JavaScript tùy ý trong trang: luôn hỏi trước.
+approval_mode = "prompt"
+# <<< my-aiqe-kit:tables

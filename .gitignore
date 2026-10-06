@@ -1,0 +1,24 @@
+# .gitignore của REPO KIT (không phải của dự án khách).
+# Với repo dự án, kit dùng .git/info/exclude, không sửa .gitignore của khách.
+
+# Bản nháp, chưa duyệt
+_draft/
+
+# Thư viện
+node_modules/
+
+# Secret và dữ liệu nhạy cảm
+.env*
+!*.example
+*.har
+storageState*.json
+cookies*.json
+
+# Output chạy thử (output thật nằm ở ~/aiqe-output/, ngoài repo)
+output/
+test-results/
+playwright-report/
+
+# Hệ điều hành và editor
+.DS_Store
+Thumbs.db
