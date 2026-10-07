@@ -12,6 +12,8 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 
 - Đợt 1 Bước 1: 3 skill mẫu (`bug-reporting`, `test-design-rbt`, `incident-triage`) + references; 6 prompt FULL RBT; 4 template; script `md_to_xlsx`, `redact`, `to-external`, `lib/config`.
 
+- `scripts/project/new-project.ps1` + `new-project.js`: tạo thư mục dự án mới và `.aiqe/project.aiqe.yml` (điền tên, URL, module, ngôn ngữ; còn lại mặc định chặt nhất; không ghi đè).
+
 ### Sửa (phát hiện khi kiểm tra Đợt 1 Bước 1)
 - `redact.js --check` trên file đã che vẫn báo còn dữ liệu (khớp lại chữ `[REDACTED]`) → bỏ qua chỗ đã che.
 - `install.js` không chép `scripts/node_modules` vào bản cài → `md_to_xlsx` chạy từ bản cài báo thiếu thư viện. Sửa: chép kèm, cảnh báo nếu chưa `npm install`.

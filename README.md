@@ -42,6 +42,34 @@ Cài vào đâu:
 
 Script **không ghi đè** file có sẵn của bạn: chỉ chèn/ghép phần của kit, backup trước vào `~/.aiqe/backup/`. Gặp trùng khóa cấu hình thì dừng và báo.
 
+## Bắt đầu dự án mới
+
+Tạo thư mục dự án kèm file khai báo `.aiqe/project.aiqe.yml`:
+
+```powershell
+cd D:pt-inform\my-aiqe-kit
+.\scripts\project
+ew-project.ps1 -Name <tên> -Url <url env được phép test> [-Modules LOGIN,PIM] [-Lang vi|en] [-Parent <thư mục cha>] [-OutputInProject]
+```
+
+Ví dụ: `.\scripts\project
+ew-project.ps1 -Name aiqe-pilot -Url https://opensource-demo.orangehrmlive.com -Modules LOGIN,PIM -Parent D:pt-inform -OutputInProject`
+
+| Tham số | Ý nghĩa | Không truyền thì |
+|---|---|---|
+| `-Name` | Tên thư mục dự án (chữ, số, `-`, `_`) | Bắt buộc |
+| `-Url` | Env được phép chạy test, ghi vào `sandbox_urls` | Bắt buộc |
+| `-Modules` | Mã module, tự đổi sang chữ in hoa | `[]` |
+| `-Lang` | Ngôn ngữ output | `vi` |
+| `-Parent` | Thư mục cha | Thư mục đang đứng (không được nằm trong repo kit) |
+| `-OutputInProject` | Output ghi vào `<dự án>/output` để Codex không phải hỏi mỗi lần ghi | `~/aiqe-output/<tên>` |
+
+- Mọi field khác giữ **mặc định chặt nhất** (`ai_policy: UNKNOWN`…). Trả lời `docs/before_you_use.md` rồi tự sửa.
+- File đã có thì script **không ghi đè**, chỉ in nội dung hiện tại.
+- Script in toàn bộ nội dung file vừa tạo để bạn đọc lại.
+- PowerShell chặn chạy `.ps1` thì dùng: `node scripts\project
+ew-project.js --name <tên> --url <url> --modules LOGIN,PIM`.
+
 ## Dùng
 
 - **Codex:** nói việc cần làm ("viết bug report cho lỗi login"), Codex tự chọn skill. Gọi thẳng skill: `$bug-reporting`.
