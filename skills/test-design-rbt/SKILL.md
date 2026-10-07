@@ -50,7 +50,8 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
    Quan sát của chính user kể trong prompt gắn `DOM-OBSERVED` (ghi người quan sát, env, ngày), **không** gắn `PROVIDED`.
 8. **Viết TC** theo `{{KIT}}/templates/test_case_table.md`: Source, Steps và Expected đánh số khớp 1-1, Test Data cụ thể (`QA-r001-...`, email `@example.com`), Risk, Priority (đặt theo Risk, `{{KIT}}/rules/test_design.md` mục 2b; chưa biết expected **không** phải lý do đặt P1), Automatable, Auto Type, Tags. **Không dùng ký hiệu tắt tự đặt** (`C0`, `E`, `R`…).
 9. **Traceability** `AC × TC`: mọi AC có ≥ 1 TC hoặc ≥ 1 mục thăm dò; ghi lý do nếu không có.
-10. Chạy Self-check, sửa, rồi mới trả kết quả.
+10. Chạy Self-check, sửa.
+11. **Bắt buộc chạy** `node {{KIT}}/scripts/verify/check-tc.js <file TC vừa ghi>`. Còn lỗi → sửa rồi chạy lại. Báo cho user **nguyên văn dòng cuối** của script (ví dụ `check-tc: 1 file, 0 lỗi → ĐẠT`). **Không báo "xong" khi script chưa ĐẠT**; không chạy được script thì nói rõ lý do, không tự kết luận đạt.
 
 ## Output
 - File `<output_dir>/testcases/TC-<MODULE>.md`, front-matter:
@@ -74,6 +75,7 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - Hệ thống lớn: sinh **từng module**, hỏi user trước khi sang module tiếp.
 
 ## Self-check
+- [ ] Đã chạy `check-tc.js` và báo nguyên văn dòng cuối; kết quả ĐẠT
 - [ ] Đã liệt kê field trước khi viết TC; field `Not specified` nằm trong danh sách câu hỏi, không bị tự đặt quy tắc
 - [ ] TC ID không trùng, đúng `{{KIT}}/rules/id_conventions.md`
 - [ ] Mọi TC có Source (`AC-` hoặc `HYP-`); mọi AC có ≥ 1 TC

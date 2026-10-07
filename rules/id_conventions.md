@@ -13,6 +13,7 @@
 | Bug | `BUG-<MODULE>-<NNN>` | `\bBUG-[A-Z][A-Z0-9]{1,9}-\d{3}\b` | `BUG-CUS-012` |
 | Run | `RUN-<YYYYMMDD>-<NN>` | `\bRUN-\d{8}-\d{2}\b` | `RUN-20261008-01` |
 | Attempt trong run | `<RUN>-a<N>` | `\bRUN-\d{8}-\d{2}-a\d+\b` | `RUN-20261008-01-a2` |
+| Session exploratory | `SES-<MODULE>-<NN>` | `\bSES-[A-Z][A-Z0-9]{1,9}-\d{2,3}\b` | `SES-PIM-01` |
 | Câu hỏi làm rõ | `Q-<MODULE>-<NN>` | `\bQ-[A-Z][A-Z0-9]{1,9}-\d{2,3}\b` | `Q-EMP-04` |
 | Data test | `<id_prefix>-r<NNN>-<tên>` | `\b[A-Z]{2,6}-r\d{3}-[a-z0-9-]+\b` | `QA-r042-emp01` |
 

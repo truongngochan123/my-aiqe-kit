@@ -2,7 +2,7 @@
 'use strict';
 // Chuyển bảng test case trong file Markdown sang Excel (.xlsx).
 //
-// Dùng:  node scripts/convert/md_to_xlsx.js <file.md> [file.xlsx] [--config <project.aiqe.yml>]
+// Dùng:  node scripts/convert/md_to_xlsx.js <file.md> [file.xlsx] [--config <project.aiqe.yml>] [--all-columns]
 //
 // - Tìm mọi bảng có cột "TC ID". Lấy cột theo TÊN tiêu đề (không theo vị trí).
 // - Thứ tự cột trong Excel lấy từ excel_columns của project.aiqe.yml (mặc định: 12 cột của rules/test_design.md).
@@ -50,11 +50,12 @@ function parseTables(markdown) {
     if (!l.startsWith('|') || !/\bTC ID\b/i.test(l)) continue;
     const sep = (lines[i + 1] || '').trim();
     if (!/^\|[\s:|-]+\|$/.test(sep)) continue;
-    const header = splitRow(l).map((h) => h.toLowerCase());
+    const headerRaw = splitRow(l);
+    const header = headerRaw.map((h) => h.toLowerCase());
     const rows = [];
     let j = i + 2;
     for (; j < lines.length && lines[j].trim().startsWith('|'); j++) rows.push(splitRow(lines[j]));
-    tables.push({ header, rows });
+    tables.push({ header, headerRaw, rows });
     i = j - 1;
   }
   return tables;
@@ -72,11 +73,13 @@ async function main() {
   const output = positional[1] ? path.resolve(positional[1]) : input.replace(/\.md$/i, '.xlsx');
 
   const { file: cfgFile, config } = loadConfig(argValue(argv, '--config'));
-  const columns = config.excel_columns;
-  console.log(`Cột Excel: ${cfgFile ? 'theo ' + cfgFile : 'mặc định (không tìm thấy project.aiqe.yml)'}`);
-
   const tables = parseTables(fs.readFileSync(input, 'utf8'));
   if (!tables.length) { console.error('Không tìm thấy bảng nào có cột "TC ID".'); process.exit(1); }
+
+  // --all-columns: giữ nguyên cột của bảng đầu tiên (dùng cho execution sheet có cột Result, Actual…).
+  const allColumns = argv.includes('--all-columns');
+  const columns = allColumns ? tables[0].headerRaw : config.excel_columns;
+  console.log(`Cột Excel: ${allColumns ? 'giữ nguyên cột của bảng (--all-columns)' : cfgFile ? 'theo ' + cfgFile : 'mặc định (không tìm thấy project.aiqe.yml)'}`);
 
   const missing = new Set();
   const rows = [];

@@ -414,11 +414,19 @@ function verify() {
 function main() {
   if (flag('--uninstall')) return uninstall();
   if (flag('--verify')) return verify();
+  // Chạy từ bản đã cài (~/.aiqe/kit/...) sẽ xóa chính thư mục nguồn khi tạo snapshot → chặn.
+  const rel = path.relative(path.join(HOME, '.aiqe'), KIT_SRC);
+  const relReal = path.relative(path.join(os.homedir(), '.aiqe'), KIT_SRC);
+  if ([rel, relReal].some((r) => r && !r.startsWith('..') && !path.isAbsolute(r))) {
+    const prev = loadState();
+    console.error('Không chạy install từ bản kit ĐÃ CÀI. Chạy từ repo kit' + (prev && prev.source ? `: ${prev.source}` : ' (xem trường "source" trong ~/.aiqe/installed.json).'));
+    process.exit(1);
+  }
   if (!['all', 'codex', 'claude', 'gemini'].includes(TOOL)) { console.error(`--tool không hợp lệ: ${TOOL}`); process.exit(1); }
   log(`my-aiqe-kit ${VERSION}  ·  home: ${HOME}${DRY ? '  ·  DRY-RUN (không ghi gì)' : ''}`);
   buildSnapshot();
   const prev = loadState() || {};
-  const state = { version: VERSION, snapshot: SNAPSHOT, installedAt: new Date().toISOString(), tools: {}, projects: prev.projects || {} };
+  const state = { version: VERSION, snapshot: SNAPSHOT, source: KIT_SRC, installedAt: new Date().toISOString(), tools: {}, projects: prev.projects || {} };
   if (prev.tools) Object.assign(state.tools, prev.tools);
   if (PROJECT) {
     installProject(state, path.resolve(PROJECT));

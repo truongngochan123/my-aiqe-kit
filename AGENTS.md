@@ -50,6 +50,16 @@ Mỗi skill có mục "Không dùng → X" để chuyển đúng việc. User g�
 ## Việc không có skill riêng
 - **Sanitize (che dữ liệu nhạy cảm):** chạy `node {{KIT}}/scripts/redact/redact.js <file>`, sau đó **người** kiểm tra lại. Screenshot do người tự che.
 - **Scaffold (dựng khung dự án):** chép từ `{{KIT}}/templates/scaffold/<stack>/`, hỏi user trước khi ghi vào repo.
+- **Tạo dự án mới** (thư mục + `.aiqe/project.aiqe.yml`): `node <repo kit>/scripts/project/new-project.js --name <tên> --url <url> [--modules A,B] [--lang vi|en] [--parent <thư mục cha>] [--output-in-project]`. Không ghi đè file đã có. Field không truyền giữ mặc định chặt nhất; nhắc user trả lời `{{KIT}}/docs/before_you_use.md` rồi tự chỉnh.
+
+## Cài hoặc cập nhật kit
+Đường dẫn **repo kit** nằm ở trường `source` trong `~/.aiqe/installed.json`. Luôn chạy từ repo kit, **không** chạy từ `{{KIT}}` (bản đã cài; script sẽ từ chối).
+1. **Xem trước:** `node <repo kit>/scripts/install/install.js --tool <codex|claude> --dry-run`, tóm tắt cho user sẽ ghi những file nào.
+2. **Xin phép user** trước khi cài thật (thao tác ghi vào thư mục cấu hình của user).
+3. **Cài:** `node <repo kit>/scripts/install/install.js --tool <codex|claude>`.
+4. **Kiểm tra:** `node <repo kit>/scripts/install/install.js --verify`, báo nguyên văn dòng cuối.
+5. Nhắc user: **khởi động lại VS Code và mở chat mới**, nếu không tool vẫn dùng skill cũ.
+- Bị sandbox/permission chặn ở bước nào → **không tìm cách vượt**; đưa user **đúng 1 dòng lệnh** để tự chạy trong terminal, ví dụ: `node D:\fpt-inform\my-aiqe-kit\scripts\install\install.js --tool codex`.
 
 ## Bảng chọn skill
 Nếu tool không tự nạp skill, đọc file `SKILL.md` tương ứng trong bảng này rồi làm theo.
@@ -58,8 +68,13 @@ Bảng do `scripts/install/gen-routing.js` sinh từ frontmatter, **không sửa
 <!-- aiqe:routing:start -->
 | Skill | Dùng khi / Không dùng khi | File |
 |---|---|---|
+| `ai-output-review` | Soát output của AI (của chính mình hoặc AI khác) theo từng claim: đối chiếu nguồn, phát hiện chi tiết bịa, nhãn sai, quyết định Accept/Reject/Defer và ghi decision log. Dùng sau khi nhờ AI phân tích, viết TC, tóm tắt kết quả. Không dùng để soát bug theo 7 điều kiện → bug-reporting review. | `{{KIT}}/skills/ai-output-review/SKILL.md` |
 | `bug-reporting` | Viết, review hoặc retest bug report có evidence và expected có nguồn; xuất bản internal và bản gửi khách. Dùng khi "viết bug", "log bug", "retest bug", soát bug người khác. Không dùng khi chưa rõ lỗi do test hay sản phẩm → incident-triage; báo cáo cả lần chạy → evidence-reporting. | `{{KIT}}/skills/bug-reporting/SKILL.md` |
+| `evidence-reporting` | Báo cáo một lần chạy test (automation hoặc chạy tay): evidence manifest, execution report giữ lần fail đầu, nhãn LOCAL/CI/MANUAL-RUN, dòng Enforcement; mode manual-run tạo execution sheet. Dùng khi "báo cáo lần chạy", "chạy tay TC". Không dùng cho báo cáo cả sprint → test-strategy. | `{{KIT}}/skills/evidence-reporting/SKILL.md` |
+| `exploratory-testing` | Lập charter, gợi ý ý tưởng test theo heuristic, sắp xếp ghi chép session exploratory có giới hạn thời gian; chuyển mỗi phát hiện thành bug, TC hoặc câu hỏi. Dùng khi "test thăm dò", "exploratory", "charter", "ghi chép session". Không dùng để ghi lại app làm gì → requirement-analysis mode B. | `{{KIT}}/skills/exploratory-testing/SKILL.md` |
 | `incident-triage` | Phân loại vì sao test fail hoặc chạy lỗi (môi trường, code test, sản phẩm, data/policy), kể cả test flaky; tách quan sát khỏi giả thuyết, quyết định chạy lại hay dừng. Dùng khi "test fail", "test đỏ", "lúc pass lúc fail", "chạy lỗi". Không dùng để viết bug → bug-reporting. | `{{KIT}}/skills/incident-triage/SKILL.md` |
+| `requirement-analysis` | Soát requirement có sẵn tìm chỗ mơ hồ, Not specified, rủi ro, lập câu hỏi (mode A); hoặc dựng ngược requirement từ screenshot/HTML/mô tả app khi không có tài liệu (mode B). Dùng trước khi viết TC. Không dùng để viết TC → test-design-rbt; tìm lỗi theo charter → exploratory-testing. | `{{KIT}}/skills/requirement-analysis/SKILL.md` |
+| `test-data` | Biến partition và giá trị biên của test case thành dữ liệu test cụ thể, unique, truy vết được, có người chịu trách nhiệm dọn; gồm tổ hợp nhiều chiều và chuỗi data qua nhiều module. Dùng khi "sinh test data", "data cho TC". Không dùng để chọn kỹ thuật/partition → test-design-rbt. | `{{KIT}}/skills/test-data/SKILL.md` |
 | `test-design-rbt` | Viết hoặc review manual test case theo EP, BVA, Decision Table, State Transition, Risk-Based Testing; mode quick, full, maintain (requirement đổi). Dùng khi "viết test case", "sinh TC", "review bộ TC". Không dùng khi requirement còn mơ hồ → requirement-analysis; cần dataset cụ thể → test-data. | `{{KIT}}/skills/test-design-rbt/SKILL.md` |
 <!-- aiqe:routing:end -->
 

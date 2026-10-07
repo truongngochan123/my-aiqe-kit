@@ -16,6 +16,12 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 
 - `rules/bug_report.md` mục 1b: danh sách đóng 4 **kỳ vọng hiển nhiên** dùng làm nguồn expected khi không có requirement; skill `bug-reporting`, template bug và `to-external.js` cập nhật theo.
 
+- Đợt 1 (07/10): 5 skill `requirement-analysis`, `test-data`, `exploratory-testing`, `ai-output-review`, `evidence-reporting`; `check-tc.js`, `check-bug.js` (bắt buộc chạy trong 2 skill mẫu); 7 template; eval cho 8 skill; `grade.js`, `prepare-isolated.ps1`; đề bài golden `bug-reporting`; `md_to_xlsx --all-columns`; `AGENTS.md` thêm cách tạo dự án và cài/cập nhật kit.
+
+### Sửa (07/10)
+- `install.js`: chạy từ bản đã cài (`~/.aiqe/kit/...`) sẽ xóa chính thư mục nguồn → từ chối, chỉ ra đường dẫn repo kit; `installed.json` thêm trường `source`.
+- `ai-output-review`: bỏ "thường có ít nhất 1 Reject"; toàn Accept thì ghi rõ đã kiểm tra những gì.
+
 ### Sửa (từ pilot T1 lần 2, 07/10)
 - `test-design-rbt` bước 0: đã có bộ TC cùng module thì hỏi (a) cập nhật hay (b) viết mới trước khi ghi file; viết mới thì không đọc/chép file cũ. Mode `maintain` nhận thêm trường hợp "luật kit đổi".
 - Thêm `evals/test-design-rbt/cases.md` với case `TDR-EXISTING-01` (đã có TC cũ) và `TDR-EXISTING-02` (case âm).

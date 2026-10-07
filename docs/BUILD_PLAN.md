@@ -10,7 +10,7 @@
 | Đợt | Trạng thái | Ngày |
 |---|---|---|
 | 0: Nền móng | ✅ Đã duyệt | 06/10 |
-| 1: Manual | 🔄 Bước 1 xong (3 skill mẫu) · chờ pilot trên Codex | 06/10 |
+| 1: Manual | ✅ Dựng xong 8 skill (07/10) · chờ Han chạy pilot/eval trên Codex và duyệt | 06–07/10 |
 | 2: Automation + CI | ⏳ Chưa | 08/10 |
 | 3: Lead, tích hợp, đa stack | ⏳ Chưa | 09/10 |
 | Agent 0.2.0 | ⏳ Chưa | 08–10/10 |
@@ -94,7 +94,7 @@
 
 ---
 
-## 4. Cấu trúc repo (đầy đủ, 174 file kit)
+## 4. Cấu trúc repo (đầy đủ, 176 file kit)
 
 Ký hiệu: `[Đ0]`…`[Đ3]` = đợt; ✅ = đã có.
 
@@ -133,7 +133,8 @@ my-aiqe-kit/
 ├── templates/
 │   ├── bug_report  test_case_table  incident_card  retry_matrix  decision_log
 │   │   execution_sheet  charter  session_note  data_registry   (.md)    [Đ1]
-│   ├── evidence_manifest  execution_report  approval_card  (.md)        [Đ2]
+│   ├── evidence_manifest  execution_report  (.md)                       [Đ1] ✅ (chuyển từ Đ2)
+│   ├── approval_card  (.md)                                             [Đ2]
 │   ├── test_plan  test_summary_report  regression_selection  run_contract
 │   │   tool_manifest  state_machine  (.md)                              [Đ3]
 │   └── scaffold/
@@ -145,6 +146,7 @@ my-aiqe-kit/
 ├── scripts/
 │   ├── install/{install.ps1, install.js, gen-routing.js}                [Đ0] ✅
 │   ├── verify/{grep-clean.js, grep-exempt.txt, check-skills.js}         [Đ0] ✅
+│   ├── verify/{check-tc.js, check-bug.js}                               [Đ1] ✅ 🆕
 │   ├── verify/aiqe-verify.js                                            [Đ2]
 │   ├── package.json  package-lock.json  lib/config.js  convert/md_to_xlsx.js  redact/{redact.js, patterns.json}
 │   │   export/to-external.js  evals/{prepare-isolated.ps1, grade.js}    [Đ1]
@@ -209,6 +211,17 @@ my-aiqe-kit/
 3. **Bước 3:** 5 skill còn lại + script, template, prompt, eval.
 4. **Bước 4:** đề bài golden `bug-reporting` (có bẫy). Han đưa đề cho Codex viết đáp án.
 
+**Tiến độ 07/10 ✅ (Bước 3 + 4, làm song song với pilot của Han)**
+- 5 skill: `requirement-analysis` (mode A + mode B có cảnh báo, cột Đáng ngờ?/Quyết định), `test-data` (dataset, combinatorial, chain, registry), `exploratory-testing` (charter, session, ranh giới với mode B), `ai-output-review` (sửa dòng 24: không ép Reject), `evidence-reporting` (mode run + manual-run, Enforcement).
+- 🆕 `scripts/verify/check-tc.js`, `check-bug.js` (+2 file, có `--self-test`); `test-design-rbt` và `bug-reporting` **bắt buộc** chạy và báo nguyên văn dòng cuối.
+- Template: `decision_log`, `execution_sheet`, `charter`, `session_note`, `data_registry`; **chuyển sớm từ Đợt 2**: `evidence_manifest`, `execution_report` (skill `evidence-reporting` cần).
+- References: `reverse_spec_format`, `data_registry_format`, `heuristics`. `prompts/qe-reviewer.md`.
+- Eval: `cases.md` cho 8 skill (≥ 3 dương + 2 âm), `evals/README.md`, `scripts/evals/grade.js`, `prepare-isolated.ps1`.
+- Golden: đề bài `evals/golden/bug-reporting.task.md` (5 tình huống, 3 bẫy). Đáp án: Codex viết.
+- `md_to_xlsx --all-columns` (execution sheet giữ đủ cột). `id_conventions` thêm `SES-`.
+- `AGENTS.md`: tạo dự án mới; cài/cập nhật kit (xem trước → xin phép → cài → kiểm tra; bị chặn thì đưa 1 dòng lệnh).
+- **Sửa lỗi nguy hiểm trong `install.js`:** chạy từ bản đã cài sẽ xóa chính thư mục nguồn → nay từ chối; `installed.json` ghi `source` (đường dẫn repo kit).
+
 **Tiến độ Bước 1 (06/10) ✅**
 - 3 skill mẫu + references: `bug-reporting`, `test-design-rbt` (4 references, có `sql_oracle.md`), `incident-triage` (`flaky_catalog.md`).
 - **Làm sớm từ Bước 3** (vì 3 skill mẫu gọi tới, thiếu thì pilot trên Codex sẽ trỏ vào file không tồn tại): 6 prompt `prompts/manual/`, 4 template (`bug_report`, `test_case_table`, `incident_card`, `retry_matrix`), `md_to_xlsx.js`, `redact.js` + `patterns.json`, `to-external.js`, `scripts/package.json`.
@@ -216,7 +229,11 @@ my-aiqe-kit/
 - `md_to_xlsx` viết lại bằng `exceljs` (bản gốc dùng `xlsx` 0.18.5 không còn cập nhật trên npm, và lấy cột theo vị trí). `uuid` ép lên 11.1.1 qua `overrides` để hết cảnh báo GHSA-w5hq-g745-h8pq (`npm audit`: 0 lỗ hổng).
 - Kiểm chứng: `check-skills` 3 skill 0 lỗi · `grep-clean` sạch · chạy thử 3 script với file mẫu · cài thử vào home giả: 16/16 đường dẫn trong skill tồn tại, script chạy được từ bản cài.
 - **07/10:** thêm `scripts/project/new-project.ps1` + `.js` (tạo thư mục dự án + `.aiqe/project.aiqe.yml`, không ghi đè). Pilot đổi sang **OrangeHRM** (`D:\fpt-inform\aiqe-pilot`, yml do Han tạo tay, script xác nhận không ghi đè).
-- **Pilot trên Codex (OrangeHRM):** T1 ✅ đúng skill (`test-design-rbt`), không đoán required, không bịa message, Source `HYP-PIM`. 3 điểm cần sửa đã sửa (quyết định #30). Lần 2: kit cài lại đúng nhưng Codex mở `TC-PIM.md` cũ và chép lại gần nguyên văn → thêm bước 0 (quyết định #31) và eval `evals/test-design-rbt/cases.md`. Còn 8 prompt.
+- **Pilot trên Codex (OrangeHRM), ghi theo kết quả Han gửi:**
+  - T1: routing đúng; **bước 0** (hỏi trước khi đụng TC cũ) chạy ĐÚNG, Codex dừng và dẫn `SKILL.md:36`.
+  - **Bài học:** cài lại kit → **khởi động lại VS Code** → **chat mới**. Thiếu bước nào là Codex dùng skill cũ.
+  - Ví dụ đối chứng **không có kit** (Codex bịa khoảng 15 luật): `D:\fpt-inform\aiqe-pilot-archive\no-kit-example.md` (Han lưu, Claude không đụng).
+- Lịch sử pilot T1: đúng skill (`test-design-rbt`), không đoán required, không bịa message, Source `HYP-PIM`. 3 điểm cần sửa đã sửa (quyết định #30). Lần 2: kit cài lại đúng nhưng Codex mở `TC-PIM.md` cũ và chép lại gần nguyên văn → thêm bước 0 (quyết định #31) và eval `evals/test-design-rbt/cases.md`. Còn 8 prompt.
 - Bảng `field_validation_15.md` có **bản sao** trong `prompts/manual/05_…md` (để dán sang AI khác). Sửa bảng thì sửa cả hai (có comment `sync` đánh dấu). Câu hỏi mở Q9.
 
 | File | Chức năng | Phải có / Nghiệm thu |
@@ -360,12 +377,12 @@ agent/
 | Phần | Số file |
 |---|---|
 | Đợt 0 | 36 |
-| Đợt 1 | 55 |
-| Đợt 2 | 34 |
+| Đợt 1 | 59 |
+| Đợt 2 | 32 |
 | Đợt 3 | 49 |
-| **Kit 0.1.0** | **174** |
+| **Kit 0.1.0** | **176** |
 | Agent 0.2.0 (30 trong `agent/` + `docs/agent_design.md`) | 31 |
-| **Tổng** | **205** |
+| **Tổng** | **207** |
 
 Thay đổi so với plan v4.2 (194 file kit):
 - −15: bỏ lệnh tắt Codex (quyết định #21)
@@ -376,4 +393,6 @@ Thay đổi so với plan v4.2 (194 file kit):
 - +1: `evals/golden/bug-reporting.task.md` (tách đề bài khỏi đáp án)
 - +2: `scripts/lib/config.js`, `scripts/package-lock.json` (phát sinh ở Bước 1)
 - +2: `scripts/project/new-project.ps1` + `new-project.js` (yêu cầu ngày 07/10: tạo dự án mới kèm yml)
-- = **174**
+- +2: `scripts/verify/check-tc.js`, `check-bug.js` (yêu cầu 07/10)
+- 0: `evidence_manifest.md`, `execution_report.md` chuyển từ Đợt 2 sang Đợt 1 (Đợt 1 +2, Đợt 2 −2)
+- = **176**

@@ -1,9 +1,26 @@
 # Eval: test-design-rbt
 
-> Cách chạy và chấm: `evals/README.md` (Đợt 1 Bước 3). Bộ đầy đủ (3 case dương, 2 case âm) bổ sung ở Bước 3.
-> File này hiện có 2 case cho tình huống **đã có bộ TC cũ** (phát hiện ở pilot T1 lần 2, 07/10: Codex mở `TC-PIM.md` cũ và chép lại gần nguyên văn, không áp luật mới).
+> Cách chạy và chấm: `evals/README.md`. Mỗi prompt một chat **mới**. Chấm: `node scripts/evals/grade.js <output_dir>` (đọc `produced_by`, chạy `check-tc.js`) + checklist.
+> Ô `[...]`: điền từ quan sát thật của bạn.
+
+## Case dương (phải kích hoạt `test-design-rbt`)
+
+| ID | Prompt | Đúng khi |
+|---|---|---|
+| **TDR-P1** | OrangeHRM (https://opensource-demo.orangehrmlive.com) không có tài liệu requirement. Quan sát của mình ngày [ngày], màn PIM > Add Employee: các field là [liệt kê, field nào có dấu *]; bỏ trống field bắt buộc rồi bấm Save thì hiện [message]. Viết test case cho Add Employee, làm nhanh một lượt. | Source `HYP-PIM-…`, không có `AC-`/`REQ-CONFIRMED`; quan sát gắn `DOM-OBSERVED` (người, env, ngày); bảng 3a và 3b tách riêng; dòng tổng đúng; **`check-tc.js` ĐẠT** và dòng cuối được báo nguyên văn |
+| **TDR-P2** | Sinh test case cho màn Login của OrangeHRM theo đầy đủ quy trình 6 bước có phân tích rủi ro. Quan sát của mình ngày [ngày]: form có [các field]; sai mật khẩu thì hiện [message]; bỏ trống thì hiện [message]. | Mode `full`: **dừng ở bước 2** với câu hỏi đánh số; không tự trả lời; chưa ghi file TC |
+| **TDR-P3** | Soát giúp bộ test case Employee List này: `\| TC1 \| Tìm nhân viên \| Nhập tên hợp lệ, bấm Search \| Hiện thông báo thành công \|`, `\| TC2 \| Xóa nhân viên \| Chọn 1 người, bấm Delete \| Không lỗi \|` | Mode `review`: chỉ ra thiếu Source, data mơ hồ, oracle yếu, không đánh số; không viết lại cả bộ khi chưa được yêu cầu |
+
+## Case âm (KHÔNG được kích hoạt `test-design-rbt`)
+
+| ID | Prompt | Skill đúng | Đúng khi |
+|---|---|---|---|
+| **TDR-N1** | Requirement nghỉ phép này còn thiếu gì? Chưa cần viết test case: "AC-LEAVE-01: Nhân viên gửi đơn nghỉ phép. AC-LEAVE-02: Quản lý duyệt hoặc từ chối đơn." | `requirement-analysis` | File `produced_by: requirement-analysis`; không có file TC |
+| **TDR-N2** | Sinh giúp 10 bộ dữ liệu cụ thể cho TC-PIM-001 đến TC-PIM-003, có người dọn dữ liệu. | `test-data` | File `produced_by: test-data`; không viết lại TC |
 
 ---
+
+## Case bổ sung: đã có bộ TC cũ (từ pilot T1 lần 2)
 
 ## TDR-EXISTING-01: đã có bộ TC cũ cùng module → phải hỏi trước
 

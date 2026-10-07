@@ -54,7 +54,8 @@ description: Viết, review hoặc retest bug report có evidence và expected c
 6. **Xuất 2 bản:**
    - Internal: `<output_dir>/bugs/BUG-<MODULE>-<NNN>.md` (có front-matter, giữ nhãn).
    - External: `node {{KIT}}/scripts/export/to-external.js <file>` → `<output_dir>/external/` (bỏ front-matter, nhãn chuyển thành lời, bỏ priority đề xuất).
-7. **Không tự đẩy lên Jira.** Đưa user file để **người** đẩy lên sau G4.
+7. **Bắt buộc chạy** `node {{KIT}}/scripts/verify/check-bug.js <file vừa ghi>` (cả file bug lẫn file câu hỏi `Q-*`). Còn lỗi → sửa rồi chạy lại. Báo user **nguyên văn dòng cuối** (ví dụ `check-bug: 1 file, 0 lỗi → ĐẠT`). **Không báo "xong" khi chưa ĐẠT**; không chạy được thì nói rõ lý do.
+8. **Không tự đẩy lên Jira.** Đưa user file để **người** đẩy lên sau G4.
 
 ## Quy trình (review)
 Chấm bug theo 7 điều kiện + format. Output: bảng `# | Điều kiện | Đạt? | Dòng | Cần sửa`. Không viết lại thay người viết trừ khi được yêu cầu.
@@ -83,6 +84,7 @@ Chấm bug theo 7 điều kiện + format. Output: bảng `# | Điều kiện | 
 - Không viết bug cho hành vi requirement không quy định.
 
 ## Self-check
+- [ ] Đã chạy `check-bug.js` và báo nguyên văn dòng cuối; kết quả ĐẠT
 - [ ] Actual có evidence thật (không phải `HYPOTHESIS`/`AI-PROPOSAL`); thiếu thì status là `draft`
 - [ ] Expected có nguồn (a) requirement hoặc (b) kỳ vọng hiển nhiên #1–#4 kèm `AI-PROPOSAL` + "cần PO/BA xác nhận"; không có thì đã chuyển thành câu hỏi, không tạo bug
 - [ ] Không dùng kỳ vọng hiển nhiên cho thứ ngoài danh sách (trùng lặp, độ dài, định dạng, nội dung thông báo, UX, tốc độ)
