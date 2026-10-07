@@ -21,7 +21,7 @@ description: Viết hoặc review manual test case theo EP, BVA, Decision Table,
 |---|---|---|
 | `quick` (mặc định) | 1 tính năng, AC rõ | Sinh một lượt theo mục Quy trình |
 | `full` | Nhiều module, AC mơ hồ, cần đánh giá rủi ro | 6 bước theo `{{KIT}}/prompts/manual/01_context_and_roleplay.md` … `06_template_mapping.md`. **Dừng chờ user ở bước 2 (Q&A) và bước 4 (duyệt scenario).** Không gộp bước |
-| `maintain` | Requirement đổi | Cần **2 phiên bản** requirement hoặc diff. Không có → từ chối, hỏi user. Output: TC giữ / sửa / lỗi thời (`status: deprecated`) / mới |
+| `maintain` | Requirement đổi, **hoặc** luật của kit đổi | Requirement đổi: cần **2 phiên bản** requirement hoặc diff, không có → từ chối, hỏi user. Luật kit đổi: soát bộ TC cũ theo Self-check **hiện hành**. Output: TC giữ / sửa / chuyển sang mục thăm dò / lỗi thời (`status: deprecated`) / mới |
 | `review` | Soát bộ TC có sẵn | Chạy Self-check ở cuối file lên bộ TC, liệt kê lỗi theo dòng |
 
 User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full …".
@@ -33,6 +33,11 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - **Thiếu AC có ID:** hỏi user. Nếu user chỉ có mô tả tự do, đánh ID tạm `HYP-<MODULE>-NN` và ghi rõ là giả định, không dùng `AC-`.
 
 ## Quy trình (quick)
+0. **Kiểm tra bộ TC cũ trước khi làm gì khác** (áp dụng cả mode `full`). Nếu `<output_dir>/testcases/` đã có file TC của **cùng module** (`TC-<MODULE>*.md`): **dừng, hỏi user**, chưa ghi file nào:
+   > "Đã có `<tên file>` (ngày …). Bạn muốn: (a) **cập nhật bộ cũ** theo luật hiện hành (mode `maintain`), hay (b) **viết mới** từ đầu?"
+   - (a) → chạy mode `maintain`: soát từng TC cũ theo Self-check hiện hành, ghi rõ TC nào giữ / sửa / chuyển sang mục thăm dò, và vì sao.
+   - (b) → **không mở, không đọc, không chép** nội dung file cũ. Viết từ requirement/quan sát của user. Ghi ra file mới `TC-<MODULE>.v<N>.md` (N tăng dần), **giữ nguyên** file cũ. Viết xong mới được so sánh với bản cũ nếu user yêu cầu.
+   - Không có file cũ → làm tiếp, không hỏi.
 1. **Liệt kê field và luồng** trước khi viết TC: bảng `Field | Loại | Required | Min/Max | Format | Unique | Nguồn`. Field nào requirement không nói → ghi `Not specified` và đưa vào danh sách câu hỏi, **không tự đặt quy tắc**.
 2. **Đánh giá rủi ro** từng chức năng: Probability × Impact → Critical/High/Medium/Low (`AI-PROPOSAL`, user có thể sửa).
 3. **Chọn kỹ thuật** theo bảng ở `{{KIT}}/rules/test_design.md` mục 1: EP, BVA (min-1, min, min+1, max-1, max, max+1), Decision Table, State Transition (cả chuyển trạng thái **không** hợp lệ), Pairwise.
@@ -61,6 +66,7 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - Bản gửi khách: `node {{KIT}}/scripts/export/to-external.js <file.md>`.
 
 ## Gate và giới hạn
+- Bước 0 (hỏi trước khi đụng tới bộ TC cũ) là **📝 lời dặn**: không có cơ chế ép. Eval `evals/test-design-rbt/cases.md` case `TDR-EXISTING-01` kiểm tra skill có làm đúng không.
 - TC có payload XSS/SQLi: tag `@Security`, ghi rõ "chỉ chạy trên env thuộc `sandbox_urls`, cần G1". Skill này **không chạy** TC.
 - Oracle SQL: **chỉ `SELECT`**, chỉ env sandbox, tài khoản DB chỉ đọc. Không có thì ghi `UNKNOWN`, không đoán tên bảng/cột.
 - Không bịa field label, message lỗi, giới hạn ký tự. Message lỗi requirement không cho → expected ghi "hiển thị thông báo lỗi (nội dung: `Not specified`)".
@@ -81,4 +87,5 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - [ ] Quan sát của chính user gắn `DOM-OBSERVED` (có người quan sát, env, ngày), không gắn `PROVIDED`
 - [ ] Priority khớp Risk; không có TC nào được đặt P1 chỉ vì chưa biết expected
 - [ ] Không có ký hiệu tắt tự đặt (`C0`, `E`, `R`…) chưa chú thích
-- [ ] Mode `maintain`: mỗi TC cũ có trạng thái giữ/sửa/lỗi thời, không xóa TC cũ
+- [ ] Mode `maintain`: mỗi TC cũ có trạng thái giữ/sửa/chuyển sang thăm dò/lỗi thời, không xóa TC cũ
+- [ ] Đã có TC cùng module → đã hỏi user (a) cập nhật hay (b) viết mới **trước khi** ghi file; chọn (b) thì không có dòng nào chép nguyên từ file cũ, file cũ còn nguyên

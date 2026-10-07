@@ -48,6 +48,7 @@
 | 25 🆕 | **Bỏ cả 15 lệnh tắt của Claude.** Gọi skill bằng tên đầy đủ: `/tên-skill` (Claude), `$tên-skill` (Codex). Tham số mode ghi thẳng vào câu: `/bug-reporting retest BUG-CUS-012`. Sanitize và scaffold: nói bằng lời, `AGENTS.md` mục "Việc không có skill riêng" hướng dẫn |
 | 26 🆕 | `.gitattributes`: văn bản dùng LF, `.ps1` dùng CRLF, Excel/ảnh/zip là binary |
 | 27 🆕 | Test database: `test-design-rbt/references/sql_oracle.md` (oracle đọc lại dữ liệu bằng SQL, **chỉ SELECT**, chỉ trên env sandbox) ở Đợt 1 |
+| 31 🆕 | Sau pilot T1 lần 2: `test-design-rbt` **bước 0**: đã có TC cùng module trong `output_dir` thì hỏi (a) cập nhật theo luật hiện hành hay (b) viết mới; (b) không đọc/chép file cũ, ghi `TC-<MODULE>.v<N>.md`, giữ file cũ. Eval `TDR-EXISTING-01/02` |
 | 30 🆕 | Sau pilot T1 (07/10): quan sát QA tự làm (kể cả kể lại trong prompt) là `DOM-OBSERVED`, thông tin từ người khác là `PROVIDED`; output test case tách **TC chạy được** và **mục thăm dò** (expected chưa biết, khóa `Q-*`); Priority theo Risk; cấm ký hiệu tắt tự đặt |
 | 29 🆕 | **Kỳ vọng hiển nhiên** (chọn phương án b, 07/10): khi sản phẩm không có requirement, bug được tạo nếu hành vi khớp **danh sách đóng 4 mục** trong `rules/bug_report.md` mục 1b (lỗi hệ thống · dữ liệu lưu sai/mất · lộ dữ liệu/vượt quyền · tài khoản hợp lệ không đăng nhập được). Expected gắn `AI-PROPOSAL` + "cần PO/BA xác nhận". Ngoài danh sách → câu hỏi `Q-*` |
 | 28 🆕 | Đợt 1 làm theo thứ tự **pilot**: 3 skill mẫu → dừng → Han cài kit thật cho Codex và test 9 prompt → ổn mới làm 5 skill còn lại |
@@ -215,7 +216,7 @@ my-aiqe-kit/
 - `md_to_xlsx` viết lại bằng `exceljs` (bản gốc dùng `xlsx` 0.18.5 không còn cập nhật trên npm, và lấy cột theo vị trí). `uuid` ép lên 11.1.1 qua `overrides` để hết cảnh báo GHSA-w5hq-g745-h8pq (`npm audit`: 0 lỗ hổng).
 - Kiểm chứng: `check-skills` 3 skill 0 lỗi · `grep-clean` sạch · chạy thử 3 script với file mẫu · cài thử vào home giả: 16/16 đường dẫn trong skill tồn tại, script chạy được từ bản cài.
 - **07/10:** thêm `scripts/project/new-project.ps1` + `.js` (tạo thư mục dự án + `.aiqe/project.aiqe.yml`, không ghi đè). Pilot đổi sang **OrangeHRM** (`D:\fpt-inform\aiqe-pilot`, yml do Han tạo tay, script xác nhận không ghi đè).
-- **Pilot trên Codex (OrangeHRM):** T1 ✅ đúng skill (`test-design-rbt`), không đoán required, không bịa message, Source `HYP-PIM`. 3 điểm cần sửa đã sửa (quyết định #30). Cần **cài lại kit** để Codex nhận bản sửa. Còn 8 prompt.
+- **Pilot trên Codex (OrangeHRM):** T1 ✅ đúng skill (`test-design-rbt`), không đoán required, không bịa message, Source `HYP-PIM`. 3 điểm cần sửa đã sửa (quyết định #30). Lần 2: kit cài lại đúng nhưng Codex mở `TC-PIM.md` cũ và chép lại gần nguyên văn → thêm bước 0 (quyết định #31) và eval `evals/test-design-rbt/cases.md`. Còn 8 prompt.
 - Bảng `field_validation_15.md` có **bản sao** trong `prompts/manual/05_…md` (để dán sang AI khác). Sửa bảng thì sửa cả hai (có comment `sync` đánh dấu). Câu hỏi mở Q9.
 
 | File | Chức năng | Phải có / Nghiệm thu |

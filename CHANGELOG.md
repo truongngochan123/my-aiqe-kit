@@ -16,6 +16,10 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 
 - `rules/bug_report.md` mục 1b: danh sách đóng 4 **kỳ vọng hiển nhiên** dùng làm nguồn expected khi không có requirement; skill `bug-reporting`, template bug và `to-external.js` cập nhật theo.
 
+### Sửa (từ pilot T1 lần 2, 07/10)
+- `test-design-rbt` bước 0: đã có bộ TC cùng module thì hỏi (a) cập nhật hay (b) viết mới trước khi ghi file; viết mới thì không đọc/chép file cũ. Mode `maintain` nhận thêm trường hợp "luật kit đổi".
+- Thêm `evals/test-design-rbt/cases.md` với case `TDR-EXISTING-01` (đã có TC cũ) và `TDR-EXISTING-02` (case âm).
+
 ### Sửa (từ pilot T1 trên Codex, 07/10)
 - `rules/evidence_labels.md`: phân biệt rõ `DOM-OBSERVED` (QA tự quan sát, kể cả kể lại trong prompt) và `PROVIDED` (nguồn khác); bảng tình huống mẫu.
 - `rules/test_design.md` mục 2a, 2b: tách TC chạy được / mục thăm dò; Priority theo Risk; cấm ký hiệu tắt tự đặt.
