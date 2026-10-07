@@ -79,5 +79,5 @@ console.log('================ NỘI DUNG (đọc lại để kiểm tra) =======
 console.log(text);
 console.log('================================================================');
 console.log('Các field còn ở mặc định chặt nhất: ai_policy: UNKNOWN, allowed_ai_tools: [], server_review: UNKNOWN, sms_gateway_disabled: UNKNOWN.');
-console.log('→ Trả lời checklist docs/before_you_use.md rồi tự sửa các field này trong file trên.');
+console.log('→ Trả lời checklist docs/before_you_use.md rồi tự chỉnh các field này trong file trên.');
 console.log(`Tiếp theo: mở thư mục ${dir} trong VS Code để làm việc với Codex/Claude.`);

@@ -64,7 +64,7 @@ ew-project.ps1 -Name aiqe-pilot -Url https://opensource-demo.orangehrmlive.com -
 | `-Parent` | Thư mục cha | Thư mục đang đứng (không được nằm trong repo kit) |
 | `-OutputInProject` | Output ghi vào `<dự án>/output` để Codex không phải hỏi mỗi lần ghi | `~/aiqe-output/<tên>` |
 
-- Mọi field khác giữ **mặc định chặt nhất** (`ai_policy: UNKNOWN`…). Trả lời `docs/before_you_use.md` rồi tự sửa.
+- Mọi field khác giữ **mặc định chặt nhất** (`ai_policy: UNKNOWN`…). Trả lời `docs/before_you_use.md` rồi chỉnh lại các field đó.
 - File đã có thì script **không ghi đè**, chỉ in nội dung hiện tại.
 - Script in toàn bộ nội dung file vừa tạo để bạn đọc lại.
 - PowerShell chặn chạy `.ps1` thì dùng: `node scripts\project
