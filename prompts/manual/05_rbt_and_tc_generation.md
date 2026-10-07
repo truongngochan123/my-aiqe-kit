@@ -21,7 +21,7 @@ Mức rủi ro tôi đã chốt cho từng module:
 | Steps | Đánh số `1. 2. 3.` |
 | Expected | Đánh số **khớp 1-1** với Steps |
 | Test Data | **Cụ thể** (xem mục 3) |
-| Priority | P1–P4 |
+| Priority | P1–P4 **theo Risk**: P1 = luồng chính bắt buộc chạy được hoặc Risk Critical; P2 = High; P3 = Medium; P4 = Low. "Chưa biết expected" **không** phải lý do đặt P1 |
 | Risk | Critical / High / Medium / Low |
 | Automatable / Auto Type / Tags | Yes·No·Partial / UI·API·Unit·N/A / @Smoke @Regression @CriticalPath @Security @Boundary |
 
@@ -31,6 +31,12 @@ Expected phải kiểm tra **dữ liệu nghiệp vụ**, không dừng ở thô
 - ✅ "Tìm theo mã `QA-r001-cus01` thấy đúng 1 dòng; cột Công ty = `QA Công ty 01`"
 
 Thông báo lỗi mà tài liệu không cho nội dung → ghi "hiển thị thông báo lỗi (nội dung: Not specified)", **không** tự đặt câu chữ.
+
+## 2b. Expected chưa biết: tách riêng, không viết thành test case
+- **Bảng test case** chỉ gồm TC có expected **đã biết**: từ tài liệu, hoặc từ quan sát của tôi (ghi "hành vi quan sát ngày …, chưa có requirement xác nhận").
+- Tình huống **chưa biết expected** → đưa vào **bảng thăm dò riêng**, cột: `Q ID | Scenario cần thăm dò | Cần biết điều gì | Cách quan sát | Risk`. Không viết test case có expected "chưa rõ", "cần xác nhận".
+- Quan sát tôi tự làm và kể lại là **quan sát trực tiếp** (ghi người quan sát, môi trường, ngày), không phải "thông tin được cung cấp".
+- Không dùng ký hiệu tắt tự đặt (ví dụ `C0`, `E`, `R`); cần phân loại thì viết chữ đầy đủ.
 
 ## 3. Test data cụ thể
 ```

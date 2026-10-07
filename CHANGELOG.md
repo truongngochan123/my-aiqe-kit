@@ -16,6 +16,11 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 
 - `rules/bug_report.md` mục 1b: danh sách đóng 4 **kỳ vọng hiển nhiên** dùng làm nguồn expected khi không có requirement; skill `bug-reporting`, template bug và `to-external.js` cập nhật theo.
 
+### Sửa (từ pilot T1 trên Codex, 07/10)
+- `rules/evidence_labels.md`: phân biệt rõ `DOM-OBSERVED` (QA tự quan sát, kể cả kể lại trong prompt) và `PROVIDED` (nguồn khác); bảng tình huống mẫu.
+- `rules/test_design.md` mục 2a, 2b: tách TC chạy được / mục thăm dò; Priority theo Risk; cấm ký hiệu tắt tự đặt.
+- Skill `test-design-rbt`, template `test_case_table.md`, prompt 05 và 06 cập nhật theo.
+
 ### Sửa (phát hiện khi kiểm tra Đợt 1 Bước 1)
 - `redact.js --check` trên file đã che vẫn báo còn dữ liệu (khớp lại chữ `[REDACTED]`) → bỏ qua chỗ đã che.
 - `install.js` không chép `scripts/node_modules` vào bản cài → `md_to_xlsx` chạy từ bản cài báo thiếu thư viện. Sửa: chép kèm, cảnh báo nếu chưa `npm install`.

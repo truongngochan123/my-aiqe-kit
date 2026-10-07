@@ -39,9 +39,13 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 4. **Validation từng field** theo `references/field_validation_15.md`: mỗi field ≥ 1 positive + ≥ 2 negative/boundary, **mỗi field một TC riêng**.
 5. **Case nâng cao** khi phù hợp: `references/advanced_scenarios.md`; app mobile: `references/mobile_scenarios.md`.
 6. **Oracle mạnh:** expected phải kiểm tra **dữ liệu nghiệp vụ** (tìm lại record theo ID, đúng giá trị trong cùng row), không dừng ở toast hay HTTP 200. Có quyền đọc DB sandbox → oracle SQL theo `references/sql_oracle.md`.
-7. **Viết TC** theo `{{KIT}}/templates/test_case_table.md`: Source, Steps và Expected đánh số khớp 1-1, Test Data cụ thể (`QA-r001-...`, email `@example.com`), Priority, Risk, Automatable, Auto Type, Tags.
-8. **Traceability** `AC × TC`: mọi AC có ≥ 1 TC; AC không có TC thì ghi lý do.
-9. Chạy Self-check, sửa, rồi mới trả kết quả.
+7. **Chia 2 nhóm** theo `{{KIT}}/rules/test_design.md` mục 2a:
+   - **TC chạy được:** expected đã biết, có nguồn (`REQ-CONFIRMED`, `DOM-OBSERVED`, kỳ vọng hiển nhiên #1–#4). Expected từ `DOM-OBSERVED` ghi kèm "(hành vi quan sát ngày …, chưa có requirement xác nhận)".
+   - **Mục thăm dò:** expected chưa biết → bảng riêng khóa bằng `Q-<MODULE>-NN`, **không** viết thành TC với expected "UNKNOWN"/"cần xác nhận".
+   Quan sát của chính user kể trong prompt gắn `DOM-OBSERVED` (ghi người quan sát, env, ngày), **không** gắn `PROVIDED`.
+8. **Viết TC** theo `{{KIT}}/templates/test_case_table.md`: Source, Steps và Expected đánh số khớp 1-1, Test Data cụ thể (`QA-r001-...`, email `@example.com`), Risk, Priority (đặt theo Risk, `{{KIT}}/rules/test_design.md` mục 2b; chưa biết expected **không** phải lý do đặt P1), Automatable, Auto Type, Tags. **Không dùng ký hiệu tắt tự đặt** (`C0`, `E`, `R`…).
+9. **Traceability** `AC × TC`: mọi AC có ≥ 1 TC hoặc ≥ 1 mục thăm dò; ghi lý do nếu không có.
+10. Chạy Self-check, sửa, rồi mới trả kết quả.
 
 ## Output
 - File `<output_dir>/testcases/TC-<MODULE>.md`, front-matter:
@@ -52,7 +56,7 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
   produced_by: test-design-rbt
   status: draft
   ```
-- Nội dung: (1) bảng field, (2) bảng rủi ro, (3) bảng TC, (4) traceability `AC × TC`, (5) **câu hỏi mở / `Not specified`** (`Q-<MODULE>-NN`).
+- Nội dung: (1) bảng field, (2) bảng rủi ro, (3a) **bảng TC chạy được**, (3b) **bảng mục thăm dò** (khóa `Q-<MODULE>-NN`), (4) traceability `AC × TC`, (5) **câu hỏi mở / `Not specified`**. Đầu file in số lượng: "N TC chạy được · M mục thăm dò · K câu hỏi".
 - Excel (nếu user cần): `node {{KIT}}/scripts/convert/md_to_xlsx.js <file.md>`; cột theo `excel_columns` trong yml.
 - Bản gửi khách: `node {{KIT}}/scripts/export/to-external.js <file.md>`.
 
@@ -73,4 +77,8 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - [ ] Không TC nào chỉ dùng oracle yếu (toast, click không lỗi, HTTP 200)
 - [ ] Có BVA đủ 6 điểm cho field có min/max
 - [ ] Đủ metadata: Priority, Risk, Automatable, Auto Type, Tags
+- [ ] Không TC nào có expected chưa biết; những điểm đó nằm ở bảng thăm dò, khóa bằng `Q-*`
+- [ ] Quan sát của chính user gắn `DOM-OBSERVED` (có người quan sát, env, ngày), không gắn `PROVIDED`
+- [ ] Priority khớp Risk; không có TC nào được đặt P1 chỉ vì chưa biết expected
+- [ ] Không có ký hiệu tắt tự đặt (`C0`, `E`, `R`…) chưa chú thích
 - [ ] Mode `maintain`: mỗi TC cũ có trạng thái giữ/sửa/lỗi thời, không xóa TC cũ

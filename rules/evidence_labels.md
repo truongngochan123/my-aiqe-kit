@@ -7,8 +7,8 @@
 | Nhãn | Dùng khi | Bắt buộc kèm |
 |---|---|---|
 | `REQ-CONFIRMED` | Lấy từ requirement hoặc AC có ID, hoặc PO/BA đã xác nhận | ID nguồn (`AC-LOGIN-01`) hoặc tên người xác nhận + ngày |
-| `PROVIDED` | Thông tin được cung cấp, không tự kiểm chứng | **Nguồn**: khách, BA, đồng nghiệp, tài liệu, bộ kit gốc (AI sinh)… |
-| `DOM-OBSERVED` | Tự quan sát DOM hoặc UI trên môi trường thật | **env + ngày**. Cũ đi sau mỗi lần deploy |
+| `PROVIDED` | Thông tin do **người hoặc nguồn khác** cung cấp, QA chưa tự xem: khách, BA, dev, đồng nghiệp, tài liệu, ticket, bộ kit gốc (AI sinh) | **Nguồn** (ai/tài liệu nào) |
+| `DOM-OBSERVED` | **QA tự quan sát** giao diện/DOM/hành vi trên môi trường thật. Gồm cả khi QA **kể lại quan sát của chính mình** trong prompt cho AI | **Người quan sát + env + ngày**. Cũ đi sau mỗi lần deploy |
 | `AI-PROPOSAL` | Đề xuất của AI, chưa ai duyệt | — |
 | `QA-ACCEPTED` | `AI-PROPOSAL` đã được QA duyệt | Dòng trong decision log |
 | `HYPOTHESIS` | Giải thích chưa kiểm chứng | — |
@@ -19,6 +19,18 @@
 | `CI-RUN: passed\|failed\|flaky` | CI chạy trên SHA **chưa** được người khác review | SHA, link job |
 | `RUN-PASSED` / `RUN-FAILED` | CI chạy trên SHA **đã được người khác review** (hoặc SHA đã merge khi branch protection bật), đủ reporter, trace, oracle đạt, cleanup DONE | SHA, link job, trace ref |
 | `UNKNOWN` | Không có nguồn để kết luận | — |
+
+**Phân biệt `DOM-OBSERVED` và `PROVIDED`: hỏi "ai đã tự nhìn thấy?"**
+
+| Tình huống | Nhãn |
+|---|---|
+| User (QA) viết: "mình quan sát ngày 07/10 trên OrangeHRM demo: form có 3 field…" | `DOM-OBSERVED` (người quan sát: user, env: OrangeHRM demo, ngày: 07/10) |
+| AI tự xem DOM qua MCP browser | `DOM-OBSERVED` (người quan sát: AI qua MCP, env, ngày) |
+| User viết: "dev bảo field này tối đa 50 ký tự" | `PROVIDED` (nguồn: dev) |
+| User dán đoạn trong tài liệu/ticket/email của khách | `PROVIDED` (nguồn: tên tài liệu/ticket) |
+| Quan sát không ghi ngày hoặc env | Vẫn là `DOM-OBSERVED` nhưng ghi `env/ngày: UNKNOWN` và hỏi lại user |
+
+AI không kiểm chứng được lời kể của user; nhãn ghi **ai** quan sát để người đọc biết độ tin cậy. `DOM-OBSERVED` cho biết **hành vi hiện tại**, không chứng minh hành vi đó **đúng** (xem `test_design.md` mục 2).
 
 **Hai cụm cố định:**
 - `Not specified`: requirement **không quy định** hành vi này.

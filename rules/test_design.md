@@ -21,9 +21,34 @@
 - **Steps và Expected:** đánh số khớp 1-1.
 - **Test Data:** giá trị cụ thể (`QA-r042-emp01`), không viết "dữ liệu hợp lệ". Email dùng `@example.com`.
 - **Mỗi field có validation TC riêng**, không gộp nhiều field vào một TC.
-- **Priority:** P1–P4. **Risk:** Critical / High / Medium / Low.
+- **Priority:** P1–P4. **Risk:** Critical / High / Medium / Low. Cách đặt: mục 2b.
 - **Automatable:** Yes / No / Partial. **Auto Type:** UI / API / Unit / N/A.
 - **Tags:** `@Smoke`, `@Regression`, `@CriticalPath`, `@Security`, `@Boundary`, `@A11y`, `@Mobile`.
+- **Không dùng ký hiệu tắt tự đặt** (ví dụ `C0`, `E`, `R`, `N1`). Cần phân loại thì viết chữ đầy đủ (Happy / Negative / Boundary / Edge). Ký hiệu nào thật sự cần thì phải có bảng chú thích ngay trong file.
+
+## 2a. TC chạy được và mục thăm dò: không trộn chung
+| | **TC chạy được** | **Mục thăm dò / câu hỏi** |
+|---|---|---|
+| Khi nào | Expected **đã biết** và có nguồn | Expected **chưa biết** (`UNKNOWN` / `Not specified`) |
+| Nguồn expected | `REQ-CONFIRMED`, `DOM-OBSERVED`, kỳ vọng hiển nhiên #1–#4 (`bug_report.md` mục 1b) | Không có |
+| Nằm ở | Bảng TC (có cột `TC ID`) | Bảng riêng, khóa bằng mã câu hỏi `Q-<MODULE>-NN` (**không** có cột `TC ID`, nên không bị xuất sang Excel như TC) |
+| Chạy thế nào | Pass/fail theo expected | Quan sát rồi ghi lại hành vi; có câu trả lời của PO/BA hoặc quan sát xong thì **chuyển thành TC** |
+
+- TC có expected từ `DOM-OBSERVED` kiểm tra **hành vi hiện tại không đổi**, không chứng minh hành vi đó đúng. Ghi rõ trong cột Expected: "(hành vi quan sát ngày …, chưa có requirement xác nhận)".
+- **Không** viết TC với expected "UNKNOWN", "cần xác nhận", "tùy hệ thống".
+
+## 2b. Đặt Priority theo rủi ro thật
+1. Đánh **Risk** = khả năng xảy ra × mức ảnh hưởng (nghiệp vụ, dữ liệu, bảo mật, số người dùng bị ảnh hưởng).
+2. Quy đổi mặc định (dự án có quy ước khác thì theo dự án):
+
+| Priority | Khi nào |
+|---|---|
+| P1 | Luồng chính bắt buộc phải chạy được (smoke), hoặc Risk Critical (mất/sai dữ liệu, bảo mật, chặn người dùng) |
+| P2 | Risk High: chức năng quan trọng, có cách vòng |
+| P3 | Risk Medium |
+| P4 | Risk Low: hiển thị, trường hợp hiếm |
+
+3. **"Chưa biết expected" không phải lý do tăng priority.** Điểm chưa rõ đi vào bảng thăm dò (mục 2a), không đội priority của TC.
 
 ## 3. Oracle tốt và oracle yếu
 | Oracle yếu ❌ | Oracle mạnh ✅ |
@@ -41,3 +66,5 @@ TC dùng payload XSS hoặc SQL injection phải gắn tag `@Security`, chỉ ch
 - [ ] Test Data cụ thể, không chứa PII hay secret thật
 - [ ] Không TC nào chỉ dùng oracle yếu
 - [ ] Điểm mơ hồ hoặc `Not specified` được tách riêng để hỏi
+- [ ] Không TC nào có expected chưa biết; những mục đó nằm ở bảng thăm dò
+- [ ] Priority dựa trên Risk; không có ký hiệu tắt chưa chú thích

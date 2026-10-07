@@ -26,4 +26,7 @@ Bước cuối: gom **toàn bộ** test case ở bước 5 vào **một bảng M
 - [ ] Mỗi field có TC validation riêng
 - [ ] Đủ cột Priority, Risk, Automatable, Auto Type, Tags
 
-Sau bảng, liệt kê lại **các câu hỏi còn mở** (`Not specified`) từ các bước trước.
+Sau bảng test case, đặt **bảng thăm dò riêng** (không có cột TC ID) cho các tình huống chưa biết expected:
+`| Q ID | Scenario cần thăm dò | Cần biết điều gì | Cách quan sát | Risk |`
+
+Cuối cùng liệt kê lại **các câu hỏi còn mở** (`Not specified`) từ các bước trước, và dòng tổng: "N test case chạy được · M mục thăm dò · K câu hỏi".
