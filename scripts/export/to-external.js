@@ -44,8 +44,16 @@ const WORDS = {
 };
 const LEFTOVER = /\b(REQ-CONFIRMED|DOM-OBSERVED|AI-PROPOSAL|QA-ACCEPTED|HYPOTHESIS|VERIFIED|REFUTED|MANUAL-RUN|LOCAL-RUN|CI-RUN|RUN-PASSED|RUN-FAILED|UNKNOWN)\b/;
 
+const OBVIOUS = {
+  vi: 'kỳ vọng chung của phần mềm, chờ PO xác nhận',
+  en: 'general software expectation, pending PO confirmation',
+};
+
 function convertLabels(text, lang) {
   let t = text;
+  // Nguồn expected "kỳ vọng hiển nhiên #n" (rules/bug_report.md mục 1b).
+  t = t.replace(/kỳ vọng hiển nhiên\s*#\s*[1-4]/gi, OBVIOUS[lang])
+    .replace(/,?\s*cần PO\/BA xác nhận expected/gi, ''); // ghi chú nội bộ, đã nằm trong cụm thay thế
   // REQ-CONFIRMED: bỏ nhãn, giữ mã AC.
   t = t.replace(/\(\s*`?REQ-CONFIRMED`?\s*,\s*/g, '(')
     .replace(/,\s*`?REQ-CONFIRMED`?\s*\)/g, ')')

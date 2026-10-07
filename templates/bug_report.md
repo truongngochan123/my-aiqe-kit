@@ -29,6 +29,9 @@ status: draft
 
 ## Expected / Kết quả mong đợi
 <kết quả> — nguồn: `AC-…` (`REQ-CONFIRMED`)
+<!-- Không có requirement? Chỉ dùng được khi khớp danh sách đóng ở rules/bug_report.md mục 1b:
+     <kết quả> — nguồn: kỳ vọng hiển nhiên #<1-4> (`AI-PROPOSAL`), cần PO/BA xác nhận expected -->
+
 
 ## Actual / Kết quả thực tế
 <kết quả> — `<nhãn evidence>` (người chạy, thời điểm)

@@ -48,6 +48,7 @@
 | 25 🆕 | **Bỏ cả 15 lệnh tắt của Claude.** Gọi skill bằng tên đầy đủ: `/tên-skill` (Claude), `$tên-skill` (Codex). Tham số mode ghi thẳng vào câu: `/bug-reporting retest BUG-CUS-012`. Sanitize và scaffold: nói bằng lời, `AGENTS.md` mục "Việc không có skill riêng" hướng dẫn |
 | 26 🆕 | `.gitattributes`: văn bản dùng LF, `.ps1` dùng CRLF, Excel/ảnh/zip là binary |
 | 27 🆕 | Test database: `test-design-rbt/references/sql_oracle.md` (oracle đọc lại dữ liệu bằng SQL, **chỉ SELECT**, chỉ trên env sandbox) ở Đợt 1 |
+| 29 🆕 | **Kỳ vọng hiển nhiên** (chọn phương án b, 07/10): khi sản phẩm không có requirement, bug được tạo nếu hành vi khớp **danh sách đóng 4 mục** trong `rules/bug_report.md` mục 1b (lỗi hệ thống · dữ liệu lưu sai/mất · lộ dữ liệu/vượt quyền · tài khoản hợp lệ không đăng nhập được). Expected gắn `AI-PROPOSAL` + "cần PO/BA xác nhận". Ngoài danh sách → câu hỏi `Q-*` |
 | 28 🆕 | Đợt 1 làm theo thứ tự **pilot**: 3 skill mẫu → dừng → Han cài kit thật cho Codex và test 9 prompt → ổn mới làm 5 skill còn lại |
 
 ## 1. Lịch

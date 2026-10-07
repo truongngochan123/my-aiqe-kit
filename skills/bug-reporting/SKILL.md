@@ -13,7 +13,7 @@ description: Viết, review hoặc retest bug report có evidence và expected c
 - **Không dùng:**
   - Test automation fail, chưa biết do test, môi trường hay sản phẩm → `incident-triage` trước. Chỉ viết bug khi triage kết luận "product behavior".
   - Báo cáo kết quả cả một lần chạy (nhiều TC) → `evidence-reporting`.
-  - Hành vi lạ nhưng requirement không nói phải thế nào → **không phải bug**: tạo câu hỏi `Q-*` cho BA/PO (xem bước 2).
+  - Hành vi lạ nhưng requirement không nói phải thế nào, và **không** thuộc danh sách kỳ vọng hiển nhiên → **không phải bug**: tạo câu hỏi `Q-*` cho BA/PO (xem bước 2).
 
 ## Mode
 | Mode | Việc | Ví dụ lời gọi |
@@ -26,7 +26,7 @@ description: Viết, review hoặc retest bug report có evidence và expected c
 | Cần | Bắt buộc? | Thiếu thì |
 |---|---|---|
 | Actual + evidence (screenshot/video/log, đã che dữ liệu nhạy cảm) | ✅ | Chỉ tạo **bản nháp**, ghi `Insufficient evidence` |
-| Expected + nguồn (`AC-*`, file requirement, PO xác nhận) | ✅ | **Không tạo bug**, tạo câu hỏi `Q-*` |
+| Expected + nguồn: (a) `AC-*`/requirement/PO xác nhận, hoặc (b) **kỳ vọng hiển nhiên #1–#4** khi không có requirement | ✅ | Không thuộc (a) hay (b) → **không tạo bug**, tạo câu hỏi `Q-*` |
 | Build/version, env, trình duyệt/thiết bị | ✅ | Hỏi user, không đoán |
 | Các bước tái hiện, data đã dùng | ✅ | Hỏi user |
 | Tỉ lệ tái hiện (ví dụ `3/5`) | Nên có | Ghi `Insufficient evidence` cho mục này |
@@ -38,7 +38,9 @@ description: Viết, review hoặc retest bug report có evidence và expected c
 1. **Đọc yml** để lấy thang đo và ngôn ngữ.
 2. **Kiểm tra 7 điều kiện** của `{{KIT}}/rules/bug_report.md` mục 1, theo thứ tự này:
    - Evidence của actual chỉ là `HYPOTHESIS`/`AI-PROPOSAL`, hoặc không có → dừng, tạo bản nháp `status: draft` + `Insufficient evidence`.
-   - Expected không có nguồn → dừng, **không tạo bug**; viết câu hỏi `Q-<MODULE>-NN`: hành vi quan sát được, câu hỏi, vì sao quan trọng.
+   - Tìm nguồn cho expected theo `{{KIT}}/rules/bug_report.md` điều kiện 3:
+     (a) có requirement/AC → dùng; (b) không có requirement → so với **danh sách đóng 4 mục** ở mục 1b (lỗi hệ thống · dữ liệu lưu sai/mất · lộ dữ liệu/vượt quyền · tài khoản hợp lệ không đăng nhập được). Khớp → expected ghi `kỳ vọng hiển nhiên #n` + `AI-PROPOSAL` + "cần PO/BA xác nhận expected". **Không tự mở rộng danh sách**.
+   - Không có nguồn (a) hay (b) → dừng, **không tạo bug**; viết câu hỏi `Q-<MODULE>-NN`: hành vi quan sát được, câu hỏi, vì sao quan trọng. Ví dụ trùng tên, độ dài tối đa, nội dung thông báo là câu hỏi, không phải bug.
    - Lỗi đến từ automation mà chưa có kết luận triage → dừng, chuyển `incident-triage`.
 3. **Kiểm tra trùng** trong CSV: so module, tiêu đề, bước tái hiện. Nghi trùng → báo ID bug cũ và hỏi user, không tạo mới.
 4. **Che dữ liệu nhạy cảm** trong log/HAR đính kèm: `node {{KIT}}/scripts/redact/redact.js <file>`; nhắc user tự che screenshot.
@@ -82,7 +84,8 @@ Chấm bug theo 7 điều kiện + format. Output: bảng `# | Điều kiện | 
 
 ## Self-check
 - [ ] Actual có evidence thật (không phải `HYPOTHESIS`/`AI-PROPOSAL`); thiếu thì status là `draft`
-- [ ] Expected có nguồn; không có thì đã chuyển thành câu hỏi, không tạo bug
+- [ ] Expected có nguồn (a) requirement hoặc (b) kỳ vọng hiển nhiên #1–#4 kèm `AI-PROPOSAL` + "cần PO/BA xác nhận"; không có thì đã chuyển thành câu hỏi, không tạo bug
+- [ ] Không dùng kỳ vọng hiển nhiên cho thứ ngoài danh sách (trùng lặp, độ dài, định dạng, nội dung thông báo, UX, tốc độ)
 - [ ] Đã kiểm tra trùng hoặc ghi rõ chưa kiểm tra vì thiếu CSV
 - [ ] Bước tái hiện đánh số, có data cụ thể, người khác làm lại được
 - [ ] Có build/version, env, tỉ lệ tái hiện

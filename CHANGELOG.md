@@ -14,6 +14,8 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 
 - `scripts/project/new-project.ps1` + `new-project.js`: tạo thư mục dự án mới và `.aiqe/project.aiqe.yml` (điền tên, URL, module, ngôn ngữ; còn lại mặc định chặt nhất; không ghi đè).
 
+- `rules/bug_report.md` mục 1b: danh sách đóng 4 **kỳ vọng hiển nhiên** dùng làm nguồn expected khi không có requirement; skill `bug-reporting`, template bug và `to-external.js` cập nhật theo.
+
 ### Sửa (phát hiện khi kiểm tra Đợt 1 Bước 1)
 - `redact.js --check` trên file đã che vẫn báo còn dữ liệu (khớp lại chữ `[REDACTED]`) → bỏ qua chỗ đã che.
 - `install.js` không chép `scripts/node_modules` vào bản cài → `md_to_xlsx` chạy từ bản cài báo thiếu thư viện. Sửa: chép kèm, cảnh báo nếu chưa `npm install`.
