@@ -212,7 +212,7 @@ my-aiqe-kit/
 - **Phát sinh +2 file:** `scripts/lib/config.js` (đọc `project.aiqe.yml`, dùng chung cho các script) và `scripts/package-lock.json` (khóa version thư viện).
 - `md_to_xlsx` viết lại bằng `exceljs` (bản gốc dùng `xlsx` 0.18.5 không còn cập nhật trên npm, và lấy cột theo vị trí). `uuid` ép lên 11.1.1 qua `overrides` để hết cảnh báo GHSA-w5hq-g745-h8pq (`npm audit`: 0 lỗ hổng).
 - Kiểm chứng: `check-skills` 3 skill 0 lỗi · `grep-clean` sạch · chạy thử 3 script với file mẫu · cài thử vào home giả: 16/16 đường dẫn trong skill tồn tại, script chạy được từ bản cài.
-- **07/10:** thêm `scripts/project/new-project.ps1` + `.js` (tạo thư mục dự án + `.aiqe/project.aiqe.yml`, không ghi đè). Pilot đổi sang **OrangeHRM** (`D:pt-informiqe-pilot`, yml do Han tạo tay, script xác nhận không ghi đè).
+- **07/10:** thêm `scripts/project/new-project.ps1` + `.js` (tạo thư mục dự án + `.aiqe/project.aiqe.yml`, không ghi đè). Pilot đổi sang **OrangeHRM** (`D:\fpt-inform\aiqe-pilot`, yml do Han tạo tay, script xác nhận không ghi đè).
 - Bảng `field_validation_15.md` có **bản sao** trong `prompts/manual/05_…md` (để dán sang AI khác). Sửa bảng thì sửa cả hai (có comment `sync` đánh dấu). Câu hỏi mở Q9.
 
 | File | Chức năng | Phải có / Nghiệm thu |
