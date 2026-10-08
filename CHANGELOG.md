@@ -24,6 +24,7 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 - Q9: `check-skills.js` so bảng field giữa bản gốc và prompt 05. Q10: output mặc định `<repo>/.aiqe/output/`, `new-project` thêm `.aiqe/` vào `.git/info/exclude`.
 
 ### Sửa (08/10)
+- Sau pilot T2/T3 (quyết định #35): script kiểm tra là cổng bắt buộc (`AGENTS.md`, `test-design-rbt`, `bug-reporting`); mã `PRV-` cho quy tắc kể lại (`id_conventions`, `evidence_labels`, `test_design`, prompt 04); `check-tc` bắt dòng tổng sai mẫu/sai số, dòng bảng vỡ, `REQ-CONFIRMED` không nguồn, giảm cảnh báo ngày giả; mode `full` gộp bước 1+2, marker `aiqe-stop-in-skill` trong 6 prompt, `check-skills` so điểm dừng; prompt 06 dùng đúng mẫu dòng tổng; 4 eval case mới.
 - Tên người/record trong data mang prefix; regex ID data cho phép chữ hoa. `test-design-rbt` luôn có "Bước tiếp theo".
 - Fixture chỉ tính file dữ liệu (tránh báo nhầm tài liệu `.md`).
 - Agent: lỗ hổng tự gây ra khi viết controller (đi vòng qua AWAIT_G1 để quay lại ACT sau VERIFY) đã sửa trước khi commit.

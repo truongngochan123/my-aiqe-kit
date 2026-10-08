@@ -36,6 +36,9 @@ Mỗi skill có mục "Không dùng → X" để chuyển đúng việc. User g�
 - Mỗi file output có front-matter: `id`, `source`, `labels`, `produced_by: <tên skill>`, `status`. Skill sau đọc front-matter của skill trước.
 - Bản gửi khách (external) tạo bằng `{{KIT}}/scripts/export/to-external.js`: bỏ front-matter, chuyển nhãn thành lời, redact.
 
+## Script kiểm tra là cổng bắt buộc
+Skill nào yêu cầu chạy script kiểm tra (`check-tc.js`, `check-bug.js`, `tsc`, `--list`…): exit khác 0 hoặc dòng cuối `CHƯA ĐẠT` thì **chưa xong**: sửa rồi chạy lại; câu trả lời cuối **in nguyên văn dòng cuối** của script. Không chạy được thì nói rõ, không tự kết luận đạt.
+
 ## Rules: đọc khi cần
 | Khi | Đọc |
 |---|---|

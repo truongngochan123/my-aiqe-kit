@@ -1,4 +1,5 @@
 # FULL RBT · Bước 4/6: Truy vết và scenario
+<!-- aiqe-stop-in-skill: yes -->
 
 > ⚠️ Xem cảnh báo ở `01_context_and_roleplay.md` trước khi dán.
 > **Điểm dừng do người quyết định:** bạn tự đánh giá rủi ro, bổ sung scenario AI bỏ sót, rồi mới cho sang bước 5.
@@ -9,7 +10,7 @@
 Từ kết quả phân rã ở bước 3, lập **ma trận truy vết** để chắc chắn mọi yêu cầu đều có scenario.
 
 ### 1. Truy vết yêu cầu
-Dùng **mã AC có sẵn** trong tài liệu (ví dụ `AC-CUS-01`). Yêu cầu nào tài liệu không đánh mã → đánh mã tạm `HYP-<MODULE>-NN` và ghi rõ là giả định.
+Dùng **mã AC có sẵn** trong tài liệu (ví dụ `AC-CUS-01`). Yêu cầu nào tài liệu không đánh mã → đánh mã tạm `HYP-<MODULE>-NN` và ghi rõ là giả định. Quy tắc do BA/dev **kể lại qua tôi** mà chưa có tên + ngày hoặc mã ticket → mã `PRV-<MODULE>-NN`, nhãn `PROVIDED`, kèm câu hỏi xin tên BA + ngày hoặc mã ticket (không dùng `HYP-`, không `REQ-CONFIRMED`).
 
 | Mã AC/HYP | Module | Mô tả yêu cầu | Trích dẫn tài liệu |
 |---|---|---|---|

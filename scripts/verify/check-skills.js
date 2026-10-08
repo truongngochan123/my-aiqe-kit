@@ -85,5 +85,27 @@ if (fs.existsSync(SRC) && fs.existsSync(COPY)) {
   }
 }
 
+// Điểm dừng mode full: prompts/manual/0N khai báo <!-- aiqe-stop-in-skill: yes|no -->,
+// SKILL.md test-design-rbt ghi "chỉ dừng ở bước X và bước Y". Hai nơi phải khớp (pilot T3).
+const PDIR = path.join(ROOT, 'prompts', 'manual');
+const TDR = path.join(ROOT, 'skills', 'test-design-rbt', 'SKILL.md');
+if (fs.existsSync(PDIR) && fs.existsSync(TDR)) {
+  const promptStops = [];
+  for (const f of fs.readdirSync(PDIR).filter((x) => /^0\d_.*\.md$/.test(x)).sort()) {
+    const m = fs.readFileSync(path.join(PDIR, f), 'utf8').match(/<!-- aiqe-stop-in-skill: (yes|no) -->/);
+    if (!m) err('test-design-rbt', `prompt ${f} thiếu dòng <!-- aiqe-stop-in-skill: yes|no -->`);
+    else if (m[1] === 'yes') promptStops.push(Number(f.slice(0, 2)));
+  }
+  const row = fs.readFileSync(TDR, 'utf8').split(/\r?\n/).find((l) => l.startsWith('| `full`'));
+  const said = row && row.match(/chỉ dừng ở ([^(;|]+)/);
+  if (!said) err('test-design-rbt', 'dòng mode `full` trong SKILL.md phải ghi "chỉ dừng ở bước X và bước Y"');
+  else {
+    const skillStops = (said[1].match(/\d+/g) || []).map(Number);
+    if (skillStops.join(',') !== promptStops.join(',')) {
+      err('test-design-rbt', `điểm dừng mode full lệch: SKILL.md ghi bước [${skillStops.join(', ')}], prompt khai báo yes ở bước [${promptStops.join(', ')}]`);
+    }
+  }
+}
+
 console.log(`\nĐã kiểm tra ${dirs.length} skill, ${errors} lỗi.`);
 process.exit(errors ? 1 : 0);

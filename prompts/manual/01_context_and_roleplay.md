@@ -1,4 +1,5 @@
 # FULL RBT · Bước 1/6: Khởi tạo ngữ cảnh
+<!-- aiqe-stop-in-skill: no -->
 
 > ⚠️ **TRƯỚC KHI DÁN PROMPT NÀY VÀO MỘT AI CHAT (ChatGPT, Gemini, Claude web…):**
 > - Chỉ dùng khi `ai_policy` của dự án **cho phép** tool đó (`docs/before_you_use.md`). Chưa biết → **không** dán tài liệu thật của khách; chỉ dùng dữ liệu luyện tập (`practices/`).
@@ -37,3 +38,5 @@ Tư duy phản biện, tập trung vào: trải nghiệm người dùng, đúng 
 - Danh sách tài liệu bạn đã nhận và tài liệu **còn thiếu** mà bạn cần
 
 Dừng lại, chờ tôi xác nhận rồi mới sang bước 2.
+
+<!-- Khi chạy QUA SKILL test-design-rbt (mode full): bước 1 và 2 được gộp trong một lượt, không dừng ở đây. Dừng sau bước 1 chỉ áp dụng khi dán prompt sang AI web. -->

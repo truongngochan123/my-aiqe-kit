@@ -1,4 +1,5 @@
 # FULL RBT · Bước 3/6: Phân rã hệ thống
+<!-- aiqe-stop-in-skill: no -->
 
 > ⚠️ Xem cảnh báo ở `01_context_and_roleplay.md` trước khi dán.
 > Gửi bước này **sau khi** đã trả lời câu hỏi ở bước 2. Câu nào chưa có trả lời thì AI phải giữ nguyên là `Not specified`.

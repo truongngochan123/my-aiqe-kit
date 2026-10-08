@@ -1,4 +1,5 @@
 # FULL RBT · Bước 5/6: Sinh test case theo rủi ro
+<!-- aiqe-stop-in-skill: no -->
 
 > ⚠️ Xem cảnh báo ở `01_context_and_roleplay.md` trước khi dán.
 > Gửi **sau khi** đã duyệt scenario và chốt rủi ro ở bước 4. Nhiều module → yêu cầu AI làm **từng module một**.

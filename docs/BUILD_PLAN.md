@@ -11,7 +11,7 @@
 |---|---|---|
 | 0: Nền móng | ✅ Đã duyệt | 06/10 |
 | 1: Manual | ✅ Dựng xong 8 skill (07/10) · chờ Han chạy pilot/eval trên Codex và duyệt | 06–07/10 |
-| 2: Automation + CI | ✅ Dựng xong (08/10) · chờ Han duyệt | 08/10 |
+| 2: Automation + CI | ✅ Đã duyệt (08/10) · sửa 4 điểm từ pilot T2/T3 | 08/10 |
 | 3: Lead, tích hợp, đa stack | ⏳ Chưa | 09/10 |
 | Agent 0.2.0 | 🔄 Lõi xong (08/10, 18 test) · tool + demo 09/10 | 08–10/10 |
 
@@ -52,6 +52,7 @@
 | 30 🆕 | Sau pilot T1 (07/10): quan sát QA tự làm (kể cả kể lại trong prompt) là `DOM-OBSERVED`, thông tin từ người khác là `PROVIDED`; output test case tách **TC chạy được** và **mục thăm dò** (expected chưa biết, khóa `Q-*`); Priority theo Risk; cấm ký hiệu tắt tự đặt |
 | 32 🆕 | **Q9 (08/10):** `field_validation_15.md` là bản gốc; prompt 05 giữ bản sao; `check-skills.js` so 2 bảng, lệch thì báo lỗi. **Q10:** `output_dir` mặc định `<repo>/.aiqe/output/` (tương đối từ thư mục chứa `.aiqe/`); `new-project` tự thêm `.aiqe/` vào `.git/info/exclude`; `--output-outside` khi dự án yêu cầu |
 | 33 🆕 | Từ pilot T1 lần 4: tên người/record trong data mang prefix (`QA-r001-An`); `test-design-rbt` luôn có mục "Bước tiếp theo" (`check-tc` bắt lỗi khi thiếu) |
+| 35 🆕 | Sau pilot T2/T3 (08/10): (1) script kiểm tra là **cổng bắt buộc**: `check-tc`/`check-bug` chưa ĐẠT thì sửa và chạy lại, không báo xong, in nguyên văn dòng cuối (skill + `AGENTS.md`); (2) quy tắc BA/dev kể qua user, không có tên + ngày hoặc mã ticket → `PROVIDED` + Source `PRV-<MODULE>-NN` + câu hỏi; không `REQ-CONFIRMED`, không `HYP-`; (3) `check-tc` báo dòng tổng sai mẫu, số tổng khác số đếm, dòng bảng bị vỡ/thiếu ô; bỏ cảnh báo ngày DOM-OBSERVED khi ngày đã có ở front-matter/tiêu đề/dòng nguồn; (4) mode `full` qua skill gộp bước 1+2, chỉ dừng ở bước 2 và 4; prompt khai báo `<!-- aiqe-stop-in-skill: yes\|no -->`, `check-skills` so với SKILL.md. Eval `TDR-PRV-01/02`, `TDR-GATE-01`, `TDR-FULL-STOP-01` |
 | 34 🆕 | Agent: TypeScript chạy bằng `node --experimental-strip-types` (Node ≥ 22.6), không build; planner 3 chế độ `mock` / `codex` / `api`; **demo trên OrangeHRM** (bỏ app giả local): luồng chỉ đọc trước, luồng tạo nhân viên chỉ khi có G1 và dọn đúng record. Kiểm tra gây tải OWASP (5–8) **cấm** trên site dùng chung |
 | 29 🆕 | **Kỳ vọng hiển nhiên** (chọn phương án b, 07/10): khi sản phẩm không có requirement, bug được tạo nếu hành vi khớp **danh sách đóng 4 mục** trong `rules/bug_report.md` mục 1b (lỗi hệ thống · dữ liệu lưu sai/mất · lộ dữ liệu/vượt quyền · tài khoản hợp lệ không đăng nhập được). Expected gắn `AI-PROPOSAL` + "cần PO/BA xác nhận". Ngoài danh sách → câu hỏi `Q-*` |
 | 28 🆕 | Đợt 1 làm theo thứ tự **pilot**: 3 skill mẫu → dừng → Han cài kit thật cho Codex và test 9 prompt → ổn mới làm 5 skill còn lại |
@@ -216,6 +217,7 @@ my-aiqe-kit/
 
 **Tiến độ 08/10 ✅ (Đợt 2 + lõi agent)**
 - Q9, Q10, 2 sửa nhỏ từ pilot T1 lần 4 (quyết định #32, #33).
+- **Pilot T2 (maintain) và T3 (full), 08/10:** Codex nộp `TC-PIM.v5.md` khi `check-tc` còn exit 1 (dòng tổng "10 TC có oracle", thiếu "Bước tiếp theo"); gắn `REQ-CONFIRMED` cho quy tắc BA kể qua user; dòng thêm vào bảng có sẵn bị vỡ (đếm 12, ghi 13); prompt 01 và SKILL lệch điểm dừng. Sửa: quyết định #35.
 - Đợt 2: `ui-automation` (Bước 0 stack; write/review/locator/run; 4 references), `api-testing` (code + Postman; OWASP gây tải cấm trên site dùng chung; 2 references), scaffold Playwright 9 file (đã `npm install` ở thư mục tạm: `--list` 3 test, `tsc` đạt, `forbidOnly` chặn `.only` trên CI, `npm audit` 0), `aiqe-verify.js` + 🆕 `oracle-patterns.js` (pattern dùng chung với hook, +1 file), CI GitHub/GitLab, CODEOWNERS, `proposal_for_lead.md`, `approval_card.md`, 6 prompt automation (bỏ self-fix, credential trong chat, domain email thật), eval 2 skill, `review_checklist_dot2.md`.
 - Sửa: fixture chỉ tính file dữ liệu (tài liệu `.md` trong thư mục `test-data` bị báo nhầm), hook thêm case 26/26.
 - Agent lõi: `docs/agent_design.md` (viết trước code), 19 file trong `agent/`; 18 test đạt; **kiểm tra ngược**: tắt từng guard (I2, I3, I4, I5, I7, I8, I9) đều có test fail.
@@ -379,8 +381,8 @@ agent/
 | ~~Q10~~ | ~~`output_dir` mặc định~~ | Đã chốt 08/10 (quyết định #32) | — |
 | (cũ) Q10 | `output_dir` mặc định | Mặc định `~/aiqe-output/` nằm **ngoài workspace** nên sandbox Codex hỏi duyệt mỗi lần ghi. Tạm thời dùng `new-project -OutputInProject`. Có đổi mặc định không? | Quyết định sau pilot |
 | ~~Q9~~ | ~~`prompts/manual/05_…md`~~ | Đã chốt 08/10 (quyết định #32) | — |
-| Q11 | `agent/src/planner/codex_planner.ts` | Cờ `codex exec --sandbox read-only --skip-git-repo-check -C` và định dạng output chưa chạy thử; mức cách ly thật `UNKNOWN` | Chạy planner codex với 1 kịch bản trên máy có Codex |
-| Q12 | `ci/gitlab/aiqe-check.gitlab-ci.yml` | `CI_JOB_TOKEN` đọc được approvals không; Code Owners bắt buộc cần gói nào | Hỏi admin GitLab của dự án |
+| Q11 | `agent/src/planner/codex_planner.ts` | Cờ `codex exec --sandbox read-only --skip-git-repo-check -C` và định dạng output chưa chạy thử; mức cách ly thật `UNKNOWN`. **08/10: đã đưa Han 1 dòng lệnh, chờ output** | Chạy planner codex với 1 kịch bản trên máy có Codex |
+| Q12 | `ci/gitlab/aiqe-check.gitlab-ci.yml` | `CI_JOB_TOKEN` đọc được approvals không; Code Owners bắt buộc cần gói nào. **08/10: để `UNKNOWN`, chưa cần** | Hỏi admin GitLab của dự án |
 | (cũ) Q9 | `prompts/manual/05_…md` | Bảng field bị chép 2 nơi; có cần script kiểm tra 2 bản khớp nhau không | Thêm vào `check-skills.js` ở Đợt 2 nếu thấy lệch |
 | Q6 | `test-strategy` | Ước lượng theo phương pháp nào; metric nào được ghi `UNKNOWN` | Đợt 3 |
 | Q7 | `regression-selection` | Ai lập coverage map lần đầu | Đợt 3 |

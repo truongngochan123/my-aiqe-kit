@@ -6,7 +6,7 @@
 
 | Nhãn | Dùng khi | Bắt buộc kèm |
 |---|---|---|
-| `REQ-CONFIRMED` | Lấy từ requirement hoặc AC có ID, hoặc PO/BA đã xác nhận | ID nguồn (`AC-LOGIN-01`) hoặc tên người xác nhận + ngày |
+| `REQ-CONFIRMED` | Lấy từ requirement hoặc AC có ID, hoặc PO/BA đã xác nhận | ID nguồn (`AC-LOGIN-01`, mã ticket) **hoặc** tên người xác nhận + ngày. Thiếu cả hai → `PROVIDED` |
 | `PROVIDED` | Thông tin do **người hoặc nguồn khác** cung cấp, QA chưa tự xem: khách, BA, dev, đồng nghiệp, tài liệu, ticket, bộ kit gốc (AI sinh) | **Nguồn** (ai/tài liệu nào) |
 | `DOM-OBSERVED` | **QA tự quan sát** giao diện/DOM/hành vi trên môi trường thật. Gồm cả khi QA **kể lại quan sát của chính mình** trong prompt cho AI | **Người quan sát + env + ngày**. Cũ đi sau mỗi lần deploy |
 | `AI-PROPOSAL` | Đề xuất của AI, chưa ai duyệt | — |
@@ -27,6 +27,8 @@
 | User (QA) viết: "mình quan sát ngày 07/10 trên OrangeHRM demo: form có 3 field…" | `DOM-OBSERVED` (người quan sát: user, env: OrangeHRM demo, ngày: 07/10) |
 | AI tự xem DOM qua MCP browser | `DOM-OBSERVED` (người quan sát: AI qua MCP, env, ngày) |
 | User viết: "dev bảo field này tối đa 50 ký tự" | `PROVIDED` (nguồn: dev) |
+| User viết: "BA vừa đổi: Company tối đa 100 ký tự" (không có tên BA, ngày, mã ticket) | `PROVIDED` (nguồn: BA, tên/ticket `UNKNOWN`) + câu hỏi `Q-*` xin tên BA + ngày hoặc mã ticket. Source TC: `PRV-<MODULE>-NN`. **Không** `REQ-CONFIRMED`, **không** `HYP-` |
+| User viết: "BA Lan xác nhận ngày 08/10, ticket PIM-123" | `REQ-CONFIRMED` (PIM-123, BA Lan, 08/10) |
 | User dán đoạn trong tài liệu/ticket/email của khách | `PROVIDED` (nguồn: tên tài liệu/ticket) |
 | Quan sát không ghi ngày hoặc env | Vẫn là `DOM-OBSERVED` nhưng ghi `env/ngày: UNKNOWN` và hỏi lại user |
 

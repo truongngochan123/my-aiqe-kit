@@ -1,4 +1,5 @@
 # FULL RBT · Bước 2/6: Phân tích yêu cầu và Q&A
+<!-- aiqe-stop-in-skill: yes -->
 
 > ⚠️ Xem cảnh báo ở `01_context_and_roleplay.md` (chính sách AI, che dữ liệu nhạy cảm) trước khi dán.
 > **Điểm dừng quan trọng nhất.** AI phải dừng chờ bạn (hoặc BA/PO) trả lời câu hỏi. Nếu AI tự trả lời hoặc đi tiếp, nhắc nó quay lại.

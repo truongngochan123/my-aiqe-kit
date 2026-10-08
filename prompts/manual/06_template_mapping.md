@@ -1,4 +1,5 @@
 # FULL RBT · Bước 6/6: Chuẩn hóa bảng test case
+<!-- aiqe-stop-in-skill: no -->
 
 > ⚠️ Xem cảnh báo ở `01_context_and_roleplay.md` trước khi dán.
 > Gửi sau khi đã xem test case ở bước 5. Bảng kết quả dán được vào Excel, hoặc lưu thành file `.md` rồi chạy `node scripts/convert/md_to_xlsx.js <file.md>` của kit.
@@ -29,4 +30,7 @@ Bước cuối: gom **toàn bộ** test case ở bước 5 vào **một bảng M
 Sau bảng test case, đặt **bảng thăm dò riêng** (không có cột TC ID) cho các tình huống chưa biết expected:
 `| Q ID | Scenario cần thăm dò | Cần biết điều gì | Cách quan sát | Risk |`
 
-Cuối cùng liệt kê lại **các câu hỏi còn mở** (`Not specified`) từ các bước trước, và dòng tổng: "N test case chạy được · M mục thăm dò · K câu hỏi".
+Cuối cùng liệt kê lại **các câu hỏi còn mở** (`Not specified`) từ các bước trước, và dòng tổng **đúng nguyên mẫu** (không đổi chữ):
+`**Tổng:** N TC chạy được · M mục thăm dò · K câu hỏi`
+
+Số N, M, K phải bằng số dòng thật trong các bảng.

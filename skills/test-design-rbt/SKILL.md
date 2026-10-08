@@ -20,7 +20,7 @@ description: Viết hoặc review manual test case theo EP, BVA, Decision Table,
 | Mode | Khi nào | Cách chạy |
 |---|---|---|
 | `quick` (mặc định) | 1 tính năng, AC rõ | Sinh một lượt theo mục Quy trình |
-| `full` | Nhiều module, AC mơ hồ, cần đánh giá rủi ro | 6 bước theo `{{KIT}}/prompts/manual/01_context_and_roleplay.md` … `06_template_mapping.md`. **Dừng chờ user ở bước 2 (Q&A) và bước 4 (duyệt scenario).** Không gộp bước |
+| `full` | Nhiều module, AC mơ hồ, cần đánh giá rủi ro | 6 bước theo `{{KIT}}/prompts/manual/01_context_and_roleplay.md` … `06_template_mapping.md`. Qua skill: **gộp bước 1+2** trong một lượt, **chỉ dừng ở bước 2 và bước 4** (Q&A, duyệt scenario); các bước khác chạy liền. Điểm dừng khai báo trong prompt bằng `<!-- aiqe-stop-in-skill: yes -->`, `check-skills.js` kiểm tra khớp |
 | `maintain` | Requirement đổi, **hoặc** luật của kit đổi | Requirement đổi: cần **2 phiên bản** requirement hoặc diff, không có → từ chối, hỏi user. Luật kit đổi: soát bộ TC cũ theo Self-check **hiện hành**. Output: TC giữ / sửa / chuyển sang mục thăm dò / lỗi thời (`status: deprecated`) / mới |
 | `review` | Soát bộ TC có sẵn | Chạy Self-check ở cuối file lên bộ TC, liệt kê lỗi theo dòng |
 
@@ -30,7 +30,9 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - Requirement/AC có ID (`AC-<MODULE>-NN`), hoặc output của `requirement-analysis` (đọc front-matter `produced_by: requirement-analysis`).
 - `project.aiqe.yml`: `output_language`, `tc_id_format`, `module_codes`, `excel_columns`, `sandbox_urls`.
 - Mode `maintain`: bộ TC cũ + requirement cũ và mới (hoặc diff).
-- **Thiếu AC có ID:** hỏi user. Nếu user chỉ có mô tả tự do, đánh ID tạm `HYP-<MODULE>-NN` và ghi rõ là giả định, không dùng `AC-`.
+- **Thiếu AC có ID:** hỏi user. Phân biệt 2 loại (`{{KIT}}/rules/id_conventions.md` quy tắc 0a):
+  - Quy tắc **người khác kể lại** ("BA nói…", "dev bảo…") mà không có tên + ngày hoặc mã ticket → Source `PRV-<MODULE>-NN`, nhãn `PROVIDED`, thêm câu hỏi `Q-*` xin tên BA + ngày hoặc mã ticket. **Không** `REQ-CONFIRMED`, **không** `HYP-`.
+  - Hành vi **dựng ngược từ quan sát app** → `HYP-<MODULE>-NN`, nhãn `DOM-OBSERVED`.
 
 ## Quy trình (quick)
 0. **Kiểm tra bộ TC cũ trước khi làm gì khác** (áp dụng cả mode `full`). Nếu `<output_dir>/testcases/` đã có file TC của **cùng module** (`TC-<MODULE>*.md`): **dừng, hỏi user**, chưa ghi file nào:
@@ -51,7 +53,12 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 8. **Viết TC** theo `{{KIT}}/templates/test_case_table.md`: Source, Steps và Expected đánh số khớp 1-1, Test Data cụ thể (`QA-r001-...`, email `@example.com`; **tên người/tên record cũng mang prefix**, ví dụ First Name `QA-r001-An`), Risk, Priority (đặt theo Risk, `{{KIT}}/rules/test_design.md` mục 2b; chưa biết expected **không** phải lý do đặt P1), Automatable, Auto Type, Tags. **Không dùng ký hiệu tắt tự đặt** (`C0`, `E`, `R`…).
 9. **Traceability** `AC × TC`: mọi AC có ≥ 1 TC hoặc ≥ 1 mục thăm dò; ghi lý do nếu không có.
 10. Chạy Self-check, sửa.
-11. **Bắt buộc chạy** `node {{KIT}}/scripts/verify/check-tc.js <file TC vừa ghi>`. Còn lỗi → sửa rồi chạy lại. Báo cho user **nguyên văn dòng cuối** của script (ví dụ `check-tc: 1 file, 0 lỗi → ĐẠT`). **Không báo "xong" khi script chưa ĐẠT**; không chạy được script thì nói rõ lý do, không tự kết luận đạt.
+11. **Bắt buộc chạy** `node {{KIT}}/scripts/verify/check-tc.js <file TC vừa ghi>` (cả mode `maintain`).
+    - Exit khác 0 / dòng cuối có `CHƯA ĐẠT` → **sửa file rồi chạy lại**, lặp tới khi ĐẠT. Đây là kiểm tra format của chính file mình viết, không phải chạy lại test sản phẩm.
+    - Trong câu trả lời cuối, **in nguyên văn dòng cuối** của script (ví dụ `check-tc: 1 file, 0 lỗi → ĐẠT`).
+    - **Không báo "xong", không nộp file** khi chưa ĐẠT. Sửa 3 lần vẫn chưa đạt → dừng, báo user lỗi còn lại kèm nguyên văn output. Không chạy được script → nói rõ lý do, **không** tự kết luận đạt.
+    - Dòng tổng phải **đúng mẫu**: `**Tổng:** N TC chạy được · M mục thăm dò · K câu hỏi` (không đổi chữ, ví dụ không viết "10 TC có oracle").
+    - Thêm dòng vào bảng có sẵn: chèn **ngay dưới** dòng cuối của bảng, không để dòng trống chen giữa; đủ số ô như tiêu đề.
 
 ## Output
 - File `<output_dir>/testcases/TC-<MODULE>.md`, front-matter:
@@ -75,7 +82,8 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - Hệ thống lớn: sinh **từng module**, hỏi user trước khi sang module tiếp.
 
 ## Self-check
-- [ ] Đã chạy `check-tc.js` và báo nguyên văn dòng cuối; kết quả ĐẠT
+- [ ] Đã chạy `check-tc.js`, kết quả **ĐẠT**, và đã in nguyên văn dòng cuối trong câu trả lời; chưa đạt thì **chưa nộp**
+- [ ] Quy tắc người khác kể lại không có tên + ngày/ticket: `PROVIDED` + Source `PRV-*` + câu hỏi, không `REQ-CONFIRMED`/`HYP-`
 - [ ] Đã liệt kê field trước khi viết TC; field `Not specified` nằm trong danh sách câu hỏi, không bị tự đặt quy tắc
 - [ ] TC ID không trùng, đúng `{{KIT}}/rules/id_conventions.md`
 - [ ] Mọi TC có Source (`AC-` hoặc `HYP-`); mọi AC có ≥ 1 TC

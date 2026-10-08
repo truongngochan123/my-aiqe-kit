@@ -84,3 +84,50 @@ $new = Get-Content <output>\testcases\TC-PIM.v2.md | Where-Object { $_ -match '^
 - [ ] **Không** hỏi (a)/(b); viết luôn
 - [ ] Tạo `TC-PIM.md` với `produced_by: test-design-rbt`
 - [ ] Có bảng 3a và 3b như luật hiện hành
+
+## Case bổ sung từ pilot T2 (maintain, 08/10)
+
+## TDR-PRV-01: quy tắc BA kể qua user, không có tên BA/ticket → PROVIDED + PRV-
+
+**Chuẩn bị:** đã có `TC-PIM.md` (đã ĐẠT `check-tc`).
+**Prompt:**
+```
+Dùng test-design-rbt mode maintain cho TC-PIM.md. BA vừa đổi: Middle Name giờ là bắt buộc. Cập nhật bộ TC.
+```
+**Đúng khi:**
+- [ ] TC mới/sửa có Source `PRV-PIM-NN`, nhãn `PROVIDED` (nguồn: BA, tên/ticket `UNKNOWN`)
+- [ ] **Không** gắn `REQ-CONFIRMED`; **không** dùng mã `HYP-` cho quy tắc này
+- [ ] Bảng câu hỏi có 1 `Q-*` xin tên BA + ngày hoặc mã ticket
+- [ ] `check-tc` ĐẠT, câu trả lời cuối in nguyên văn dòng cuối của script
+
+**Sai khi:** `REQ-CONFIRMED` không kèm mã AC/ticket hoặc tên + ngày; hoặc Source `HYP-PIM-*`.
+
+## TDR-PRV-02 (đối chứng): có tên BA + ngày → REQ-CONFIRMED
+
+**Prompt:** như TDR-PRV-01 nhưng thêm "BA Lan xác nhận ngày 08/10, ticket PIM-123".
+**Đúng khi:**
+- [ ] Source `PIM-123` (hoặc AC tương ứng), nhãn `REQ-CONFIRMED` ghi "BA Lan, 08/10"
+- [ ] Không thêm câu hỏi xin ticket
+
+## TDR-GATE-01: check-tc chưa ĐẠT thì không được nộp
+
+**Chuẩn bị:** cố ý dùng file TC có dòng tổng sai mẫu (ví dụ `**Tổng:** 10 TC có oracle`) và thiếu mục "Bước tiếp theo".
+**Prompt:**
+```
+Dùng test-design-rbt mode maintain: thêm 1 TC cho field Nickname vào TC-PIM.md.
+```
+**Đúng khi:**
+- [ ] AI chạy `check-tc`, thấy `CHƯA ĐẠT`, **sửa file TC** (dòng tổng + thêm "Bước tiếp theo"), chạy lại tới ĐẠT
+- [ ] Câu trả lời cuối in nguyên văn `check-tc: 1 file, 0 lỗi → ĐẠT`
+- [ ] Dòng thêm vào bảng nằm liền dưới bảng, đủ số ô; số trong dòng tổng = số dòng thật
+
+**Sai khi:** báo "xong" trong khi output cuối của `check-tc` còn `CHƯA ĐẠT`, hoặc không in dòng cuối.
+
+## TDR-FULL-STOP-01: mode full qua skill chỉ dừng ở bước 2 và 4
+
+**Prompt:** `Dùng test-design-rbt mode full cho module PIM > Add Employee của OrangeHRM demo.`
+**Đúng khi:**
+- [ ] Lượt đầu trả kết quả bước 1 **và** bước 2 (scope + câu hỏi Q&A), rồi dừng chờ trả lời
+- [ ] Sau khi có trả lời: làm bước 3 và 4 liền, dừng chờ duyệt scenario
+- [ ] Sau khi duyệt: bước 5 và 6 liền, chạy `check-tc`
+**Sai khi:** dừng sau bước 1 hoặc bước 3; hoặc tự trả lời Q&A.

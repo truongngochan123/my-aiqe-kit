@@ -20,7 +20,7 @@ const path = require('path');
 
 const RE = {
   tcId: /^TC-[A-Z][A-Z0-9]{1,9}-\d{3}$/,
-  source: /\b(AC|HYP)-[A-Z][A-Z0-9]{1,9}-\d{2,3}\b/,
+  source: /\b(AC|HYP|PRV)-[A-Z][A-Z0-9]{1,9}-\d{2,3}\b/,
   qId: /^Q-[A-Z][A-Z0-9]{1,9}-\d{2,3}$/,
   dataIdLike: /\b[A-Z]{2,6}-r\d+[A-Za-z0-9-]*/g,
   dataId: /^[A-Z]{2,6}-r\d{3}-[A-Za-z0-9-]+$/,
@@ -30,6 +30,8 @@ const RE = {
   vagueData: /dữ liệu hợp lệ|dữ liệu đúng|giá trị hợp lệ|email hợp lệ|mã hợp lệ|valid data|valid value/i,
   abbrev: /^(C\d+|E\d*|R\d*|N\d+|H\d*|B\d*)[\s:.)-]/,
   count: /(\d+)\s*TC chạy được\s*·\s*(\d+)\s*mục thăm dò\s*·\s*(\d+)\s*câu hỏi|(\d+)\s*executable test cases?\s*·\s*(\d+)\s*exploration items?\s*·\s*(\d+)\s*questions?/i,
+  reqSource: /\bAC-[A-Z][A-Z0-9]{1,9}-\d{2,3}\b|(?<![-\w])[A-Z][A-Z0-9]{1,9}-\d+\b|\d{1,2}\/\d{1,2}|\d{4}-\d{2}-\d{2}/,
+  date: /\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b|\b\d{4}-\d{2}-\d{2}\b/,
   qaObserved: /quan sát (của )?(mình|tôi|QA|user|tester)|mình quan sát|tôi quan sát|QA quan sát|tự quan sát/i,
 };
 
@@ -61,6 +63,15 @@ function tables(text) {
   return out;
 }
 
+// Dòng bắt đầu bằng '|' nhưng không thuộc bảng nào có tiêu đề: markdown bị vỡ (thường do dòng trống chen giữa,
+// hoặc thêm dòng vào cuối file thay vì vào bảng). Những dòng này KHÔNG được đếm.
+function orphanRows(text, all) {
+  const used = new Set();
+  for (const t of all) { used.add(t.line); used.add(t.line + 1); for (const r of t.rows) used.add(r.line); }
+  return text.split(/\r?\n/).map((l, i) => ({ l: l.trim(), line: i + 1 }))
+    .filter((x) => x.l.startsWith('|') && !used.has(x.line) && !/^\|[\s:|-]+\|$/.test(x.l));
+}
+
 function check(text) {
   const errors = [];
   const warns = [];
@@ -74,6 +85,10 @@ function check(text) {
   else if (!/^produced_by:\s*test-design-rbt\b/m.test(fm[1])) W(1, 'produced_by khác test-design-rbt');
 
   const all = tables(text);
+  for (const o of orphanRows(text, all)) E(o.line, `dòng bảng bị vỡ, không thuộc bảng có tiêu đề nên không được đếm: "${o.l.slice(0, 70)}"`);
+  for (const tb of all) for (const r of tb.rows) {
+    if (r.cells.length !== tb.header.length) E(r.line, `dòng có ${r.cells.length} ô nhưng tiêu đề có ${tb.header.length} ô (ký tự | trong ô phải viết \\|)`);
+  }
   const tcTables = all.filter((t) => t.header.includes('tc id'));
   const qTables = all.filter((t) => t.header.includes('q id') && !t.header.includes('tc id'));
   const nTc = tcTables.reduce((s, t) => s + t.rows.filter((r) => r.cells.some(Boolean)).length, 0);
@@ -82,12 +97,15 @@ function check(text) {
   // 2. Dòng tổng
   const lines = text.split(/\r?\n/);
   const ci = lines.findIndex((l) => RE.count.test(l));
-  if (ci === -1) E(1, 'thiếu dòng tổng "N TC chạy được · M mục thăm dò · K câu hỏi"');
+  if (ci === -1) {
+    const near = lines.findIndex((l) => /\b(Tổng|Total)\b/i.test(l) && /\d/.test(l));
+    E(near === -1 ? 1 : near + 1, `${near === -1 ? 'thiếu dòng tổng' : `dòng tổng sai mẫu ("${lines[near].trim().slice(0, 80)}")`}; phải đúng mẫu: "**Tổng:** N TC chạy được · M mục thăm dò · K câu hỏi"`);
+  }
   else {
     const m = lines[ci].match(RE.count);
     const N = Number(m[1] || m[4]); const M = Number(m[2] || m[5]);
-    if (N !== nTc) E(ci + 1, `dòng tổng ghi ${N} TC chạy được nhưng bảng TC có ${nTc} dòng`);
-    if (M !== nQ) E(ci + 1, `dòng tổng ghi ${M} mục thăm dò nhưng bảng thăm dò có ${nQ} dòng`);
+    if (N !== nTc) E(ci + 1, `dòng tổng ghi ${N} TC chạy được nhưng bảng TC đếm được ${nTc} dòng`);
+    if (M !== nQ) E(ci + 1, `dòng tổng ghi ${M} mục thăm dò nhưng bảng thăm dò đếm được ${nQ} dòng (kiểm tra dòng bảng bị vỡ)`);
   }
   if (tcTables.length === 0) E(1, 'không có bảng TC chạy được (bảng có cột "TC ID")');
   const iNext = lines.findIndex((l) => /^##\s.*(Bước tiếp theo|Next steps)/i.test(l));
@@ -105,7 +123,7 @@ function check(text) {
       const id = cells[iId] || '';
       if (!RE.tcId.test(id)) E(line, `TC ID "${id}" không đúng TC-<MODULE>-<NNN>`);
       if (seen.has(id)) E(line, `TC ID "${id}" bị trùng`); seen.add(id);
-      if (iSrc !== -1 && !RE.source.test(cells[iSrc] || '')) E(line, `${id}: Source "${cells[iSrc] || ''}" không có AC-/HYP- hợp lệ`);
+      if (iSrc !== -1 && !RE.source.test(cells[iSrc] || '')) E(line, `${id}: Source "${cells[iSrc] || ''}" không có AC-/HYP-/PRV- hợp lệ`);
       if (iExp !== -1 && RE.unknownExpected.test(cells[iExp] || '')) E(line, `${id}: expected chưa biết ("${(cells[iExp].match(RE.unknownExpected) || [''])[0]}") → chuyển sang bảng thăm dò, không để trong bảng TC`);
       if (iSc !== -1 && RE.abbrev.test(cells[iSc] || '')) E(line, `${id}: Scenario bắt đầu bằng ký hiệu tắt "${(cells[iSc].match(RE.abbrev) || [''])[1]}"`);
       if (iPri !== -1 && !/^P[1-4]$/.test(cells[iPri] || '')) E(line, `${id}: Priority "${cells[iPri] || ''}" phải là P1–P4`);
@@ -123,10 +141,15 @@ function check(text) {
     for (const { cells, line } of t.rows) if (cells.some(Boolean) && !RE.qId.test(cells[iq] || '')) E(line, `mã câu hỏi "${cells[iq]}" không đúng Q-<MODULE>-<NN>`);
   }
 
-  // 5. Quan sát của QA phải là DOM-OBSERVED
+  // 5. Nhãn: REQ-CONFIRMED phải có nguồn; quan sát của QA phải là DOM-OBSERVED
+  const fmText = fm ? fm[1] : '';
+  const fileHasObsDate = RE.date.test(fmText) || lines.some((l) => RE.date.test(l) && (/^#/.test(l) || /quan sát|nguồn|observed|DOM-OBSERVED/i.test(l)));
   lines.forEach((l, i) => {
+    if (/\bREQ-CONFIRMED\b/.test(l) && !/^\s*(labels|source)\s*:/.test(l) && !RE.reqSource.test(l)) {
+      E(i + 1, 'REQ-CONFIRMED không có nguồn (mã AC/ticket, hoặc tên người xác nhận + ngày). Quy tắc user kể lại từ BA → PROVIDED + câu hỏi xin tên BA/mã ticket, Source PRV-…');
+    }
     if (/\bPROVIDED\b/.test(l) && RE.qaObserved.test(l)) E(i + 1, 'quan sát của QA gắn PROVIDED → phải là DOM-OBSERVED (ghi người quan sát, env, ngày)');
-    if (/\bDOM-OBSERVED\b/.test(l) && !/\d{1,2}\/\d{1,2}|\d{4}-\d{2}-\d{2}|ngày|UNKNOWN/.test(l) && !/^\s*[|>-]?\s*\|?\s*(Nhãn|Label)/i.test(l)) W(i + 1, 'DOM-OBSERVED không thấy ngày quan sát trên cùng dòng');
+    if (!fileHasObsDate && /\bDOM-OBSERVED\b/.test(l) && !RE.date.test(l) && !/ngày|UNKNOWN/.test(l) && !/^\s*(labels|source)\s*:/.test(l)) W(i + 1, 'DOM-OBSERVED không thấy ngày quan sát (cả trên dòng lẫn ở tiêu đề/đoạn nguồn)');
   });
 
   return { errors, warns, nTc, nQ };
@@ -175,7 +198,27 @@ status: draft
 | TC-PIM-1 | Not specified | C0 Thêm nhân viên | Đăng nhập | 1. Bấm Save | 1. Lưu được theo quan sát của mình (PROVIDED) | dữ liệu hợp lệ | P0 | Huge | Yes | UI | @Smoke |
 | TC-PIM-002 | HYP-PIM-02 | E Max length | Đăng nhập | 1. Nhập 300 ký tự | 1. UNKNOWN, cần xác nhận | QA-r2, nguyen.van.a@gmail.com | P1 | Medium | Yes | UI | @Boundary |
 `;
-const EXPECT_BAD = ['thiếu produced_by', 'ghi 3 TC chạy được nhưng bảng TC có 2', 'TC-PIM-1', 'Source', 'ký hiệu tắt', 'Priority "P0"', 'Risk "Huge"',
+const BAD2 = `---
+id: TC-PIM
+produced_by: test-design-rbt
+status: draft
+---
+# Test cases: PIM
+**Tổng:** 10 TC có oracle
+
+| TC ID | Source | Scenario | Pre-condition | Steps | Expected | Test Data | Priority | Risk | Automatable | Auto Type | Tags |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| TC-PIM-001 | HYP-PIM-01 | Company tối đa 100 ký tự theo BA (REQ-CONFIRMED) | Đăng nhập | 1. Nhập 101 ký tự | 1. Báo lỗi | QA-r001-An | P2 | Medium | Yes | UI | @Boundary |
+| TC-PIM-002 | PRV-PIM-01 | thiếu ô | 1. a | 1. b |
+
+| TC-PIM-003 | HYP-PIM-03 | Dòng thêm sau dòng trống | Đăng nhập | 1. a | 1. b | QA-r001-Binh | P3 | Low | Yes | UI | @Regression |
+
+## 6. Bước tiếp theo
+1. Hỏi BA.
+`;
+const EXPECT_BAD2 = ['dòng tổng sai mẫu', 'REQ-CONFIRMED không có nguồn', 'dòng bảng bị vỡ', 'ô nhưng tiêu đề có'];
+
+const EXPECT_BAD = ['thiếu produced_by', 'ghi 3 TC chạy được nhưng bảng TC đếm được 2', 'TC-PIM-1', 'Source', 'ký hiệu tắt', 'Priority "P0"', 'Risk "Huge"',
   'test data mơ hồ', 'expected chưa biết', 'ID data "QA-r2"', 'gmail.com', 'gắn PROVIDED', 'Bước tiếp theo'];
 
 function selfTest() {
@@ -189,7 +232,14 @@ function selfTest() {
     if (!hit) fail++;
     console.log(`${hit ? 'PASS' : 'FAIL'}  file mẫu SAI bắt được: ${key}`);
   }
-  console.log(`\ncheck-tc self-test: ${1 + EXPECT_BAD.length - fail}/${1 + EXPECT_BAD.length} đúng`);
+  const b2 = check(BAD2);
+  for (const key of EXPECT_BAD2) {
+    const hit = b2.errors.some((e) => e.includes(key));
+    if (!hit) fail++;
+    console.log(`${hit ? 'PASS' : 'FAIL'}  file mẫu SAI (2) bắt được: ${key}`);
+  }
+  const total = 1 + EXPECT_BAD.length + EXPECT_BAD2.length;
+  console.log(`\ncheck-tc self-test: ${total - fail}/${total} đúng`);
   process.exit(fail ? 1 : 0);
 }
 

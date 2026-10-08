@@ -54,7 +54,7 @@ description: Viết, review hoặc retest bug report có evidence và expected c
 6. **Xuất 2 bản:**
    - Internal: `<output_dir>/bugs/BUG-<MODULE>-<NNN>.md` (có front-matter, giữ nhãn).
    - External: `node {{KIT}}/scripts/export/to-external.js <file>` → `<output_dir>/external/` (bỏ front-matter, nhãn chuyển thành lời, bỏ priority đề xuất).
-7. **Bắt buộc chạy** `node {{KIT}}/scripts/verify/check-bug.js <file vừa ghi>` (cả file bug lẫn file câu hỏi `Q-*`). Còn lỗi → sửa rồi chạy lại. Báo user **nguyên văn dòng cuối** (ví dụ `check-bug: 1 file, 0 lỗi → ĐẠT`). **Không báo "xong" khi chưa ĐẠT**; không chạy được thì nói rõ lý do.
+7. **Bắt buộc chạy** `node {{KIT}}/scripts/verify/check-bug.js <file vừa ghi>` (cả file bug lẫn file câu hỏi `Q-*`). Exit khác 0 / `CHƯA ĐẠT` → **sửa file rồi chạy lại** tới khi ĐẠT (sửa 3 lần vẫn chưa đạt → dừng, báo lỗi còn lại). Trong câu trả lời cuối **in nguyên văn dòng cuối** (ví dụ `check-bug: 1 file, 0 lỗi → ĐẠT`). **Không báo "xong", không nộp file** khi chưa ĐẠT; không chạy được thì nói rõ lý do, không tự kết luận đạt.
 8. **Không tự đẩy lên Jira.** Đưa user file để **người** đẩy lên sau G4.
 
 ## Quy trình (review)
