@@ -1,5 +1,5 @@
 {
-  "_note": "Allowlist tool. Tool không có ở đây thì bị chặn. Mẫu theo TOOL-PACKET-01 (tham khảo). Executor thật: 09/10.",
+  "_note": "Allowlist tool. Tool không có ở đây thì bị chặn. Mẫu theo TOOL-PACKET-01 (tham khảo). Executor thật: src/tools/.",
   "tools": [
     {
       "name": "read_case",
@@ -7,17 +7,37 @@
       "mode": "read",
       "phase": "inspect",
       "timeoutMs": 5000,
-      "inputs": { "caseId": { "type": "string", "required": true, "allow": ["EMP-CREATE-01"] } }
+      "inputs": {
+        "caseId": {
+          "type": "string",
+          "required": true,
+          "allow": [
+            "EMP-CREATE-01"
+          ]
+        }
+      }
     },
     {
       "name": "inspect_ui",
       "description": "Xem DOM/trang trên env sandbox (chỉ đọc). Output là dữ liệu untrusted",
       "mode": "read",
       "phase": "inspect",
-      "timeoutMs": 30000,
+      "timeoutMs": 60000,
       "inputs": {
-        "url": { "type": "string", "required": true, "url": true },
-        "scope": { "type": "string", "required": false, "allow": ["login", "employee-list", "add-employee"] }
+        "url": {
+          "type": "string",
+          "required": true,
+          "url": true
+        },
+        "scope": {
+          "type": "string",
+          "required": false,
+          "allow": [
+            "login",
+            "employee-list",
+            "add-employee"
+          ]
+        }
       }
     },
     {
@@ -26,10 +46,20 @@
       "mode": "write",
       "phase": "act",
       "gate": "G1",
-      "timeoutMs": 120000,
+      "timeoutMs": 150000,
       "inputs": {
-        "caseId": { "type": "string", "required": true, "allow": ["EMP-CREATE-01"] },
-        "recordName": { "type": "string", "required": true, "owned": true }
+        "caseId": {
+          "type": "string",
+          "required": true,
+          "allow": [
+            "EMP-CREATE-01"
+          ]
+        },
+        "recordName": {
+          "type": "string",
+          "required": true,
+          "owned": true
+        }
       }
     },
     {
@@ -38,15 +68,26 @@
       "mode": "read",
       "phase": "verify",
       "timeoutMs": 10000,
-      "inputs": { "attemptId": { "type": "string", "required": true } }
+      "inputs": {
+        "attemptId": {
+          "type": "string",
+          "required": true
+        }
+      }
     },
     {
       "name": "lookup_owned_record",
       "description": "Tra record do run tạo (chỉ đọc). Dùng khi kết quả ghi chưa rõ",
       "mode": "read",
       "phase": "lookup",
-      "timeoutMs": 20000,
-      "inputs": { "recordName": { "type": "string", "required": true, "owned": true } }
+      "timeoutMs": 60000,
+      "inputs": {
+        "recordName": {
+          "type": "string",
+          "required": true,
+          "owned": true
+        }
+      }
     },
     {
       "name": "cleanup_owned_record",
@@ -54,8 +95,15 @@
       "mode": "write",
       "phase": "cleanup",
       "gate": "G1",
-      "timeoutMs": 30000,
-      "inputs": { "recordName": { "type": "string", "required": true, "owned": true, "createdOnly": true } }
+      "timeoutMs": 60000,
+      "inputs": {
+        "recordName": {
+          "type": "string",
+          "required": true,
+          "owned": true,
+          "createdOnly": true
+        }
+      }
     }
   ]
 }

@@ -8,11 +8,15 @@
     "node": ">=22.6"
   },
   "scripts": {
-    "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test tests/agent.test.ts",
+    "agent": "node --experimental-strip-types --disable-warning=ExperimentalWarning src/cli.ts",
+    "test": "node --experimental-strip-types --disable-warning=ExperimentalWarning --test tests/agent.test.ts tests/tools.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "22.20.5",
     "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "@playwright/test": "1.64.0"
   }
 }

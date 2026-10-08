@@ -55,7 +55,7 @@ export class Controller {
       return this.#summary(ctx, 'inconclusive', bad.reason ?? 'bị từ chối');
     }
 
-    store.append(req.runId, 'run_start', { caseId: req.caseId, env: req.env, dataPrefix: req.dataPrefix, oracle: req.oracle, oracleHash: ctx.oracleHash, planner: planner.name });
+    store.append(req.runId, 'run_start', { caseId: req.caseId, env: req.env, dataPrefix: req.dataPrefix, oracle: req.oracle, oracleHash: ctx.oracleHash, planner: planner.name, simulated: req.simulated === true });
     const history: HistoryItem[] = [];
     let everCreated = false;
     let lastObservation: string | undefined;
@@ -130,10 +130,13 @@ export class Controller {
   #apply(spec: ToolSpec, action: Action & { kind: 'tool' }, result: ToolResult, ctx: RunContext): void {
     const name = String(result.data?.recordName ?? action.input.recordName ?? '');
     if (spec.mode === 'write' && spec.phase !== 'cleanup') {
-      if (result.status === 'timeout') {
+      if (result.status === 'timeout' || result.status === 'unknown') {
         // I8: không biết đã ghi hay chưa → không ghi lại, chỉ tra cứu.
         ctx.writeOutcomeUnknown = true;
         ctx.state = transition(ctx.state, 'OUTCOME_UNKNOWN');
+      } else if (result.status === 'ok' && result.data?.created === false) {
+        // Tool báo chắc chắn chưa ghi gì (lỗi trước khi bấm lưu): không có record để dọn, verify sẽ fail.
+        ctx.verifyPassed = false;
       } else if (result.status === 'ok' && name && !ctx.createdRecords.includes(name)) {
         ctx.createdRecords.push(name);
       } else if (result.status === 'error') {

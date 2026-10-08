@@ -30,6 +30,10 @@
 | `agent/src/planner/*` | 3 chế độ planner + bọc dữ liệu untrusted |
 | `agent/config/policy.json` | Luật do **người** viết: sandbox, prefix, budget, thời hạn approval |
 | `agent/config/tool_manifest.json` | Khai báo tool: đọc/ghi, input được phép, timeout, gate |
+| `agent/src/tools/*` | 6 tool thật + `sandbox_client.ts` (Playwright, tài khoản từ biến môi trường do người cấp) + `fake.ts` (tool giả cho test/demo) |
+| `agent/src/report.ts` | Báo cáo Markdown từ evidence; nhãn `LOCAL-RUN` chỉ cho run thật, run tool giả ghi "MÔ PHỎNG" |
+| `agent/src/cli.ts` | `run` / `report` / `verify` / `demo` |
+| `agent/cases/EMP-CREATE-01/` | `case.json` + `emp-create.spec.ts` (spec ghi `save-clicked.json`/`created.json` để tool phân biệt chưa ghi / đã tạo / không rõ) |
 
 ## 3. Trạng thái
 ```
@@ -82,7 +86,9 @@ Planner nhận: trạng thái, lịch sử (hành động, kết quả, lý do b
 | Planner `codex` | ⚠️ | `codex exec` có tool riêng (đọc file, chạy lệnh trong sandbox của Codex). Giảm rủi ro: thư mục tạm rỗng, sandbox chỉ đọc, mạng tắt. Mức cách ly thật: `UNKNOWN` cho tới khi kiểm chứng |
 | Dò prompt injection | 🧯 | Regex bắt được mẫu phổ biến; không bắt hết |
 
-## 8. Demo (09/10)
-1. **Luồng chỉ đọc trước**: đăng nhập + tìm nhân viên trên OrangeHRM demo. Không cần G1 cho thao tác ghi.
-2. **Luồng tạo nhân viên**: chỉ khi có G1; tên mang prefix của run (`QA-r001-An`); cleanup đúng record của run; cleanup lỗi → `CLEANUP_PENDING`.
-3. Tài khoản test đọc từ `.env.sandbox`, không qua chat.
+## 8. Demo
+1. **Luồng chỉ đọc** ✅ (09/10, Claude chạy thật trên OrangeHRM demo): `read_case` + `inspect_ui` trang Add Employee → `DONE`, `UNKNOWN` (không verify nên không kết luận). Lần đầu `inspect_ui` timeout 30 s (site chậm, login + mở trang ≈ 21 s) → nâng timeout 60 s, báo cáo nêu lỗi tool ở "Bước tiếp theo".
+2. **Luồng tạo nhân viên** ⏳ (Han chạy, 10/10): `--scenario happy --tools real`, người gõ `dong y <run ID>` cho G1; tên mang prefix của run (`QA-r001-An`); dọn đúng `empNumber` run ghi trong `created.json`; dọn lỗi → `CLEANUP_PENDING`.
+   Chưa kiểm chứng: chuyển trang sau Save, API `DELETE /api/v2/pim/employees`. Tool dọn luôn tra lại sau khi xóa nên xóa không ăn sẽ báo lỗi, không báo đã dọn.
+3. Tài khoản test: người chạy cấp qua `node --env-file=<.env.sandbox>` (`AIQE_SANDBOX_USER/PASS`), không qua chat, planner không thấy.
+4. **5 kịch bản mô phỏng** (`npm run agent -- demo`): happy, write-timeout, injection, oracle-change, budget. Nhãn "MÔ PHỎNG, không phải run thật".

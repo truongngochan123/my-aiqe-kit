@@ -50,7 +50,8 @@ export type Action =
   | { kind: 'ask_human'; question: string };
 
 export interface ToolResult {
-  status: 'ok' | 'error' | 'timeout';
+  // unknown: tool đã có thể ghi nhưng không xác nhận được (ví dụ đã bấm Save rồi mất kết quả). Xử lý như timeout.
+  status: 'ok' | 'error' | 'timeout' | 'unknown';
   data?: Record<string, unknown>;
   error?: string;
 }
@@ -104,6 +105,7 @@ export interface RunRequest {
   env: string;
   dataPrefix: string;     // ví dụ QA-r001
   oracle: OracleSpec;
+  simulated?: boolean;   // tool giả (test/demo): không bao giờ được nhãn LOCAL-RUN
 }
 
 export interface RunContext extends RunRequest {

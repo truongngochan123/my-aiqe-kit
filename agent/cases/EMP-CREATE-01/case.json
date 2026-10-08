@@ -1,0 +1,29 @@
+{
+  "id": "EMP-CREATE-01",
+  "title": "Tạo nhân viên mới trong PIM và tra lại được đúng record vừa tạo",
+  "source": {
+    "label": "Kỳ vọng hiển nhiên #2 (dữ liệu lưu sai/mất): rules/bug_report.md mục 1b",
+    "note": "OrangeHRM demo không có requirement. Bố cục form và API tra cứu: DOM-OBSERVED (Claude, opensource-demo.orangehrmlive.com, 09/10/2026, chỉ đọc). Chuyển trang sau khi bấm Save: chưa kiểm chứng, lần chạy đầu có G1 sẽ xác nhận."
+  },
+  "preconditions": [
+    "Tài khoản sandbox do người cấp qua biến môi trường AIQE_SANDBOX_USER / AIQE_SANDBOX_PASS",
+    "Tên record mang prefix của run, ví dụ QA-r001-An; họ cố định Auto"
+  ],
+  "steps": [
+    "1. Đăng nhập",
+    "2. Mở PIM > Add Employee",
+    "3. Nhập First Name = <recordName>, Last Name = Auto",
+    "4. Bấm Save",
+    "5. Chờ trang chi tiết nhân viên, ghi lại empNumber",
+    "6. Tra danh sách nhân viên theo tên"
+  ],
+  "oracle": {
+    "id": "EMP-CREATE-01-O1",
+    "expect": {
+      "afterSave": "URL chứa /pim/viewPersonalDetails/empNumber/<số>",
+      "lookup": "Tra theo tên trả đúng 1 record có empNumber vừa tạo, firstName = recordName, lastName = Auto"
+    }
+  },
+  "write": true,
+  "cleanup": "Xóa đúng empNumber do run tạo (cleanup_owned_record, cần G1)"
+}
