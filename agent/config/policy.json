@@ -1,0 +1,13 @@
+{
+  "_note": "Luật do NGƯỜI viết. Agent đọc một lần lúc khởi động, không sửa. Đổi luật = sửa file này, ghi lý do vào CHANGELOG.",
+  "sandboxUrls": ["https://opensource-demo.orangehrmlive.com"],
+  "idPrefix": "QA",
+  "runIdPattern": "^RUN-\\d{8}-\\d{2}$",
+  "dataPrefixPattern": "^[A-Z]{2,6}-r\\d{3}$",
+  "approvalTtlMs": 3600000,
+  "budget": {
+    "maxToolCalls": 20,
+    "maxBlockedActions": 3,
+    "maxWallMs": 600000
+  }
+}

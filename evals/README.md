@@ -19,7 +19,7 @@ Eval trả lời 2 câu hỏi:
 3. Mở thư mục đó trong VS Code, mở **chat mới**, dán prompt của case. Ô `[...]` điền bằng quan sát thật của bạn.
 4. Chấm:
    ```
-   node scripts\evals\grade.js <thư mục eval>\output --expect <skill mong đợi>
+   node scripts\evals\grade.js <thư mục eval>\.aiqe\output --expect <skill mong đợi>
    ```
    Rồi đọc checklist "Đúng khi" của case và tự đánh dấu.
 5. Ghi kết quả vào bảng (mục cuối file này).

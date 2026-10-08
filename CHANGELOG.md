@@ -18,6 +18,16 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 
 - Đợt 1 (07/10): 5 skill `requirement-analysis`, `test-data`, `exploratory-testing`, `ai-output-review`, `evidence-reporting`; `check-tc.js`, `check-bug.js` (bắt buộc chạy trong 2 skill mẫu); 7 template; eval cho 8 skill; `grade.js`, `prepare-isolated.ps1`; đề bài golden `bug-reporting`; `md_to_xlsx --all-columns`; `AGENTS.md` thêm cách tạo dự án và cài/cập nhật kit.
 
+### Thêm (08/10)
+- Đợt 2: skill `ui-automation`, `api-testing` (+ references); scaffold Playwright TS; `aiqe-verify.js`, `oracle-patterns.js`; CI GitHub/GitLab, `CODEOWNERS.example`, `docs/proposal_for_lead.md`; `approval_card.md`; 6 prompt automation; eval 2 skill; `review_checklist_dot2.md`.
+- Agent 0.2.0 lõi: `docs/agent_design.md`, `agent/` (controller, guard, state machine, evidence store, approval, planner mock/codex/api, 11 kịch bản, 18 test).
+- Q9: `check-skills.js` so bảng field giữa bản gốc và prompt 05. Q10: output mặc định `<repo>/.aiqe/output/`, `new-project` thêm `.aiqe/` vào `.git/info/exclude`.
+
+### Sửa (08/10)
+- Tên người/record trong data mang prefix; regex ID data cho phép chữ hoa. `test-design-rbt` luôn có "Bước tiếp theo".
+- Fixture chỉ tính file dữ liệu (tránh báo nhầm tài liệu `.md`).
+- Agent: lỗ hổng tự gây ra khi viết controller (đi vòng qua AWAIT_G1 để quay lại ACT sau VERIFY) đã sửa trước khi commit.
+
 ### Sửa (07/10)
 - `install.js`: chạy từ bản đã cài (`~/.aiqe/kit/...`) sẽ xóa chính thư mục nguồn → từ chối, chỉ ra đường dẫn repo kit; `installed.json` thêm trường `source`.
 - `ai-output-review`: bỏ "thường có ít nhất 1 Reject"; toàn Accept thì ghi rõ đã kiểm tra những gì.

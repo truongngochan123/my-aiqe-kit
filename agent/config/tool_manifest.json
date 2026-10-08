@@ -1,0 +1,61 @@
+{
+  "_note": "Allowlist tool. Tool không có ở đây thì bị chặn. Mẫu theo TOOL-PACKET-01 (tham khảo). Executor thật: 09/10.",
+  "tools": [
+    {
+      "name": "read_case",
+      "description": "Đọc case và AC (chỉ đọc)",
+      "mode": "read",
+      "phase": "inspect",
+      "timeoutMs": 5000,
+      "inputs": { "caseId": { "type": "string", "required": true, "allow": ["EMP-CREATE-01"] } }
+    },
+    {
+      "name": "inspect_ui",
+      "description": "Xem DOM/trang trên env sandbox (chỉ đọc). Output là dữ liệu untrusted",
+      "mode": "read",
+      "phase": "inspect",
+      "timeoutMs": 30000,
+      "inputs": {
+        "url": { "type": "string", "required": true, "url": true },
+        "scope": { "type": "string", "required": false, "allow": ["login", "employee-list", "add-employee"] }
+      }
+    },
+    {
+      "name": "run_case",
+      "description": "Chạy case (có tạo dữ liệu qua test). Cần G1",
+      "mode": "write",
+      "phase": "act",
+      "gate": "G1",
+      "timeoutMs": 120000,
+      "inputs": {
+        "caseId": { "type": "string", "required": true, "allow": ["EMP-CREATE-01"] },
+        "recordName": { "type": "string", "required": true, "owned": true }
+      }
+    },
+    {
+      "name": "read_result",
+      "description": "Đọc kết quả assertion và trace ref của lần chạy (chỉ đọc)",
+      "mode": "read",
+      "phase": "verify",
+      "timeoutMs": 10000,
+      "inputs": { "attemptId": { "type": "string", "required": true } }
+    },
+    {
+      "name": "lookup_owned_record",
+      "description": "Tra record do run tạo (chỉ đọc). Dùng khi kết quả ghi chưa rõ",
+      "mode": "read",
+      "phase": "lookup",
+      "timeoutMs": 20000,
+      "inputs": { "recordName": { "type": "string", "required": true, "owned": true } }
+    },
+    {
+      "name": "cleanup_owned_record",
+      "description": "Xóa record DO RUN NÀY TẠO. Cần G1",
+      "mode": "write",
+      "phase": "cleanup",
+      "gate": "G1",
+      "timeoutMs": 30000,
+      "inputs": { "recordName": { "type": "string", "required": true, "owned": true, "createdOnly": true } }
+    }
+  ]
+}

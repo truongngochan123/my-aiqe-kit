@@ -11,9 +11,9 @@
 |---|---|---|
 | 0: Nền móng | ✅ Đã duyệt | 06/10 |
 | 1: Manual | ✅ Dựng xong 8 skill (07/10) · chờ Han chạy pilot/eval trên Codex và duyệt | 06–07/10 |
-| 2: Automation + CI | ⏳ Chưa | 08/10 |
+| 2: Automation + CI | ✅ Dựng xong (08/10) · chờ Han duyệt | 08/10 |
 | 3: Lead, tích hợp, đa stack | ⏳ Chưa | 09/10 |
-| Agent 0.2.0 | ⏳ Chưa | 08–10/10 |
+| Agent 0.2.0 | 🔄 Lõi xong (08/10, 18 test) · tool + demo 09/10 | 08–10/10 |
 
 ---
 
@@ -50,6 +50,9 @@
 | 27 🆕 | Test database: `test-design-rbt/references/sql_oracle.md` (oracle đọc lại dữ liệu bằng SQL, **chỉ SELECT**, chỉ trên env sandbox) ở Đợt 1 |
 | 31 🆕 | Sau pilot T1 lần 2: `test-design-rbt` **bước 0**: đã có TC cùng module trong `output_dir` thì hỏi (a) cập nhật theo luật hiện hành hay (b) viết mới; (b) không đọc/chép file cũ, ghi `TC-<MODULE>.v<N>.md`, giữ file cũ. Eval `TDR-EXISTING-01/02` |
 | 30 🆕 | Sau pilot T1 (07/10): quan sát QA tự làm (kể cả kể lại trong prompt) là `DOM-OBSERVED`, thông tin từ người khác là `PROVIDED`; output test case tách **TC chạy được** và **mục thăm dò** (expected chưa biết, khóa `Q-*`); Priority theo Risk; cấm ký hiệu tắt tự đặt |
+| 32 🆕 | **Q9 (08/10):** `field_validation_15.md` là bản gốc; prompt 05 giữ bản sao; `check-skills.js` so 2 bảng, lệch thì báo lỗi. **Q10:** `output_dir` mặc định `<repo>/.aiqe/output/` (tương đối từ thư mục chứa `.aiqe/`); `new-project` tự thêm `.aiqe/` vào `.git/info/exclude`; `--output-outside` khi dự án yêu cầu |
+| 33 🆕 | Từ pilot T1 lần 4: tên người/record trong data mang prefix (`QA-r001-An`); `test-design-rbt` luôn có mục "Bước tiếp theo" (`check-tc` bắt lỗi khi thiếu) |
+| 34 🆕 | Agent: TypeScript chạy bằng `node --experimental-strip-types` (Node ≥ 22.6), không build; planner 3 chế độ `mock` / `codex` / `api`; **demo trên OrangeHRM** (bỏ app giả local): luồng chỉ đọc trước, luồng tạo nhân viên chỉ khi có G1 và dọn đúng record. Kiểm tra gây tải OWASP (5–8) **cấm** trên site dùng chung |
 | 29 🆕 | **Kỳ vọng hiển nhiên** (chọn phương án b, 07/10): khi sản phẩm không có requirement, bug được tạo nếu hành vi khớp **danh sách đóng 4 mục** trong `rules/bug_report.md` mục 1b (lỗi hệ thống · dữ liệu lưu sai/mất · lộ dữ liệu/vượt quyền · tài khoản hợp lệ không đăng nhập được). Expected gắn `AI-PROPOSAL` + "cần PO/BA xác nhận". Ngoài danh sách → câu hỏi `Q-*` |
 | 28 🆕 | Đợt 1 làm theo thứ tự **pilot**: 3 skill mẫu → dừng → Han cài kit thật cho Codex và test 9 prompt → ổn mới làm 5 skill còn lại |
 
@@ -94,7 +97,7 @@
 
 ---
 
-## 4. Cấu trúc repo (đầy đủ, 176 file kit)
+## 4. Cấu trúc repo (đầy đủ, 177 file kit)
 
 Ký hiệu: `[Đ0]`…`[Đ3]` = đợt; ✅ = đã có.
 
@@ -134,7 +137,7 @@ my-aiqe-kit/
 │   ├── bug_report  test_case_table  incident_card  retry_matrix  decision_log
 │   │   execution_sheet  charter  session_note  data_registry   (.md)    [Đ1]
 │   ├── evidence_manifest  execution_report  (.md)                       [Đ1] ✅ (chuyển từ Đ2)
-│   ├── approval_card  (.md)                                             [Đ2]
+│   ├── approval_card  (.md)                                             [Đ2] ✅
 │   ├── test_plan  test_summary_report  regression_selection  run_contract
 │   │   tool_manifest  state_machine  (.md)                              [Đ3]
 │   └── scaffold/
@@ -147,7 +150,7 @@ my-aiqe-kit/
 │   ├── install/{install.ps1, install.js, gen-routing.js}                [Đ0] ✅
 │   ├── verify/{grep-clean.js, grep-exempt.txt, check-skills.js}         [Đ0] ✅
 │   ├── verify/{check-tc.js, check-bug.js}                               [Đ1] ✅ 🆕
-│   ├── verify/aiqe-verify.js                                            [Đ2]
+│   ├── verify/{aiqe-verify.js, oracle-patterns.js}                      [Đ2] ✅
 │   ├── package.json  package-lock.json  lib/config.js  convert/md_to_xlsx.js  redact/{redact.js, patterns.json}
 │   │   export/to-external.js  evals/{prepare-isolated.ps1, grade.js}    [Đ1]
 │   ├── project/{new-project.ps1, new-project.js}                       [Đ1] ✅
@@ -168,7 +171,7 @@ my-aiqe-kit/
 │   ├── golden/bug-reporting.md       (đáp án, Codex viết, Han duyệt)    [Đ1]
 │   ├── golden/{selenium-java, appium-java}.md                           [Đ3]
 │   └── routing.md                                                       [Đ3]
-└── agent/  (30 file, xem mục 6)                                         [Agent]
+└── agent/  (xem mục 6)                                                  [Agent] 🔄
 ```
 
 ### Sau khi cài
@@ -211,6 +214,12 @@ my-aiqe-kit/
 3. **Bước 3:** 5 skill còn lại + script, template, prompt, eval.
 4. **Bước 4:** đề bài golden `bug-reporting` (có bẫy). Han đưa đề cho Codex viết đáp án.
 
+**Tiến độ 08/10 ✅ (Đợt 2 + lõi agent)**
+- Q9, Q10, 2 sửa nhỏ từ pilot T1 lần 4 (quyết định #32, #33).
+- Đợt 2: `ui-automation` (Bước 0 stack; write/review/locator/run; 4 references), `api-testing` (code + Postman; OWASP gây tải cấm trên site dùng chung; 2 references), scaffold Playwright 9 file (đã `npm install` ở thư mục tạm: `--list` 3 test, `tsc` đạt, `forbidOnly` chặn `.only` trên CI, `npm audit` 0), `aiqe-verify.js` + 🆕 `oracle-patterns.js` (pattern dùng chung với hook, +1 file), CI GitHub/GitLab, CODEOWNERS, `proposal_for_lead.md`, `approval_card.md`, 6 prompt automation (bỏ self-fix, credential trong chat, domain email thật), eval 2 skill, `review_checklist_dot2.md`.
+- Sửa: fixture chỉ tính file dữ liệu (tài liệu `.md` trong thư mục `test-data` bị báo nhầm), hook thêm case 26/26.
+- Agent lõi: `docs/agent_design.md` (viết trước code), 19 file trong `agent/`; 18 test đạt; **kiểm tra ngược**: tắt từng guard (I2, I3, I4, I5, I7, I8, I9) đều có test fail.
+
 **Tiến độ 07/10 ✅ (Bước 3 + 4, làm song song với pilot của Han)**
 - 5 skill: `requirement-analysis` (mode A + mode B có cảnh báo, cột Đáng ngờ?/Quyết định), `test-data` (dataset, combinatorial, chain, registry), `exploratory-testing` (charter, session, ranh giới với mode B), `ai-output-review` (sửa dòng 24: không ép Reject), `evidence-reporting` (mode run + manual-run, Enforcement).
 - 🆕 `scripts/verify/check-tc.js`, `check-bug.js` (+2 file, có `--self-test`); `test-design-rbt` và `bug-reporting` **bắt buộc** chạy và báo nguyên văn dòng cuối.
@@ -229,6 +238,7 @@ my-aiqe-kit/
 - `md_to_xlsx` viết lại bằng `exceljs` (bản gốc dùng `xlsx` 0.18.5 không còn cập nhật trên npm, và lấy cột theo vị trí). `uuid` ép lên 11.1.1 qua `overrides` để hết cảnh báo GHSA-w5hq-g745-h8pq (`npm audit`: 0 lỗ hổng).
 - Kiểm chứng: `check-skills` 3 skill 0 lỗi · `grep-clean` sạch · chạy thử 3 script với file mẫu · cài thử vào home giả: 16/16 đường dẫn trong skill tồn tại, script chạy được từ bản cài.
 - **07/10:** thêm `scripts/project/new-project.ps1` + `.js` (tạo thư mục dự án + `.aiqe/project.aiqe.yml`, không ghi đè). Pilot đổi sang **OrangeHRM** (`D:\fpt-inform\aiqe-pilot`, yml do Han tạo tay, script xác nhận không ghi đè).
+- **Pilot T1 lần 4: ĐẠT** (Han, 08/10). Hai góp ý nhỏ đã sửa (quyết định #33).
 - **Pilot trên Codex (OrangeHRM), ghi theo kết quả Han gửi:**
   - T1: routing đúng; **bước 0** (hỏi trước khi đụng TC cũ) chạy ĐÚNG, Codex dừng và dẫn `SKILL.md:36`.
   - **Bài học:** cài lại kit → **khởi động lại VS Code** → **chat mới**. Thiếu bước nào là Codex dùng skill cũ.
@@ -311,13 +321,13 @@ Mục tiêu: chạy trọn case `EMP-CREATE-01` trên app giả local, chứng m
 
 ```
 agent/
-├── README.md  package.json  tsconfig.json
+├── README.md  package.json  package-lock.json  tsconfig.json   ✅ 08/10
 ├── config/{policy.json, tool_manifest.json}
-├── src/{types, state_machine, controller, guards, approvals, evidence_store, report, cli}.ts
-├── src/planner/{planner, mock_planner, llm_planner, untrusted}.ts
-├── src/tools/{read_case, inspect_ui, run_case, read_result, lookup_owned_record, cleanup_owned_record}.ts
+├── src/{types, state_machine, controller, guards, approvals, evidence_store}.ts   ✅ 08/10
+├── src/{report, cli}.ts   ⏳ 09/10
+├── src/planner/{planner, mock_planner, codex_planner, api_planner, untrusted}.ts   ✅ 08/10
+├── src/tools/{read_case, inspect_ui, run_case, read_result, lookup_owned_record, cleanup_owned_record}.ts   ⏳ 09/10
 ├── cases/EMP-CREATE-01/{case.json, emp-create.spec.ts}
-├── fake-app/{server.js, public/index.html}
 ├── scenarios/scenarios.json
 └── tests/agent.test.ts
 ```
@@ -331,7 +341,7 @@ agent/
 | `evidence_store.ts` | JSONL chỉ ghi thêm, mỗi bản ghi có hash bản trước |
 | `approvals.ts` | Hỏi G1/G2 trên console, hiện phạm vi; planner không trả lời thay được |
 | `llm_planner.ts` | Chưa có key → báo "chưa cấu hình", không crash |
-| `fake-app/server.js` | Khớp `OBS-PACKET-01`; chế độ lỗi: lưu xong nhưng timeout, index chậm, trang có chỉ thị lạ |
+| ~~`fake-app/`~~ | **Bỏ** (quyết định #34): demo chạy trên OrangeHRM; tình huống lỗi (timeout, chỉ thị lạ) mô phỏng bằng `scenarios.json` + tool giả trong test |
 
 **5 kịch bản demo:** (1) happy path → `LOCAL-RUN: passed`; (2) timeout sau khi lưu → `OUTCOME_UNKNOWN`, chỉ lookup; (3) prompt injection → bọc `<untrusted>`, guard chặn upload; (4) planner đề xuất sửa assertion → BLOCKED, cần G3; (5) retry vượt budget → dừng an toàn, giữ lần fail đầu.
 
@@ -366,8 +376,12 @@ agent/
 | Q3 | `adapters/codex/config.toml` | Codex trên Windows có cần `npx.cmd` cho MCP không | Chạy MCP Playwright trong Codex |
 | Q4 | Toàn kit | Extension VS Code của Codex có dùng chung `~/.codex/config.toml` và hook không (nguồn hiện là bên thứ ba) | Hỏi Codex đọc `.env`, xem hook chặn không |
 | ~~Q5~~ | ~~Lệnh tắt Claude~~ | Đã chốt: bỏ cả 15 (quyết định #25) | — |
-| Q10 | `output_dir` mặc định | Mặc định `~/aiqe-output/` nằm **ngoài workspace** nên sandbox Codex hỏi duyệt mỗi lần ghi. Tạm thời dùng `new-project -OutputInProject`. Có đổi mặc định không? | Quyết định sau pilot |
-| Q9 | `prompts/manual/05_…md` | Bảng field bị chép 2 nơi; có cần script kiểm tra 2 bản khớp nhau không | Thêm vào `check-skills.js` ở Đợt 2 nếu thấy lệch |
+| ~~Q10~~ | ~~`output_dir` mặc định~~ | Đã chốt 08/10 (quyết định #32) | — |
+| (cũ) Q10 | `output_dir` mặc định | Mặc định `~/aiqe-output/` nằm **ngoài workspace** nên sandbox Codex hỏi duyệt mỗi lần ghi. Tạm thời dùng `new-project -OutputInProject`. Có đổi mặc định không? | Quyết định sau pilot |
+| ~~Q9~~ | ~~`prompts/manual/05_…md`~~ | Đã chốt 08/10 (quyết định #32) | — |
+| Q11 | `agent/src/planner/codex_planner.ts` | Cờ `codex exec --sandbox read-only --skip-git-repo-check -C` và định dạng output chưa chạy thử; mức cách ly thật `UNKNOWN` | Chạy planner codex với 1 kịch bản trên máy có Codex |
+| Q12 | `ci/gitlab/aiqe-check.gitlab-ci.yml` | `CI_JOB_TOKEN` đọc được approvals không; Code Owners bắt buộc cần gói nào | Hỏi admin GitLab của dự án |
+| (cũ) Q9 | `prompts/manual/05_…md` | Bảng field bị chép 2 nơi; có cần script kiểm tra 2 bản khớp nhau không | Thêm vào `check-skills.js` ở Đợt 2 nếu thấy lệch |
 | Q6 | `test-strategy` | Ước lượng theo phương pháp nào; metric nào được ghi `UNKNOWN` | Đợt 3 |
 | Q7 | `regression-selection` | Ai lập coverage map lần đầu | Đợt 3 |
 | Q8 | `jira-xray` | Công ty dùng TestRail hoặc Excel thì sao | Đợt 3 |
@@ -378,11 +392,11 @@ agent/
 |---|---|
 | Đợt 0 | 36 |
 | Đợt 1 | 59 |
-| Đợt 2 | 32 |
+| Đợt 2 | 33 |
 | Đợt 3 | 49 |
-| **Kit 0.1.0** | **176** |
-| Agent 0.2.0 (30 trong `agent/` + `docs/agent_design.md`) | 31 |
-| **Tổng** | **207** |
+| **Kit 0.1.0** | **177** |
+| Agent 0.2.0 (`agent/` + `docs/agent_design.md`; đã có 20, còn ~11 ở 09/10) | 31 |
+| **Tổng** | **208** |
 
 Thay đổi so với plan v4.2 (194 file kit):
 - −15: bỏ lệnh tắt Codex (quyết định #21)
@@ -395,4 +409,5 @@ Thay đổi so với plan v4.2 (194 file kit):
 - +2: `scripts/project/new-project.ps1` + `new-project.js` (yêu cầu ngày 07/10: tạo dự án mới kèm yml)
 - +2: `scripts/verify/check-tc.js`, `check-bug.js` (yêu cầu 07/10)
 - 0: `evidence_manifest.md`, `execution_report.md` chuyển từ Đợt 2 sang Đợt 1 (Đợt 1 +2, Đợt 2 −2)
-- = **176**
+- +1: `scripts/verify/oracle-patterns.js` (08/10: pattern dùng chung giữa hook và aiqe-verify)
+- = **177**
