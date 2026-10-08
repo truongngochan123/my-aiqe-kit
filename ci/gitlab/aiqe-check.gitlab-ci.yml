@@ -1,0 +1,34 @@
+# my-aiqe-kit · GitLab CI: chặn merge khi MR sửa oracle mà chưa có người duyệt.
+#
+# Cài vào repo dự án (người có quyền làm, xem docs/proposal_for_lead.md):
+#   1. include file này trong .gitlab-ci.yml, hoặc chép job dưới đây vào
+#   2. Chép scripts/verify/aiqe-verify.js và scripts/verify/oracle-patterns.js của kit vào ci/aiqe/
+#   3. Settings > Merge requests: bật "Pipelines must succeed"
+#
+# Khác GitHub: job này KHÔNG tự đọc danh sách approve (cần token có quyền API; CI_JOB_TOKEN đọc được
+# approvals hay không: UNKNOWN, phụ thuộc gói GitLab). Thay vào đó:
+#   - Có tín hiệu → job FAIL.
+#   - Người review (maintainer) đọc diff, rồi chạy lại pipeline với biến AIQE_REVIEWED_BY=<tên mình>.
+#     Chỉ người có quyền chạy pipeline với biến mới làm được việc này.
+#   - Code Owners + approval rules bắt buộc: cần gói GitLab trả phí (UNKNOWN với dự án của bạn).
+
+aiqe-check:
+  stage: test
+  image: node:22
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - git fetch --quiet origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    - set +e
+    - node ci/aiqe/aiqe-verify.js --base "origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" --head "$CI_COMMIT_SHA"; rc=$?
+    - set -e
+    - |
+      if [ "$rc" = "2" ]; then echo "aiqe-verify không chạy được: không coi là đạt."; exit 1; fi
+      if [ "$rc" = "1" ]; then
+        if [ -n "$AIQE_REVIEWED_BY" ]; then
+          echo "Có tín hiệu sửa oracle, đã được $AIQE_REVIEWED_BY review (chạy lại pipeline với AIQE_REVIEWED_BY)."
+        else
+          echo "MR có tín hiệu sửa oracle. Người review đọc diff, rồi chạy lại pipeline với biến AIQE_REVIEWED_BY=<tên> (G3)."
+          exit 1
+        fi
+      fi

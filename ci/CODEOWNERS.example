@@ -1,0 +1,24 @@
+# my-aiqe-kit · mẫu CODEOWNERS
+# Chép thành: .github/CODEOWNERS (GitHub) hoặc .gitlab/CODEOWNERS (GitLab; bắt buộc review cần gói trả phí).
+# Thay @qa-lead bằng tài khoản/nhóm review THẬT, và người đó KHÔNG được là tác giả PR thì mới có ý nghĩa.
+#
+# Mục đích: mọi thay đổi vào test, oracle, fixture, và chính cơ chế kiểm tra đều cần người thứ hai duyệt.
+
+# Test và oracle
+/tests/                @qa-lead
+/e2e/                  @qa-lead
+/src/test/             @qa-lead
+**/fixtures/           @qa-lead
+**/testdata/           @qa-lead
+**/test-data/          @qa-lead
+*.postman_collection.json  @qa-lead
+
+# Cấu hình chạy test (retries, forbidOnly, allowlist host…)
+playwright.config.*    @qa-lead
+/fixtures/test-base.*  @qa-lead
+
+# Chính cơ chế kiểm tra: không bảo vệ thì PR sửa được workflow để bỏ kiểm tra
+/.github/              @qa-lead
+/ci/aiqe/              @qa-lead
+.gitlab-ci.yml         @qa-lead
+CODEOWNERS             @qa-lead

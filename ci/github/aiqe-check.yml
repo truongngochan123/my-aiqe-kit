@@ -1,0 +1,73 @@
+# my-aiqe-kit · GitHub Actions: chặn merge khi PR sửa oracle mà chưa có người khác duyệt.
+#
+# Cài vào repo dự án (người có quyền làm, xem docs/proposal_for_lead.md):
+#   1. Chép file này thành .github/workflows/aiqe-check.yml
+#   2. Chép scripts/verify/aiqe-verify.js và scripts/verify/oracle-patterns.js của kit vào ci/aiqe/
+#   3. Chép ci/CODEOWNERS.example thành .github/CODEOWNERS, sửa tên người review
+#   4. Branch protection của nhánh chính: bật "Require status checks" (chọn job oracle-guard),
+#      "Require a pull request before merging", "Require review from Code Owners"
+#
+# Vì sao cần CODEOWNERS cho .github/ và ci/aiqe/: với PR cùng repo, workflow chạy theo bản trong nhánh của PR.
+# Không bảo vệ 2 thư mục này thì PR có thể sửa luôn workflow/script để bỏ kiểm tra (docs/threat_model.md).
+#
+# Logic: aiqe-verify thấy tín hiệu (xóa/sửa assertion, thêm skip/only, sửa fixture, xóa test)
+#        → job FAIL, trừ khi PR đã có APPROVE của một người KHÔNG phải tác giả.
+#        Job chạy lại khi có review mới (pull_request_review), nên approve xong thì check tự xanh.
+
+name: aiqe-check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  oracle-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Tìm tín hiệu sửa oracle
+        id: verify
+        shell: bash
+        run: |
+          set +e
+          node ci/aiqe/aiqe-verify.js \
+            --base "origin/${{ github.event.pull_request.base.ref }}" \
+            --head "${{ github.event.pull_request.head.sha }}" | tee aiqe-verify.txt
+          echo "rc=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Có tín hiệu → cần approve của người khác tác giả
+        if: steps.verify.outputs.rc == '1'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          # Lấy trạng thái review MỚI NHẤT của từng người; chỉ tính APPROVED của người khác tác giả.
+          approvers=$(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}/reviews" --paginate \
+            --jq 'group_by(.user.login) | map(last) | .[] | select(.state=="APPROVED") | .user.login' \
+            | grep -vx "${AUTHOR}" || true)
+          if [ -z "${approvers}" ]; then
+            echo "::error::PR có tín hiệu sửa oracle (xem log bước trên). Cần một người KHÔNG phải tác giả review và approve (G3)."
+            exit 1
+          fi
+          echo "Đã có approve của: ${approvers}"
+
+      - name: Lỗi khi chạy aiqe-verify
+        if: steps.verify.outputs.rc == '2'
+        run: |
+          echo "::error::aiqe-verify không chạy được (thiếu ci/aiqe/ hoặc lỗi git). Không coi là đạt."
+          exit 1

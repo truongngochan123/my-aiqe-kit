@@ -78,6 +78,7 @@ Mỗi case in `PASS` hoặc `FAIL`. Lệnh thoát với mã 0 khi mọi case đ�
   {"hook":"block-assertion-edit","name":"Java: thêm @Disabled","input":{"tool_name":"Edit","tool_input":{"file_path":"src/test/java/tests/SmokeTest.java","old_string":"@Test","new_string":"@Disabled\n@Test"}},"expect":"block"},
   {"hook":"block-assertion-edit","name":"Java code sản phẩm tên Audit.java","input":{"tool_name":"Edit","tool_input":{"file_path":"src/main/java/Audit.java","old_string":"int a = 1;","new_string":"int a = 2;"}},"expect":"allow"},
   {"hook":"block-assertion-edit","name":"Người dùng cho phép bằng AIQE_ALLOW_ORACLE_EDIT","env":{"AIQE_ALLOW_ORACLE_EDIT":"JIRA-123 PO đổi AC"},"input":{"tool_name":"Edit","tool_input":{"file_path":"tests/login.spec.ts","old_string":"await expect(page).toHaveURL('/dashboard');","new_string":"await expect(page).toHaveURL('/home');"}},"expect":"allow"},
+  {"hook":"block-assertion-edit","name":"Tài liệu .md trong thư mục tên test-data không phải fixture","input":{"tool_name":"Edit","tool_input":{"file_path":"skills/test-data/SKILL.md","old_string":"a","new_string":"b"}},"expect":"allow"},
   {"hook":"block-assertion-edit","name":"Edit README","input":{"tool_name":"Edit","tool_input":{"file_path":"README.md","old_string":"a","new_string":"b"}},"expect":"allow"}
 ]
 ```

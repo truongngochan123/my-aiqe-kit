@@ -1,0 +1,14 @@
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Secret: không commit
+.env*
+!.env.sandbox.example
+*.har
+storageState*.json
+
+# Output của my-aiqe-kit
+.aiqe/

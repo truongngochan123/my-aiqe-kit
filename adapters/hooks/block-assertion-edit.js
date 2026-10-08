@@ -15,15 +15,8 @@ const { normPath, pathTokens, commandText, block, ALLOW, runHook } = require('./
 
 const HOOK = 'block-assertion-edit';
 
-const TEST_FILE_RES = [
-  /\.(spec|test)\.[cm]?[jt]sx?$/,
-  /(^|\/)(tests?|e2e|__tests__|specs?)\/.*\.(ts|tsx|js|jsx|mjs|cjs|java|kt|py)$/,
-  /(test|tests)\.(java|kt)$/,               // *Test.java (đường dẫn đã chuyển chữ thường; *IT.java được bắt qua src/test/)
-  /(^|\/)src\/test\//,
-  /\.postman_collection\.json$/,
-  /(^|\/)test_[^/]*\.py$/,
-  /_test\.py$/,
-];
+// Mẫu nhận diện dùng chung với scripts/verify/aiqe-verify.js (một nguồn duy nhất).
+const { ASSERT_RE, SKIP_RE, isTest, isFixture } = require('../../scripts/verify/oracle-patterns');
 
 const PROTECTED_RES = [
   /(^|\/)\.codex\/(config\.toml|hooks\.json)$/,
@@ -32,14 +25,7 @@ const PROTECTED_RES = [
   /(^|\/)\.aiqe\/installed\.json$/,
 ];
 
-const ASSERT_RE = /\bexpect\s*\(|\bassert[A-Za-z]*\s*[(.]|\.should\s*\(|\bAssert\.[A-Za-z]+\s*\(|\bassertThat\s*\(|\bpm\.expect\s*\(|\bpm\.test\s*\(|\bverify\s*\(/;
-const SKIP_RE = /\b(test|it|describe|context)(\.describe)?\.(skip|only|fixme|fail)\s*\(|\b(xit|xdescribe|xtest|fit|fdescribe)\s*\(|@Disabled\b|@Ignore\b|enabled\s*=\s*false/;
-
-const isTest = (p) => TEST_FILE_RES.some((re) => re.test(p));
 const isProtected = (p) => PROTECTED_RES.some((re) => re.test(p));
-function isFixture(p, dirs) {
-  return dirs.some((d) => new RegExp('(^|/)' + d.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '/').test(p));
-}
 
 const lines = (s) => (s || '').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
 
