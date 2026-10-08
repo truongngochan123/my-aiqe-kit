@@ -36,7 +36,7 @@ Phải che trước khi đưa vào prompt, file chia sẻ hoặc báo cáo:
 - Mỗi record có prefix hoặc nằm trong data registry để cleanup.
 
 ## 5. Lưu trữ
-- Output nằm trong `output_dir` (mặc định `~/aiqe-output/<project>/`), **không nằm trong repo khách**.
+- Output nằm trong `output_dir` (mặc định `<repo>/.aiqe/output/`). `.aiqe/` phải có trong `.git/info/exclude`: **không** commit vào repo khách, **không** sửa `.gitignore` của khách. Dự án yêu cầu thì để ngoài repo (`~/aiqe-output/<tên>/`).
 - Xóa output sau `retention_days` (mặc định 90 ngày), hoặc sớm hơn nếu hợp đồng yêu cầu.
 - Trace, screenshot, video lưu ở nơi có phân quyền; report chỉ chứa **ref**.
 - Publish hoặc chia sẻ ra ngoài cần **G4**.

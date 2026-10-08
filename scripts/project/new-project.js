@@ -4,7 +4,7 @@
 // Thường gọi qua scripts/project/new-project.ps1.
 //
 //   node new-project.js --name <tên> --url <url> [--modules LOGIN,PIM] [--lang vi|en]
-//                       [--parent <thư mục cha>] [--output-in-project]
+//                       [--parent <thư mục cha>] [--output-outside]
 //
 // - Chỉ điền: project_name, sandbox_urls, module_codes, output_language, output_dir.
 // - Mọi field khác giữ MẶC ĐỊNH CHẶT NHẤT của file mẫu (ai_policy: UNKNOWN, allowed_ai_tools: [] ...).
@@ -24,7 +24,9 @@ const url = opt('--url');
 const lang = opt('--lang') || 'vi';
 const parent = path.resolve(opt('--parent') || process.cwd());
 const modules = (opt('--modules') || '').split(',').map((m) => m.trim().toUpperCase()).filter(Boolean);
-const outputInProject = argv.includes('--output-in-project');
+// Q10: mặc định output nằm trong <dự án>/.aiqe/output (Codex không phải hỏi mỗi lần ghi; .aiqe/ được loại khỏi git).
+// --output-outside: dự án yêu cầu để ngoài repo → ~/aiqe-output/<tên>. --output-in-project: giữ để tương thích (nay là mặc định).
+const outputOutside = argv.includes('--output-outside');
 
 // ---- kiểm tra tham số
 if (!name || !url) fail('cần --name và --url. Ví dụ: --name aiqe-pilot --url https://opensource-demo.orangehrmlive.com');
@@ -46,14 +48,14 @@ if (fs.existsSync(target)) {
 }
 
 // ---- điền vào file mẫu (giữ nguyên comment giải thích)
-const outputDir = outputInProject ? path.join(dir, 'output').replace(/\\/g, '/') : `~/aiqe-output/${name}`;
+const outputDir = outputOutside ? `~/aiqe-output/${name}` : '.aiqe/output';
 let text = fs.readFileSync(path.join(KIT, 'project.aiqe.example.yml'), 'utf8');
 const today = new Date().toISOString().slice(0, 10);
 const edits = [
   [/^project_name:.*$/m, `project_name: "${name}"            # tạo bởi scripts/project/new-project ngày ${today}`],
   [/^sandbox_urls:\s*\[\][^\n]*$/m, `sandbox_urls: ["${url}"]    # env được phép chạy test/ghi data`],
   [/^output_language:.*$/m, `output_language: ${lang}                 # vi | en`],
-  [/^output_dir:.*$/m, `output_dir: "${outputDir}"${outputInProject ? '   # trong thư mục dự án (Codex không phải hỏi mỗi lần ghi)' : ''}`],
+  [/^output_dir:.*$/m, `output_dir: "${outputDir}"${outputOutside ? '   # ngoài repo theo yêu cầu dự án' : '   # tương đối từ thư mục dự án; .aiqe/ nằm trong .git/info/exclude'}`],
   [/^module_codes:.*$/m, `module_codes: [${modules.join(', ')}]${modules.length ? '' : '                 # chưa khai báo: thêm mã module chữ in hoa, ví dụ [LOGIN, PIM]'}`],
 ];
 for (const [re, line] of edits) {
@@ -71,10 +73,26 @@ try {
 }
 
 fs.mkdirSync(path.dirname(target), { recursive: true });
-if (outputInProject) fs.mkdirSync(path.join(dir, 'output'), { recursive: true });
+if (!outputOutside) fs.mkdirSync(path.join(dir, '.aiqe', 'output'), { recursive: true });
 fs.writeFileSync(target, text, 'utf8');
 
-console.log(`Đã tạo ${target}\n`);
+// Loại .aiqe/ khỏi git của repo (không sửa .gitignore của khách). Chưa phải repo git thì chỉ nhắc.
+let excludeMsg;
+const gitDir = path.join(dir, '.git');
+if (fs.existsSync(gitDir) && fs.statSync(gitDir).isDirectory()) {
+  const ex = path.join(gitDir, 'info', 'exclude');
+  const cur = fs.existsSync(ex) ? fs.readFileSync(ex, 'utf8') : '';
+  if (!cur.split(/\r?\n/).includes('.aiqe/')) {
+    fs.mkdirSync(path.dirname(ex), { recursive: true });
+    fs.writeFileSync(ex, cur.trimEnd() + (cur ? '\n' : '') + '# my-aiqe-kit\n.aiqe/\n', 'utf8');
+    excludeMsg = `Đã thêm ".aiqe/" vào ${ex}.`;
+  } else excludeMsg = `".aiqe/" đã có trong ${ex}.`;
+} else {
+  excludeMsg = `${dir} chưa phải repo git. Nếu sau này "git init" hoặc clone vào đây, thêm dòng ".aiqe/" vào .git/info/exclude (AI cũng sẽ kiểm tra việc này theo AGENTS.md).`;
+}
+
+console.log(`Đã tạo ${target}`);
+console.log(excludeMsg + '\n');
 console.log('================ NỘI DUNG (đọc lại để kiểm tra) ================');
 console.log(text);
 console.log('================================================================');

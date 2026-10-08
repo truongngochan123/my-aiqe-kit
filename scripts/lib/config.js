@@ -32,9 +32,22 @@ function findConfig(explicit) {
   return candidates.find((f) => fs.existsSync(f)) || null;
 }
 
+// Thư mục dự án: thư mục chứa .aiqe/ (yml nằm ở <dự án>/.aiqe/project.aiqe.yml);
+// yml nằm chỗ khác (ví dụ ~/aiqe-output/<tên>/) thì lấy thư mục đang đứng.
+function projectRoot(file) {
+  if (file && path.basename(path.dirname(file)) === '.aiqe') return path.dirname(path.dirname(file));
+  return process.cwd();
+}
+
+// output_dir mặc định (Q10): <dự án>/.aiqe/output. Đường dẫn tương đối tính từ thư mục dự án.
+function resolveOutputDir(value, file) {
+  const v = value ? expandHome(String(value)) : '.aiqe/output';
+  return path.isAbsolute(v) ? v : path.join(projectRoot(file), v);
+}
+
 function loadConfig(explicit) {
   const file = findConfig(explicit);
-  if (!file) return { file: null, config: { ...DEFAULTS }, strictest: true };
+  if (!file) return { file: null, config: { ...DEFAULTS, output_dir: resolveOutputDir(null, null) }, strictest: true };
   let parsed = {};
   try {
     parsed = require('yaml').parse(fs.readFileSync(file, 'utf8')) || {};
@@ -42,7 +55,7 @@ function loadConfig(explicit) {
     throw new Error(`Không đọc được ${file}: ${e.message}`);
   }
   const config = { ...DEFAULTS, ...parsed };
-  if (config.output_dir) config.output_dir = expandHome(config.output_dir);
+  config.output_dir = resolveOutputDir(config.output_dir, file);
   return { file, config, strictest: false };
 }
 

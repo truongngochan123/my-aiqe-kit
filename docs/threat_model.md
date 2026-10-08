@@ -36,7 +36,7 @@
 | Allowlist URL cho `browser_navigate` | `rules/agent_safety.md` | 📝 | Không có cơ chế ép | Trang độc hại dẫn MCP tới URL lạ |
 | AI không giữ token Jira/Xray/CI | `rules/agent_safety.md` mục 3 | 🛡️ **chỉ khi** token thật sự không nằm trong repo, `.env` hay biến môi trường toàn máy | Token để sai chỗ | Nếu token có trong môi trường AI thì guard này chỉ còn là 📝 |
 | `.env.sandbox` chỉ chứa tài khoản test quyền thấp | quy ước tên file | 📝 | Người dùng đặt nhầm credential staging vào đó | AI dùng credential mạnh hơn dự định |
-| Output nằm ngoài repo (`~/aiqe-output/`) | `AGENTS.md`, yml | 📝 | AI ghi vào repo | Dữ liệu nhạy cảm bị commit |
+| Output trong `<repo>/.aiqe/output/`, `.aiqe/` nằm trong `.git/info/exclude` | `AGENTS.md`, `new-project.js`, yml | 🧯 | `git add -f`, xóa dòng trong exclude, ghi output ra chỗ khác trong repo | Dữ liệu nhạy cảm bị commit → chốt thật là review PR (người thứ hai thấy file lạ trong diff) |
 | Script redact | `scripts/redact/redact.js` (Đợt 1) | 🧯 | Regex không bắt hết; ảnh không redact được | **Người phải kiểm tra lại** |
 | Job CI chặn merge khi assertion giảm | `ci/` (Đợt 2) | 🛡️ **chỉ khi** có CODEOWNERS + bảo vệ `.github/**` + review bởi người khác | Sửa chính file workflow trong cùng PR (nếu không bảo vệ `.github/**`) | Dự án không cho sửa CI → không có lớp này |
 | Nhãn `RUN-PASSED` chỉ cho SHA đã được review | `rules/evidence_labels.md` | 📝 | AI gắn nhãn sai | Báo cáo PASS sai → `qe-reviewer` và người đọc kiểm tra |

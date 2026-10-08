@@ -26,7 +26,7 @@ $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $evalName = "$Name-$stamp"
 $kit = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 
-$argsList = @("$kit\scripts\project\new-project.js", '--name', $evalName, '--url', $Url, '--parent', $root, '--output-in-project')
+$argsList = @("$kit\scripts\project\new-project.js", '--name', $evalName, '--url', $Url, '--parent', $root)
 if ($Modules) { $argsList += @('--modules', ($Modules -join ',')) }
 & node @argsList | Out-Null
 if ($LASTEXITCODE -ne 0) { Write-Error 'Tạo thư mục eval thất bại (xem new-project.js).'; exit 1 }
@@ -43,5 +43,5 @@ if ($leak) { Write-Error "Thư mục eval có file đáp án: $($leak.FullName -
 Write-Output "Thư mục eval: $dir"
 Write-Output "Đầu vào đã chép: $(@($Inputs).Count) file. Không có file đáp án golden."
 Write-Output "Tiếp theo: mở thư mục này trong VS Code, chat MỚI, dán prompt của case, rồi chấm:"
-Write-Output "  node `"$kit\scripts\evals\grade.js`" `"$dir\output`" --expect <tên skill>"
+Write-Output "  node `"$kit\scripts\evals\grade.js`" `"$dir\.aiqe\output`" --expect <tên skill>"
 Write-Output "Lưu ý: ai_policy trong .aiqe\project.aiqe.yml đang là UNKNOWN (mặc định chặt nhất); dữ liệu công khai thì có thể đổi thành allowed."

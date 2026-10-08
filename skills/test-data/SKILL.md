@@ -37,6 +37,7 @@ description: Biến partition và giá trị biên của test case thành dữ l
    | Field tham chiếu (ID từ module trước) | Chép từ output module trước, ghi rõ lấy từ đâu |
    | Field tính toán | Tính theo công thức **có nguồn**; không có nguồn → `UNKNOWN` |
 2. **ID truy vết** theo `{{KIT}}/rules/id_conventions.md`: `<id_prefix>-r<NNN>-<tên>`, ví dụ `QA-r001-emp01`. Mode `chain`/`combinatorial` thêm mã tổ hợp vào tên: `QA-r001-c01-emp`.
+   **Tên người và tên record cũng mang prefix** (First Name `QA-r001-An`, Last Name `Test`; tên phòng ban `QA-r001-Kho`), không chỉ ID và tên file: để tìm lại và dọn đúng dữ liệu của mình trên site dùng chung.
 3. **Field có format cứng** (ví dụ mã đúng 8 chữ số, CCCD 12 số) → **không** chèn prefix (sẽ sai format, biến TC positive thành negative). Dùng giá trị hợp lệ và ghi vào **data registry** để truy vết.
 4. **Dữ liệu an toàn:** email `@example.com`; tên, địa chỉ synthetic tiếng Việt (ví dụ `Nguyễn QA Thử Nghiệm`); số điện thoại chỉ dùng khi `sms_gateway_disabled: yes`, nếu không thì ghi cảnh báo trong cột Ghi chú. Không dùng dữ liệu người thật.
 5. **Giá trị biên** phải đúng con số: "chuỗi 101 ký tự `A`", không viết "chuỗi dài".
@@ -55,7 +56,7 @@ description: Biến partition và giá trị biên của test case thành dữ l
 
 ## Self-check
 - [ ] Field chiều lấy đúng giá trị từ TC/ma trận, không random
-- [ ] ID truy vết đúng `<prefix>-r<NNN>-<tên>`; field format cứng không bị chèn prefix mà có trong registry
+- [ ] ID truy vết đúng `<prefix>-r<NNN>-<tên>`; tên người/tên record cũng mang prefix; field format cứng không bị chèn prefix mà có trong registry
 - [ ] Email `@example.com`; không PII thật; số điện thoại có cảnh báo nếu SMS chưa tắt
 - [ ] Giá trị biên ghi đúng con số
 - [ ] Mỗi bộ data có cleanup owner và cách dọn

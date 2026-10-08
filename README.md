@@ -48,10 +48,10 @@ Tạo thư mục dự án kèm file khai báo `.aiqe/project.aiqe.yml`:
 
 ```powershell
 cd D:\fpt-inform\my-aiqe-kit
-.\scripts\project\new-project.ps1 -Name <tên> -Url <url env được phép test> [-Modules LOGIN,PIM] [-Lang vi|en] [-Parent <thư mục cha>] [-OutputInProject]
+.\scripts\project\new-project.ps1 -Name <tên> -Url <url env được phép test> [-Modules LOGIN,PIM] [-Lang vi|en] [-Parent <thư mục cha>] [-OutputOutside]
 ```
 
-Ví dụ: `.\scripts\project\new-project.ps1 -Name aiqe-pilot -Url https://opensource-demo.orangehrmlive.com -Modules LOGIN,PIM -Parent D:\fpt-inform -OutputInProject`
+Ví dụ: `.\scripts\project\new-project.ps1 -Name aiqe-pilot -Url https://opensource-demo.orangehrmlive.com -Modules LOGIN,PIM -Parent D:\fpt-inform`
 
 | Tham số | Ý nghĩa | Không truyền thì |
 |---|---|---|
@@ -60,7 +60,7 @@ Ví dụ: `.\scripts\project\new-project.ps1 -Name aiqe-pilot -Url https://opens
 | `-Modules` | Mã module, tự đổi sang chữ in hoa | `[]` |
 | `-Lang` | Ngôn ngữ output | `vi` |
 | `-Parent` | Thư mục cha | Thư mục đang đứng (không được nằm trong repo kit) |
-| `-OutputInProject` | Output ghi vào `<dự án>/output` để Codex không phải hỏi mỗi lần ghi | `~/aiqe-output/<tên>` |
+| `-OutputOutside` | Dự án yêu cầu để output ngoài repo → `~/aiqe-output/<tên>` | `<dự án>/.aiqe/output/` (Codex không phải hỏi mỗi lần ghi); `.aiqe/` tự thêm vào `.git/info/exclude` nếu đã là repo git |
 
 - Mọi field khác giữ **mặc định chặt nhất** (`ai_policy: UNKNOWN`…). Trả lời `docs/before_you_use.md` rồi chỉnh lại các field đó.
 - File đã có thì script **không ghi đè**, chỉ in nội dung hiện tại.
@@ -73,7 +73,7 @@ Ví dụ: `.\scripts\project\new-project.ps1 -Name aiqe-pilot -Url https://opens
 - **Claude Code:** tương tự; gọi thẳng skill bằng `/bug-reporting`.
 - Chọn mode bằng cách ghi thẳng vào câu, ví dụ: `/bug-reporting retest BUG-CUS-012`.
 - Che dữ liệu nhạy cảm, dựng khung dự án: nói bằng lời ("redact file X", "dựng scaffold Playwright").
-- Output ghi vào `~/aiqe-output/<project>/`, **không** vào repo của khách.
+- Output ghi vào `<repo>/.aiqe/output/` (mặc định). `.aiqe/` nằm trong `.git/info/exclude` nên **không** bị commit vào repo của khách.
 
 ## Mức hỗ trợ
 

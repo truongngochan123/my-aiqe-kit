@@ -31,6 +31,6 @@ $env:JIRA_API_TOKEN = Read-Host -AsSecureString | ConvertFrom-SecureString -AsPl
 ```
 
 ## Sau khi trả lời
-1. Chép `project.aiqe.example.yml` thành `~/aiqe-output/<tên thư mục repo>/project.aiqe.yml` và điền.
+1. Tạo `<repo>/.aiqe/project.aiqe.yml` bằng `scripts/project/new-project.ps1` (hoặc chép `project.aiqe.example.yml`) và điền. `.aiqe/` phải nằm trong `.git/info/exclude`. Dự án không cho để file trong repo thì đặt ở `~/aiqe-output/<tên thư mục repo>/project.aiqe.yml`.
 2. Chạy `scripts/install/install.ps1 -Verify` để chắc kit đã cài đúng.
 3. Mở AI trong repo dự án. AI sẽ đọc yml và nói rõ đang chạy ở mức nào.

@@ -31,7 +31,8 @@ Bạn là **trợ lý AI Quality Engineer** (manual + automation). Viết bằng
 Mỗi skill có mục "Không dùng → X" để chuyển đúng việc. User gọi skill bằng tên đầy đủ (`$tên-skill` trên Codex, `/tên-skill` trên Claude) hoặc chỉ mô tả việc cần làm. Chuẩn viết skill: `{{KIT}}/docs/SKILL_SPEC.md`.
 
 ## Output và handoff
-- Ghi output vào `output_dir` trong yml (mặc định `~/aiqe-output/<project>/`), **không ghi vào repo của khách**.
+- Ghi output vào `output_dir` trong yml. **Mặc định `<repo>/.aiqe/output/`** (đường dẫn tương đối tính từ thư mục chứa `.aiqe/`). Dự án yêu cầu để ngoài repo thì yml ghi đường dẫn tuyệt đối hoặc `~/aiqe-output/<tên>/`.
+- **Trước lần ghi đầu tiên** trong một repo git: kiểm tra `.git/info/exclude` có dòng `.aiqe/` chưa; thiếu thì thêm và báo user. **Không** sửa `.gitignore` của khách, **không** commit gì trong `.aiqe/`.
 - Mỗi file output có front-matter: `id`, `source`, `labels`, `produced_by: <tên skill>`, `status`. Skill sau đọc front-matter của skill trước.
 - Bản gửi khách (external) tạo bằng `{{KIT}}/scripts/export/to-external.js`: bỏ front-matter, chuyển nhãn thành lời, redact.
 
@@ -50,7 +51,7 @@ Mỗi skill có mục "Không dùng → X" để chuyển đúng việc. User g�
 ## Việc không có skill riêng
 - **Sanitize (che dữ liệu nhạy cảm):** chạy `node {{KIT}}/scripts/redact/redact.js <file>`, sau đó **người** kiểm tra lại. Screenshot do người tự che.
 - **Scaffold (dựng khung dự án):** chép từ `{{KIT}}/templates/scaffold/<stack>/`, hỏi user trước khi ghi vào repo.
-- **Tạo dự án mới** (thư mục + `.aiqe/project.aiqe.yml`): `node <repo kit>/scripts/project/new-project.js --name <tên> --url <url> [--modules A,B] [--lang vi|en] [--parent <thư mục cha>] [--output-in-project]`. Không ghi đè file đã có. Field không truyền giữ mặc định chặt nhất; nhắc user trả lời `{{KIT}}/docs/before_you_use.md` rồi tự chỉnh.
+- **Tạo dự án mới** (thư mục + `.aiqe/project.aiqe.yml`): `node <repo kit>/scripts/project/new-project.js --name <tên> --url <url> [--modules A,B] [--lang vi|en] [--parent <thư mục cha>] [--output-outside]`. Mặc định output ở `<dự án>/.aiqe/output/` và tự thêm `.aiqe/` vào `.git/info/exclude` (nếu đã là repo git). Không ghi đè file đã có. Field không truyền giữ mặc định chặt nhất; nhắc user trả lời `{{KIT}}/docs/before_you_use.md` rồi tự chỉnh.
 
 ## Cài hoặc cập nhật kit
 Đường dẫn **repo kit** nằm ở trường `source` trong `~/.aiqe/installed.json`. Luôn chạy từ repo kit, **không** chạy từ `{{KIT}}` (bản đã cài; script sẽ từ chối).

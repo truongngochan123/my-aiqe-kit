@@ -48,7 +48,7 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
    - **TC chạy được:** expected đã biết, có nguồn (`REQ-CONFIRMED`, `DOM-OBSERVED`, kỳ vọng hiển nhiên #1–#4). Expected từ `DOM-OBSERVED` ghi kèm "(hành vi quan sát ngày …, chưa có requirement xác nhận)".
    - **Mục thăm dò:** expected chưa biết → bảng riêng khóa bằng `Q-<MODULE>-NN`, **không** viết thành TC với expected "UNKNOWN"/"cần xác nhận".
    Quan sát của chính user kể trong prompt gắn `DOM-OBSERVED` (ghi người quan sát, env, ngày), **không** gắn `PROVIDED`.
-8. **Viết TC** theo `{{KIT}}/templates/test_case_table.md`: Source, Steps và Expected đánh số khớp 1-1, Test Data cụ thể (`QA-r001-...`, email `@example.com`), Risk, Priority (đặt theo Risk, `{{KIT}}/rules/test_design.md` mục 2b; chưa biết expected **không** phải lý do đặt P1), Automatable, Auto Type, Tags. **Không dùng ký hiệu tắt tự đặt** (`C0`, `E`, `R`…).
+8. **Viết TC** theo `{{KIT}}/templates/test_case_table.md`: Source, Steps và Expected đánh số khớp 1-1, Test Data cụ thể (`QA-r001-...`, email `@example.com`; **tên người/tên record cũng mang prefix**, ví dụ First Name `QA-r001-An`), Risk, Priority (đặt theo Risk, `{{KIT}}/rules/test_design.md` mục 2b; chưa biết expected **không** phải lý do đặt P1), Automatable, Auto Type, Tags. **Không dùng ký hiệu tắt tự đặt** (`C0`, `E`, `R`…).
 9. **Traceability** `AC × TC`: mọi AC có ≥ 1 TC hoặc ≥ 1 mục thăm dò; ghi lý do nếu không có.
 10. Chạy Self-check, sửa.
 11. **Bắt buộc chạy** `node {{KIT}}/scripts/verify/check-tc.js <file TC vừa ghi>`. Còn lỗi → sửa rồi chạy lại. Báo cho user **nguyên văn dòng cuối** của script (ví dụ `check-tc: 1 file, 0 lỗi → ĐẠT`). **Không báo "xong" khi script chưa ĐẠT**; không chạy được script thì nói rõ lý do, không tự kết luận đạt.
@@ -62,7 +62,7 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
   produced_by: test-design-rbt
   status: draft
   ```
-- Nội dung: (1) bảng field, (2) bảng rủi ro, (3a) **bảng TC chạy được**, (3b) **bảng mục thăm dò** (khóa `Q-<MODULE>-NN`), (4) traceability `AC × TC`, (5) **câu hỏi mở / `Not specified`**. Đầu file in số lượng: "N TC chạy được · M mục thăm dò · K câu hỏi".
+- Nội dung: (1) bảng field, (2) bảng rủi ro, (3a) **bảng TC chạy được**, (3b) **bảng mục thăm dò** (khóa `Q-<MODULE>-NN`), (4) traceability `AC × TC`, (5) **câu hỏi mở / `Not specified`**, (6) **Bước tiếp theo** (luôn có, ở cuối file): việc cụ thể kế tiếp, ví dụ "thăm dò Q-PIM-01…05 trên OrangeHRM demo, rồi gọi `test-design-rbt maintain` để chuyển thành TC". Đầu file in số lượng: "N TC chạy được · M mục thăm dò · K câu hỏi".
 - Excel (nếu user cần): `node {{KIT}}/scripts/convert/md_to_xlsx.js <file.md>`; cột theo `excel_columns` trong yml.
 - Bản gửi khách: `node {{KIT}}/scripts/export/to-external.js <file.md>`.
 
@@ -89,5 +89,7 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - [ ] Quan sát của chính user gắn `DOM-OBSERVED` (có người quan sát, env, ngày), không gắn `PROVIDED`
 - [ ] Priority khớp Risk; không có TC nào được đặt P1 chỉ vì chưa biết expected
 - [ ] Không có ký hiệu tắt tự đặt (`C0`, `E`, `R`…) chưa chú thích
+- [ ] Tên người/tên record trong Test Data mang prefix (`QA-r001-An`)
+- [ ] Cuối file có mục **Bước tiếp theo** với việc cụ thể (thăm dò `Q-*` nào, rồi gọi skill/mode nào)
 - [ ] Mode `maintain`: mỗi TC cũ có trạng thái giữ/sửa/chuyển sang thăm dò/lỗi thời, không xóa TC cũ
 - [ ] Đã có TC cùng module → đã hỏi user (a) cập nhật hay (b) viết mới **trước khi** ghi file; chọn (b) thì không có dòng nào chép nguyên từ file cũ, file cũ còn nguyên

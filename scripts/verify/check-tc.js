@@ -23,7 +23,7 @@ const RE = {
   source: /\b(AC|HYP)-[A-Z][A-Z0-9]{1,9}-\d{2,3}\b/,
   qId: /^Q-[A-Z][A-Z0-9]{1,9}-\d{2,3}$/,
   dataIdLike: /\b[A-Z]{2,6}-r\d+[A-Za-z0-9-]*/g,
-  dataId: /^[A-Z]{2,6}-r\d{3}-[a-z0-9-]+$/,
+  dataId: /^[A-Z]{2,6}-r\d{3}-[A-Za-z0-9-]+$/,
   email: /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g,
   safeEmail: /@(?:example\.(?:com|org|net)|[A-Za-z0-9.-]+\.(?:test|invalid|example))$/i,
   unknownExpected: /\b(UNKNOWN|Not specified|TBD|N\/A)\b|chưa biết|chưa rõ|cần xác nhận|tùy hệ thống|chờ xác nhận/i,
@@ -90,6 +90,9 @@ function check(text) {
     if (M !== nQ) E(ci + 1, `dòng tổng ghi ${M} mục thăm dò nhưng bảng thăm dò có ${nQ} dòng`);
   }
   if (tcTables.length === 0) E(1, 'không có bảng TC chạy được (bảng có cột "TC ID")');
+  const iNext = lines.findIndex((l) => /^##\s.*(Bước tiếp theo|Next steps)/i.test(l));
+  if (iNext === -1) E(lines.length, 'thiếu mục "## Bước tiếp theo" ở cuối file');
+  else if (!lines.slice(iNext + 1).some((l) => /\S/.test(l) && !/^\s*(<!--|1\.\s*$)/.test(l))) E(iNext + 1, 'mục "Bước tiếp theo" để trống');
 
   // 3–6. Từng dòng TC
   const seen = new Set();
@@ -110,7 +113,7 @@ function check(text) {
       if (iData !== -1) {
         const d = cells[iData] || '';
         if (RE.vagueData.test(d)) E(line, `${id}: test data mơ hồ ("${d.match(RE.vagueData)[0]}")`);
-        for (const x of d.match(RE.dataIdLike) || []) if (!RE.dataId.test(x)) E(line, `${id}: ID data "${x}" không đúng <PREFIX>-r<NNN>-<tên> (ví dụ QA-r001-emp01)`);
+        for (const x of d.match(RE.dataIdLike) || []) if (!RE.dataId.test(x)) E(line, `${id}: ID data "${x}" không đúng <PREFIX>-r<NNN>-<tên> (ví dụ QA-r001-emp01, QA-r001-An)`);
       }
       for (const em of cells.join(' ').match(RE.email) || []) if (!RE.safeEmail.test(em)) E(line, `${id}: email "${em}" không dùng domain test (@example.com, .test)`);
     }
@@ -149,12 +152,15 @@ status: draft
 
 | TC ID | Source | Scenario | Pre-condition | Steps | Expected | Test Data | Priority | Risk | Automatable | Auto Type | Tags |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| TC-PIM-001 | HYP-PIM-01 | Thêm nhân viên đủ field bắt buộc | Đăng nhập Admin | 1. Mở Add Employee<br>2. Nhập tên<br>3. Bấm Save | 1. Form mở<br>2. Nhập được<br>3. Tìm theo tên thấy đúng 1 dòng (hành vi quan sát ngày 07/10, chưa có requirement xác nhận) | QA-r001-emp01 | P1 | High | Yes | UI | @Smoke |
+| TC-PIM-001 | HYP-PIM-01 | Thêm nhân viên đủ field bắt buộc | Đăng nhập Admin | 1. Mở Add Employee<br>2. Nhập tên<br>3. Bấm Save | 1. Form mở<br>2. Nhập được<br>3. Tìm theo tên thấy đúng 1 dòng (hành vi quan sát ngày 07/10, chưa có requirement xác nhận) | First Name QA-r001-An, Last Name Test | P1 | High | Yes | UI | @Smoke |
 | TC-PIM-002 | HYP-PIM-02 | Bỏ trống First Name | Đăng nhập Admin | 1. Bấm Save | 1. Hiện thông báo bắt buộc dưới First Name (DOM-OBSERVED, user, OrangeHRM demo, 07/10) | qa.emp02@example.com | P2 | Medium | Yes | UI | @Regression |
 
 | Q ID | Scenario cần thăm dò | Cần biết điều gì | Cách quan sát | Risk |
 |---|---|---|---|---|
 | Q-PIM-01 | First Name 300 ký tự | Độ dài tối đa | Nhập 300 ký tự, xem phản hồi | Medium |
+
+## 6. Bước tiếp theo
+1. Thăm dò Q-PIM-01 trên OrangeHRM demo, rồi gọi test-design-rbt maintain.
 `;
 const BAD = `---
 id: TC-PIM
@@ -170,7 +176,7 @@ status: draft
 | TC-PIM-002 | HYP-PIM-02 | E Max length | Đăng nhập | 1. Nhập 300 ký tự | 1. UNKNOWN, cần xác nhận | QA-r2, nguyen.van.a@gmail.com | P1 | Medium | Yes | UI | @Boundary |
 `;
 const EXPECT_BAD = ['thiếu produced_by', 'ghi 3 TC chạy được nhưng bảng TC có 2', 'TC-PIM-1', 'Source', 'ký hiệu tắt', 'Priority "P0"', 'Risk "Huge"',
-  'test data mơ hồ', 'expected chưa biết', 'ID data "QA-r2"', 'gmail.com', 'gắn PROVIDED'];
+  'test data mơ hồ', 'expected chưa biết', 'ID data "QA-r2"', 'gmail.com', 'gắn PROVIDED', 'Bước tiếp theo'];
 
 function selfTest() {
   let fail = 0;

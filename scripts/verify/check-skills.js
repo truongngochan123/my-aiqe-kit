@@ -61,5 +61,29 @@ for (const name of dirs) {
   }
 }
 
+// Bảng field có 2 bản (Q9, BUILD_PLAN): references/field_validation_15.md là BẢN GỐC,
+// prompts/manual/05 giữ bản sao giữa <!-- sync: ... --> và <!-- /sync --> để dán sang AI web. Hai bản phải khớp.
+const SRC = path.join(ROOT, 'skills', 'test-design-rbt', 'references', 'field_validation_15.md');
+const COPY = path.join(ROOT, 'prompts', 'manual', '05_rbt_and_tc_generation.md');
+if (fs.existsSync(SRC) && fs.existsSync(COPY)) {
+  const tableRows = (t) => t.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.startsWith('|'));
+  const srcText = fs.readFileSync(SRC, 'utf8');
+  const srcSection = (srcText.split(/^## Bảng\s*$/m)[1] || '').split(/^## /m)[0];
+  const copyMatch = fs.readFileSync(COPY, 'utf8').match(/<!-- sync:[^>]*-->([\s\S]*?)<!-- \/sync -->/);
+  const a = tableRows(srcSection);
+  const b = copyMatch ? tableRows(copyMatch[1]) : [];
+  if (!copyMatch) err('test-design-rbt', `không thấy khối <!-- sync --> trong ${path.relative(ROOT, COPY)}`);
+  else if (a.length === 0) err('test-design-rbt', `không thấy bảng dưới "## Bảng" trong ${path.relative(ROOT, SRC)}`);
+  else {
+    const n = Math.max(a.length, b.length);
+    for (let k = 0; k < n; k++) {
+      if (a[k] !== b[k]) {
+        err('test-design-rbt', `bảng field lệch giữa bản gốc và prompt 05 ở dòng bảng thứ ${k + 1}: gốc "${(a[k] || '(không có)').slice(0, 60)}" / bản sao "${(b[k] || '(không có)').slice(0, 60)}". Sửa bản gốc rồi chép sang prompt 05`);
+        break;
+      }
+    }
+  }
+}
+
 console.log(`\nĐã kiểm tra ${dirs.length} skill, ${errors} lỗi.`);
 process.exit(errors ? 1 : 0);

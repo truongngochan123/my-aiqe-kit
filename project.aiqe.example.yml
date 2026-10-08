@@ -1,8 +1,9 @@
 # project.aiqe.yml — khai báo cho MỘT dự án.
 #
 # Cách dùng: chép file này thành
-#   ~/aiqe-output/<tên thư mục repo>/project.aiqe.yml   (mặc định, ngoài repo khách)
-#   hoặc <repo>/.aiqe/project.aiqe.yml                  (chỉ khi dự án cho phép)
+#   <repo>/.aiqe/project.aiqe.yml                       (mặc định; .aiqe/ nằm trong .git/info/exclude)
+#   hoặc ~/aiqe-output/<tên thư mục repo>/project.aiqe.yml (khi dự án không cho để file trong repo)
+# Nhanh nhất: scripts/project/new-project.ps1
 #
 # NGƯỜI viết file này, AI không sửa.
 # Đây là KHAI BÁO, không phải cơ chế bảo vệ: AI đọc nó để biết luật,
@@ -29,7 +30,7 @@ sms_gateway_disabled: UNKNOWN       # yes | no | UNKNOWN: env test đã tắt g�
 
 # ---------- Output ----------
 output_language: vi                 # vi | en. Mặc định: vi
-output_dir: "~/aiqe-output/demo-crm"  # Mặc định: ~/aiqe-output/<project_name>
+output_dir: ".aiqe/output"         # Mặc định: <repo>/.aiqe/output (tương đối từ thư mục chứa .aiqe/). Ngoài repo: "~/aiqe-output/<tên>"
 retention_days: 90                  # sau bao lâu xóa output. Mặc định: 90
 
 # ---------- Quy ước ID (regex xem rules/id_conventions.md) ----------

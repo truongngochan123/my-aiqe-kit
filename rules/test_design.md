@@ -19,7 +19,7 @@
 - **TC ID:** theo `id_conventions.md` (mặc định `TC-<MODULE>-<NNN>`).
 - **Source:** mọi TC trỏ về ít nhất một `AC-*`. TC dựng từ reverse spec (requirement dựng ngược từ app) ghi `HYP-<id>`, **không** ghi `AC-`. Không có nguồn thì ghi `Not specified` và đưa vào danh sách câu hỏi.
 - **Steps và Expected:** đánh số khớp 1-1.
-- **Test Data:** giá trị cụ thể (`QA-r042-emp01`), không viết "dữ liệu hợp lệ". Email dùng `@example.com`.
+- **Test Data:** giá trị cụ thể (`QA-r042-emp01`), không viết "dữ liệu hợp lệ". Email dùng `@example.com`. **Tên người/tên record cũng mang prefix** (First Name `QA-r001-An`) để tìm và dọn được trên site dùng chung.
 - **Mỗi field có validation TC riêng**, không gộp nhiều field vào một TC.
 - **Priority:** P1–P4. **Risk:** Critical / High / Medium / Low. Cách đặt: mục 2b.
 - **Automatable:** Yes / No / Partial. **Auto Type:** UI / API / Unit / N/A.

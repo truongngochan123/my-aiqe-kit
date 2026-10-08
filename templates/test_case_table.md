@@ -43,3 +43,7 @@ status: draft
 ## 5. Open questions / Câu hỏi mở (`Not specified`)
 | ID | Câu hỏi | Vì sao quan trọng | Ảnh hưởng nếu đoán sai |
 |---|---|---|---|
+
+## 6. Bước tiếp theo / Next steps
+<!-- Luôn có. Việc cụ thể, ví dụ: "Thăm dò Q-PIM-01…05 trên OrangeHRM demo (data QA-r00x-…), rồi gọi test-design-rbt maintain để chuyển thành TC." -->
+1. 
