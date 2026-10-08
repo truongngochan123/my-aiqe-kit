@@ -1,0 +1,10 @@
+target/
+test-output/
+*.log
+
+# Secret: không commit
+.env*
+!.env.sandbox.example
+
+# Output của my-aiqe-kit
+.aiqe/

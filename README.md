@@ -82,10 +82,12 @@ Ví dụ: `.\scripts\project\new-project.ps1 -Name aiqe-pilot -Url https://opens
 | Manual test (phân tích, thiết kế, bug, báo cáo) | Đầy đủ (từ Đợt 1) |
 | Playwright TypeScript | Đầy đủ (từ Đợt 2) |
 | API (code, Postman/Newman) | Đầy đủ (từ Đợt 2) |
-| Selenium Java, Appium Java | **Beta** (Đợt 3) |
+| Selenium Java | **Beta**: khung compile được, smoke chỉ đọc đã chạy thật (09/10) |
+| Appium Java | **Beta**: khung compile được, chưa chạy trên thiết bị |
+| Jira / Xray | Lấy requirement (chỉ đọc) và chuẩn bị payload; **người** chạy lệnh có token và tự đẩy (G4) |
 | Codex | Tool chính |
 | Claude Code | Hỗ trợ ngang hàng |
-| Gemini CLI | Đợt 3 |
+| Gemini CLI | **Beta**: cài cấp user (`--tool gemini`), không chép skill, **không có hook** |
 | Performance, security chuyên sâu, accessibility đầy đủ, UAT | Chưa hỗ trợ (xem `docs/BUILD_PLAN.md` mục "Để sau") |
 
 ## Giới hạn cần biết

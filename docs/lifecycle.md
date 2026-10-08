@@ -9,7 +9,7 @@
                          ▲                                                    │
                          └──────────── requirement đổi: test-design-rbt (maintain) ◀───┘
 
- Mọi giai đoạn: ai-output-review (soát output của AI) · qe-coach (chỉ khi học)
+ Mọi giai đoạn: ai-output-review (soát output của AI) · qe-coach (khi QA muốn tự làm, không làm hộ)
  Agent tự chạy test: agent-architecture
 ```
 

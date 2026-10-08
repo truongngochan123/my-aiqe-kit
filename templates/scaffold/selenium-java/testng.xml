@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!-- Chạy song song theo class, mỗi thread một WebDriver (ThreadLocal trong BaseTest).
+     Lọc theo nhóm: mvn test -Dgroups=smoke -->
+<suite name="aiqe-selenium" parallel="classes" thread-count="2">
+  <test name="all">
+    <packages>
+      <package name="aiqe.tests"/>
+    </packages>
+  </test>
+</suite>

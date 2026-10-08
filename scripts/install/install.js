@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 'use strict';
-// Cài / gỡ / kiểm tra my-aiqe-kit cho Codex và Claude Code.
+// Cài / gỡ / kiểm tra my-aiqe-kit cho Codex và Claude Code (Gemini CLI: beta, chỉ khi --tool gemini).
 // Thường gọi qua scripts/install/install.ps1. Có thể gọi trực tiếp:
 //
-//   node install.js [--tool codex|claude|all] [--home <dir>] [--project <repo>] [--dry-run]
+//   node install.js [--tool codex|claude|gemini|all] [--home <dir>] [--project <repo>] [--dry-run]
+//   (all = codex + claude; gemini phải chọn riêng)
 //   node install.js --uninstall [--home <dir>]
 //   node install.js --verify    [--home <dir>]
 //
@@ -38,6 +39,7 @@ const SNAPSHOT = path.join(AIQE, 'kit', VERSION);
 const SNAP_FWD = SNAPSHOT.replace(/\\/g, '/');
 const CODEX_HOME = opt('--home', null) ? path.join(HOME, '.codex') : (process.env.CODEX_HOME || path.join(HOME, '.codex'));
 const CLAUDE_HOME = path.join(HOME, '.claude');
+const GEMINI_HOME = path.join(HOME, '.gemini');
 const AGENTS_SKILLS = path.join(HOME, '.agents', 'skills');
 const STATE_FILE = path.join(AIQE, 'installed.json');
 const STAMP = new Date().toISOString().replace(/[:.]/g, '-');
@@ -294,11 +296,36 @@ function installClaude(state) {
   state.tools.claude = st;
 }
 
+// Gemini CLI (beta): ghép AGENTS.md + adapters/gemini/GEMINI.md vào ~/.gemini/GEMINI.md; thêm tên file context vào settings.json.
+// Không chép skill (Gemini có đọc SKILL.md tự động hay không: UNKNOWN), không có hook.
+function installGemini(state) {
+  log('\n== Gemini CLI (beta) ==');
+  const st = { geminiMd: path.join(GEMINI_HOME, 'GEMINI.md'), settings: path.join(GEMINI_HOME, 'settings.json'), fileNamesAdded: [] };
+  const agents = readText(path.join(SNAPSHOT, 'AGENTS.md')) || readText(path.join(KIT_SRC, 'AGENTS.md'));
+  const addendum = readText(path.join(SNAPSHOT, 'adapters', 'gemini', 'GEMINI.md'))
+    || readText(path.join(KIT_SRC, 'adapters', 'gemini', 'GEMINI.md')).split('{{KIT}}').join(SNAP_FWD);
+  upsertMdBlock(st.geminiMd, `${agents.trim()}\n\n${addendum.trim()}`);
+  const kit = JSON.parse(readText(path.join(SNAPSHOT, 'adapters', 'gemini', 'settings.json')) || readText(path.join(KIT_SRC, 'adapters', 'gemini', 'settings.json')));
+  const prev = (state.tools.gemini && state.tools.gemini.fileNamesAdded) || [];
+  const obj = readJson(st.settings);
+  if (obj === null) { st.fileNamesAdded = prev; }
+  else {
+    obj.context = obj.context || {};
+    const cur = obj.context.fileName === undefined ? [] : [].concat(obj.context.fileName);
+    const add = kit.context.fileName.filter((n) => !cur.includes(n));
+    if (add.length) { obj.context.fileName = [...cur, ...add]; backup(st.settings); writeText(st.settings, JSON.stringify(obj, null, 2) + '\n'); }
+    st.fileNamesAdded = [...new Set([...prev, ...add])];
+  }
+  log('  Không chép skill, không có hook trên Gemini (xem adapters/gemini/GEMINI.md).');
+  state.tools.gemini = st;
+}
+
 function installProject(state, repo) {
   log(`\n== Chế độ dự án: ${repo} ==`);
   const created = [];
   const exclude = [];
   const tools = TOOL === 'all' ? ['codex', 'claude'] : [TOOL];
+  if (tools.includes('gemini')) warn('Chế độ dự án chưa hỗ trợ Gemini: cài cấp user bằng --tool gemini.');
   const placeMd = (rel, content) => {
     const f = path.join(repo, rel);
     const cur = readText(f);
@@ -359,6 +386,18 @@ function uninstall() {
     }
     [...(cl.skills || []), ...(cl.commands || []), ...(cl.agents || [])].forEach(removePath);
   }
+  const g = s.tools && s.tools.gemini;
+  if (g) {
+    removeMdBlock(g.geminiMd);
+    const j = readJson(g.settings);
+    if (j && j.context && j.context.fileName !== undefined) {
+      backup(g.settings);
+      const left = [].concat(j.context.fileName).filter((n) => !(g.fileNamesAdded || []).includes(n));
+      if (left.length) j.context.fileName = left; else delete j.context.fileName;
+      if (!Object.keys(j.context).length) delete j.context;
+      Object.keys(j).length ? writeText(g.settings, JSON.stringify(j, null, 2) + '\n') : removePath(g.settings);
+    }
+  }
   for (const [repo, p] of Object.entries(s.projects || {})) {
     for (const f of p.created || []) { if (/\.md$/i.test(f)) removeMdBlock(f); else removePath(f); }
     const exFile = path.join(repo, '.git', 'info', 'exclude');
@@ -393,6 +432,12 @@ function verify() {
     check((readText(cl.claudeMd) || '').includes(MD_START), 'Claude CLAUDE.md có khối của kit');
     const j = readJson(cl.settings) || {};
     check(Object.values(j.hooks || {}).flat().some(isKitHook), 'Claude settings.json có hook của kit');
+  }
+  const g = s.tools && s.tools.gemini;
+  if (g) {
+    check((readText(g.geminiMd) || '').includes(MD_START), 'Gemini GEMINI.md có khối của kit');
+    const j = readJson(g.settings) || {};
+    check([].concat((j.context && j.context.fileName) || []).includes('AGENTS.md'), 'Gemini settings.json có context.fileName AGENTS.md');
   }
   const allSkills = [...((c && c.skills) || []), ...((cl && cl.skills) || [])];
   for (const dest of allSkills) {
@@ -433,7 +478,7 @@ function main() {
   } else {
     if (TOOL === 'all' || TOOL === 'codex') installCodex(state);
     if (TOOL === 'all' || TOOL === 'claude') installClaude(state);
-    if (TOOL === 'gemini') warn('Adapter Gemini thuộc Đợt 3, chưa có.');
+    if (TOOL === 'gemini') installGemini(state);
   }
   if (!DRY) { fs.mkdirSync(AIQE, { recursive: true }); fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2) + '\n', 'utf8'); }
   if (fs.existsSync(BACKUP)) log(`\nBackup: ${BACKUP}`);

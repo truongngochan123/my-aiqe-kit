@@ -22,8 +22,12 @@ Bản `-dev` là bản đang dựng, chưa chốt.
 - Đợt 2: skill `ui-automation`, `api-testing` (+ references); scaffold Playwright TS; `aiqe-verify.js`, `oracle-patterns.js`; CI GitHub/GitLab, `CODEOWNERS.example`, `docs/proposal_for_lead.md`; `approval_card.md`; 6 prompt automation; eval 2 skill; `review_checklist_dot2.md`.
 - Agent 0.2.0 lõi: `docs/agent_design.md`, `agent/` (controller, guard, state machine, evidence store, approval, planner mock/codex/api, 11 kịch bản, 18 test).
 - Q9: `check-skills.js` so bảng field giữa bản gốc và prompt 05. Q10: output mặc định `<repo>/.aiqe/output/`, `new-project` thêm `.aiqe/` vào `.git/info/exclude`.
+- Agent: 6 tool thật (`src/tools/`), `report.ts`, `cli.ts` (`run`/`report`/`verify`/`demo`), case `EMP-CREATE-01`, kịch bản `readonly`; 30 test. Luồng chỉ đọc chạy thật trên OrangeHRM demo.
+- Đợt 3 (làm sớm, lịch là 09/10): 6 skill `test-strategy`, `regression-selection`, `jira-xray`, `run-contract`, `agent-architecture`, `qe-coach` (+ 2 reference); `scripts/jira/` (5 file, viết lại từ bản gốc, có self-test); `scripts/trace/build-trace-index.js` (đọc regex từ `rules/id_conventions.md`); subagent `qe-reviewer` cho Claude; Selenium Java + Appium Java beta (2 reference, 2 scaffold); adapter Gemini + `install.js --tool gemini`; 6 template; eval 6 skill, đề golden Selenium/Appium, `evals/routing.md`; `review_checklist_dot3.md`; 3 case hook mới (lệnh `--env-file`).
 
 ### Sửa (08/10)
+- Agent: run dùng tool giả ghi nhãn "MÔ PHỎNG", không còn `LOCAL-RUN` (phát hiện khi chạy demo). Timeout tool có đăng nhập 30 s → 60 s (site demo chậm, đo ≈ 21 s); báo cáo nêu lỗi tool ở "Bước tiếp theo". Tool báo `created: false` thì không cần dọn; trạng thái `unknown` xử lý như timeout.
+- `ui-automation`: Bước 0 nhận Selenium/Appium Java (beta) thay vì từ chối.
 - Sau pilot T2/T3 (quyết định #35): script kiểm tra là cổng bắt buộc (`AGENTS.md`, `test-design-rbt`, `bug-reporting`); mã `PRV-` cho quy tắc kể lại (`id_conventions`, `evidence_labels`, `test_design`, prompt 04); `check-tc` bắt dòng tổng sai mẫu/sai số, dòng bảng vỡ, `REQ-CONFIRMED` không nguồn, giảm cảnh báo ngày giả; mode `full` gộp bước 1+2, marker `aiqe-stop-in-skill` trong 6 prompt, `check-skills` so điểm dừng; prompt 06 dùng đúng mẫu dòng tổng; 4 eval case mới.
 - Tên người/record trong data mang prefix; regex ID data cho phép chữ hoa. `test-design-rbt` luôn có "Bước tiếp theo".
 - Fixture chỉ tính file dữ liệu (tránh báo nhầm tài liệu `.md`).

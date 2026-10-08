@@ -53,14 +53,15 @@ Skill nào yêu cầu chạy script kiểm tra (`check-tc.js`, `check-bug.js`, `
 
 ## Việc không có skill riêng
 - **Sanitize (che dữ liệu nhạy cảm):** chạy `node {{KIT}}/scripts/redact/redact.js <file>`, sau đó **người** kiểm tra lại. Screenshot do người tự che.
-- **Scaffold (dựng khung dự án):** chép từ `{{KIT}}/templates/scaffold/<stack>/`, hỏi user trước khi ghi vào repo.
+- **Scaffold (dựng khung dự án):** chép từ `{{KIT}}/templates/scaffold/<stack>/` (`playwright-ts`; beta: `selenium-java`, `appium-java`), hỏi user trước khi ghi vào repo.
+- **Bảng truy vết** requirement → TC → bug/run: `node {{KIT}}/scripts/trace/build-trace-index.js <output_dir> [--check]`, báo nguyên văn dòng cuối.
 - **Tạo dự án mới** (thư mục + `.aiqe/project.aiqe.yml`): `node <repo kit>/scripts/project/new-project.js --name <tên> --url <url> [--modules A,B] [--lang vi|en] [--parent <thư mục cha>] [--output-outside]`. Mặc định output ở `<dự án>/.aiqe/output/` và tự thêm `.aiqe/` vào `.git/info/exclude` (nếu đã là repo git). Không ghi đè file đã có. Field không truyền giữ mặc định chặt nhất; nhắc user trả lời `{{KIT}}/docs/before_you_use.md` rồi tự chỉnh.
 
 ## Cài hoặc cập nhật kit
 Đường dẫn **repo kit** nằm ở trường `source` trong `~/.aiqe/installed.json`. Luôn chạy từ repo kit, **không** chạy từ `{{KIT}}` (bản đã cài; script sẽ từ chối).
-1. **Xem trước:** `node <repo kit>/scripts/install/install.js --tool <codex|claude> --dry-run`, tóm tắt cho user sẽ ghi những file nào.
+1. **Xem trước:** `node <repo kit>/scripts/install/install.js --tool <codex|claude|gemini> --dry-run`, tóm tắt cho user sẽ ghi những file nào.
 2. **Xin phép user** trước khi cài thật (thao tác ghi vào thư mục cấu hình của user).
-3. **Cài:** `node <repo kit>/scripts/install/install.js --tool <codex|claude>`.
+3. **Cài:** `node <repo kit>/scripts/install/install.js --tool <codex|claude|gemini>` (`all` = codex + claude; gemini là beta, chọn riêng).
 4. **Kiểm tra:** `node <repo kit>/scripts/install/install.js --verify`, báo nguyên văn dòng cuối.
 5. Nhắc user: **khởi động lại VS Code và mở chat mới**, nếu không tool vẫn dùng skill cũ.
 - Bị sandbox/permission chặn ở bước nào → **không tìm cách vượt**; đưa user **đúng 1 dòng lệnh** để tự chạy trong terminal, ví dụ: `node D:\fpt-inform\my-aiqe-kit\scripts\install\install.js --tool codex`.
@@ -72,16 +73,22 @@ Bảng do `scripts/install/gen-routing.js` sinh từ frontmatter, **không sửa
 <!-- aiqe:routing:start -->
 | Skill | Dùng khi / Không dùng khi | File |
 |---|---|---|
+| `agent-architecture` | Thiết kế hoặc review kiến trúc AI agent chạy test: planner, controller, tool, evidence, người duyệt; tool manifest; state machine; invariant và chỗ ép; đường dữ liệu untrusted thành lệnh. Dùng khi "thiết kế agent", "review agent", "tool manifest". Không dùng cho hợp đồng một case → run-contract. | `{{KIT}}/skills/agent-architecture/SKILL.md` |
 | `ai-output-review` | Soát output của AI (của chính mình hoặc AI khác) theo từng claim: đối chiếu nguồn, phát hiện chi tiết bịa, nhãn sai, quyết định Accept/Reject/Defer và ghi decision log. Dùng sau khi nhờ AI phân tích, viết TC, tóm tắt kết quả. Không dùng để soát bug theo 7 điều kiện → bug-reporting review. | `{{KIT}}/skills/ai-output-review/SKILL.md` |
 | `api-testing` | Thiết kế và viết test API theo contract (Swagger/OpenAPI hoặc request mẫu): code Playwright request hoặc collection Postman chạy Newman; oracle đọc lại dữ liệu; kiểm tra bảo mật OWASP chỉ trên sandbox. Dùng khi "test API", "Postman", "Newman". Không dùng cho test giao diện → ui-automation. | `{{KIT}}/skills/api-testing/SKILL.md` |
 | `bug-reporting` | Viết, review hoặc retest bug report có evidence và expected có nguồn; xuất bản internal và bản gửi khách. Dùng khi "viết bug", "log bug", "retest bug", soát bug người khác. Không dùng khi chưa rõ lỗi do test hay sản phẩm → incident-triage; báo cáo cả lần chạy → evidence-reporting. | `{{KIT}}/skills/bug-reporting/SKILL.md` |
 | `evidence-reporting` | Báo cáo một lần chạy test (automation hoặc chạy tay): evidence manifest, execution report giữ lần fail đầu, nhãn LOCAL/CI/MANUAL-RUN, dòng Enforcement; mode manual-run tạo execution sheet. Dùng khi "báo cáo lần chạy", "chạy tay TC". Không dùng cho báo cáo cả sprint → test-strategy. | `{{KIT}}/skills/evidence-reporting/SKILL.md` |
 | `exploratory-testing` | Lập charter, gợi ý ý tưởng test theo heuristic, sắp xếp ghi chép session exploratory có giới hạn thời gian; chuyển mỗi phát hiện thành bug, TC hoặc câu hỏi. Dùng khi "test thăm dò", "exploratory", "charter", "ghi chép session". Không dùng để ghi lại app làm gì → requirement-analysis mode B. | `{{KIT}}/skills/exploratory-testing/SKILL.md` |
 | `incident-triage` | Phân loại vì sao test fail hoặc chạy lỗi (môi trường, code test, sản phẩm, data/policy), kể cả test flaky; tách quan sát khỏi giả thuyết, quyết định chạy lại hay dừng. Dùng khi "test fail", "test đỏ", "lúc pass lúc fail", "chạy lỗi". Không dùng để viết bug → bug-reporting. | `{{KIT}}/skills/incident-triage/SKILL.md` |
+| `jira-xray` | Lấy requirement từ Jira thành file Markdown và chuẩn bị payload kết quả test cho Xray (dry-run); người tự chạy lệnh có token và tự đẩy lên. Dùng khi "lấy ticket Jira", "kéo story KAN-…", "đẩy kết quả lên Xray". Không dùng để phân tích requirement → requirement-analysis. | `{{KIT}}/skills/jira-xray/SKILL.md` |
+| `qe-coach` | Kèm QA tự làm và tự hiểu một việc QE (phân tích requirement, thiết kế TC, triage, nhãn evidence) bằng câu hỏi gợi mở, không làm thay. Dùng khi "hướng dẫn tôi tự làm", "giải thích cho tôi hiểu", "kèm tôi làm", "tôi mới làm QA". Không dùng khi cần kết quả ngay → skill chuyên môn. | `{{KIT}}/skills/qe-coach/SKILL.md` |
+| `regression-selection` | Chọn test case cần chạy lại sau một thay đổi (PR, commit, ticket) dựa trên coverage map, ghi rõ vì sao chọn, vì sao bỏ và rủi ro. Dùng khi "chạy lại test nào", "regression cho PR này", "thay đổi này ảnh hưởng gì". Không dùng để chạy test → ui-automation. | `{{KIT}}/skills/regression-selection/SKILL.md` |
 | `requirement-analysis` | Soát requirement có sẵn tìm chỗ mơ hồ, Not specified, rủi ro, lập câu hỏi (mode A); hoặc dựng ngược requirement từ screenshot/HTML/mô tả app khi không có tài liệu (mode B). Dùng trước khi viết TC. Không dùng để viết TC → test-design-rbt; tìm lỗi theo charter → exploratory-testing. | `{{KIT}}/skills/requirement-analysis/SKILL.md` |
+| `run-contract` | Viết run contract cho một case E2E trước khi cho agent hoặc script chạy thật: precondition, setup, bước ghi, oracle gắn AC, evidence, cleanup, owner, điều kiện dừng, chống trùng run ID. Dùng khi "run contract", "chuẩn bị cho agent chạy case". Không dùng để thiết kế cả agent → agent-architecture. | `{{KIT}}/skills/run-contract/SKILL.md` |
 | `test-data` | Biến partition và giá trị biên của test case thành dữ liệu test cụ thể, unique, truy vết được, có người chịu trách nhiệm dọn; gồm tổ hợp nhiều chiều và chuỗi data qua nhiều module. Dùng khi "sinh test data", "data cho TC". Không dùng để chọn kỹ thuật/partition → test-design-rbt. | `{{KIT}}/skills/test-data/SKILL.md` |
 | `test-design-rbt` | Viết hoặc review manual test case theo EP, BVA, Decision Table, State Transition, Risk-Based Testing; mode quick, full, maintain (requirement đổi). Dùng khi "viết test case", "sinh TC", "review bộ TC". Không dùng khi requirement còn mơ hồ → requirement-analysis; cần dataset cụ thể → test-data. | `{{KIT}}/skills/test-design-rbt/SKILL.md` |
-| `ui-automation` | Viết, review hoặc chạy test UI Playwright TypeScript: nhận diện stack, POM, locator có scope lấy từ DOM thật qua MCP, chạy suite theo tag và trình duyệt. Dùng khi "viết automation", "lấy locator", "chạy smoke". Không dùng để phân loại test fail → incident-triage. | `{{KIT}}/skills/ui-automation/SKILL.md` |
+| `test-strategy` | Lập test plan cho dự án/release (phạm vi, rủi ro, loại test, môi trường, tiêu chí entry/exit, ước lượng) hoặc tổng kết release (metrics, đề xuất go/no-go). Dùng khi "lập test plan", "chiến lược test", "tổng kết release". Không dùng cho báo cáo một lần chạy → evidence-reporting. | `{{KIT}}/skills/test-strategy/SKILL.md` |
+| `ui-automation` | Viết, review hoặc chạy test UI Playwright TypeScript (Selenium/Appium Java beta): nhận diện stack, POM, locator có scope lấy từ DOM thật, chạy suite theo tag. Dùng khi "viết automation", "lấy locator", "chạy smoke". Không dùng để phân loại test fail → incident-triage. | `{{KIT}}/skills/ui-automation/SKILL.md` |
 <!-- aiqe:routing:end -->
 
 ## An toàn thao tác

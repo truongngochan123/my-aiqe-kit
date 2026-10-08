@@ -12,8 +12,8 @@
 | 0: Nền móng | ✅ Đã duyệt | 06/10 |
 | 1: Manual | ✅ Dựng xong 8 skill (07/10) · chờ Han chạy pilot/eval trên Codex và duyệt | 06–07/10 |
 | 2: Automation + CI | ✅ Đã duyệt (08/10) · sửa 4 điểm từ pilot T2/T3 | 08/10 |
-| 3: Lead, tích hợp, đa stack | ⏳ Chưa | 09/10 |
-| Agent 0.2.0 | 🔄 Lõi xong (08/10, 18 test) · tool + demo 09/10 | 08–10/10 |
+| 3: Lead, tích hợp, đa stack | ✅ Dựng xong 49 file (làm sớm ngày 08/10 theo yêu cầu) · chờ Han duyệt (`docs/review_checklist_dot3.md`) | 09/10 |
+| Agent 0.2.0 | 🔄 Lõi + 6 tool + report + CLI xong (30 test) · luồng chỉ đọc chạy thật trên OrangeHRM · luồng ghi chờ G1 của Han (10/10) | 08–10/10 |
 
 ---
 
@@ -52,6 +52,8 @@
 | 30 🆕 | Sau pilot T1 (07/10): quan sát QA tự làm (kể cả kể lại trong prompt) là `DOM-OBSERVED`, thông tin từ người khác là `PROVIDED`; output test case tách **TC chạy được** và **mục thăm dò** (expected chưa biết, khóa `Q-*`); Priority theo Risk; cấm ký hiệu tắt tự đặt |
 | 32 🆕 | **Q9 (08/10):** `field_validation_15.md` là bản gốc; prompt 05 giữ bản sao; `check-skills.js` so 2 bảng, lệch thì báo lỗi. **Q10:** `output_dir` mặc định `<repo>/.aiqe/output/` (tương đối từ thư mục chứa `.aiqe/`); `new-project` tự thêm `.aiqe/` vào `.git/info/exclude`; `--output-outside` khi dự án yêu cầu |
 | 33 🆕 | Từ pilot T1 lần 4: tên người/record trong data mang prefix (`QA-r001-An`); `test-design-rbt` luôn có mục "Bước tiếp theo" (`check-tc` bắt lỗi khi thiếu) |
+| 37 🆕 | Đợt 3 (Q6–Q8): ước lượng ghi **cách tính + giả định**, không có cơ sở thì `UNKNOWN` (Q6); coverage map do QA phụ trách module lập lần đầu, AI chỉ dựng nháp `HYPOTHESIS` (Q7); TestRail/Excel chưa hỗ trợ, dùng `md_to_xlsx` (Q8) |
+| 36 🆕 | Đợt 3 + agent (08/10): (1) script Jira/Xray không dùng dotenv, người cấp biến qua `node --env-file=<file ngoài repo>`; hook `block-secret-read` chặn AI chạy lệnh có `--env-file` trỏ file `.env.*`; `xray_importer` mặc định **dry-run**, `--push` là G4 do người chạy; flaky ghi FAILED; không đính kèm trace/video; test không có `[KEY-n]` được liệt kê, không gửi. (2) Gemini beta: `--tool gemini` riêng (`all` = codex + claude), không chép skill, không có hook. (3) Agent: run dùng tool giả ghi nhãn "MÔ PHỎNG", không bao giờ `LOCAL-RUN`. (4) Selenium 4.50.0, TestNG 7.12.0, Appium java-client 11.0.0 (+ `selenium-support` vì java-client 11 không kéo theo), tra Maven Central 09/10 |
 | 35 🆕 | Sau pilot T2/T3 (08/10): (1) script kiểm tra là **cổng bắt buộc**: `check-tc`/`check-bug` chưa ĐẠT thì sửa và chạy lại, không báo xong, in nguyên văn dòng cuối (skill + `AGENTS.md`); (2) quy tắc BA/dev kể qua user, không có tên + ngày hoặc mã ticket → `PROVIDED` + Source `PRV-<MODULE>-NN` + câu hỏi; không `REQ-CONFIRMED`, không `HYP-`; (3) `check-tc` báo dòng tổng sai mẫu, số tổng khác số đếm, dòng bảng bị vỡ/thiếu ô; bỏ cảnh báo ngày DOM-OBSERVED khi ngày đã có ở front-matter/tiêu đề/dòng nguồn; (4) mode `full` qua skill gộp bước 1+2, chỉ dừng ở bước 2 và 4; prompt khai báo `<!-- aiqe-stop-in-skill: yes\|no -->`, `check-skills` so với SKILL.md. Eval `TDR-PRV-01/02`, `TDR-GATE-01`, `TDR-FULL-STOP-01` |
 | 34 🆕 | Agent: TypeScript chạy bằng `node --experimental-strip-types` (Node ≥ 22.6), không build; planner 3 chế độ `mock` / `codex` / `api`; **demo trên OrangeHRM** (bỏ app giả local): luồng chỉ đọc trước, luồng tạo nhân viên chỉ khi có G1 và dọn đúng record. Kiểm tra gây tải OWASP (5–8) **cấm** trên site dùng chung |
 | 29 🆕 | **Kỳ vọng hiển nhiên** (chọn phương án b, 07/10): khi sản phẩm không có requirement, bug được tạo nếu hành vi khớp **danh sách đóng 4 mục** trong `rules/bug_report.md` mục 1b (lỗi hệ thống · dữ liệu lưu sai/mất · lộ dữ liệu/vượt quyền · tài khoản hợp lệ không đăng nhập được). Expected gắn `AI-PROPOSAL` + "cần PO/BA xác nhận". Ngoài danh sách → câu hỏi `Q-*` |
@@ -64,7 +66,7 @@
 | 1 · 06/10 | `BUILD_PLAN.md` + Đợt 0 ✅ | — | Duyệt Đợt 0 ✅ |
 | 2 · 07/10 | **Bước 1:** 3 skill mẫu → **dừng**. **Bước 3:** 5 skill còn lại + script, template, prompt, eval. **Bước 4:** đề bài golden | Test routing 9 prompt (Bước 2); viết đáp án golden | Cài kit thật cho Codex; báo kết quả 9 prompt; duyệt Đợt 1 và golden |
 | 3 · 08/10 | Đợt 2 + `docs/agent_design.md` + lõi agent | Eval routing Đợt 1 | Duyệt Đợt 2 |
-| 4 · 09/10 | Đợt 3 (cả beta Selenium/Appium, Gemini) + tool, planner, kịch bản, test của agent | Eval Đợt 2 | Duyệt Đợt 3 |
+| 4 · 09/10 | Đợt 3 (cả beta Selenium/Appium, Gemini) + tool, planner, kịch bản, test của agent. **Làm sớm ngày 08/10** theo yêu cầu của Han | Eval Đợt 2 | Duyệt Đợt 3 |
 | 5 · 10/10 | Sáng: test agent + demo 5 kịch bản. Chiều: sửa theo eval, chốt 0.1.0 và 0.2.0 | Routing eval toàn bộ | Chạy demo; duyệt cuối |
 | Sau 10/10 | — | Tiếp quản: làm tiếp, bảo trì | Lỗi còn tồn ghi ở mục 9 |
 
@@ -90,7 +92,9 @@
 | `.agent/skills/test_data_generator/SKILL.md:67`, `:81`; `.agent/rules/api_rules.md:48`; `.agent/rules/automation_rules.md:21` | Email `@test.com` (domain có thật), số `0912345678` | `@example.com`; SMS gateway phải tắt |
 | `.agent/skills/ui_debug_agent/SKILL.md:88`, `:160` | Hỏi credentials qua chat | Chỉ fixture/storageState |
 | `.agent/rules/playwright_rules.md:15`, `.agent/rules/selenium_rules.md:71` | Bắt buộc headed | Headed khi debug local; CI headless |
-| `scripts/integrations/jira/utils.js:42`, `xray_auth.js:58` | Dùng chung token đọc/ghi; **chưa đọc hết file** | Đọc toàn bộ ở Đợt 3; người chạy script |
+| `scripts/integrations/jira/*` (đã đọc toàn bộ 2.169 dòng, 09/10) | `xray_auth.js`: in 20 ký tự đầu của token, cache token ra `.xray_token_cache.json`; `utils.js`/`xray_auth.js`/`xray_importer.js`: `loadEnv()` gọi `process.exit` ngay khi import; `xray_importer.js`: regex `[A-Z]+-\d+` coi `HTTP-500`, `TC-001` là Jira key, test không key bị lọc mất không báo, flaky map về TODO và chỉ lấy lần chạy cuối, đính kèm body attachment (trace có cookie), ghi "Allure" nhưng không hỗ trợ; `jira_fetcher.js`: ghép thẳng key/type vào JQL, AC đoán `customfield_10020` (thường là Sprint), tải attachment theo tên file của server (path traversal) và gửi token tới URL attachment bất kỳ, chỉ có endpoint Cloud, output mặc định vào thư mục cài script; `package.json`: script trỏ `jira/jira_fetcher.js` sai đường dẫn; README troubleshooting sai thư mục | Viết lại trong `scripts/jira/` (ghi lỗi ở đầu từng file), self-test 5 + 7 + 6 case; người chạy lệnh có token |
+| `prompt_templates/prompt_03_create_framework_selenium.txt` | Chứa tài khoản đăng nhập của site demo bên thứ ba | Không chuyển sang kit |
+| `.agent/rules/appium_rules.md` (mục 5) | `autoGrantPermissions: true` làm mất hộp thoại xin quyền (không test được); `driver.rotate`… chưa rõ còn trong java-client 11 | Không bật mặc định; API ghi `UNKNOWN` tới khi chạy thật |
 | `scripts/integrations/jira/jira_fetcher.js:28`, `xray_importer.js:24`, `:29`, `xray_auth.js:24` | `require('./utils')`, `require('./xray_auth')` | Phải chuyển cả `utils.js`, `xray_auth.js` |
 | `ai-qe-kit/.claude/skills/ai-output-review/SKILL.md:24` | "Thường có ít nhất 1 Reject hoặc Defer" | Đổi: toàn Accept thì phải ghi rõ đã kiểm tra những gì |
 
@@ -326,10 +330,10 @@ agent/
 ├── README.md  package.json  package-lock.json  tsconfig.json   ✅ 08/10
 ├── config/{policy.json, tool_manifest.json}
 ├── src/{types, state_machine, controller, guards, approvals, evidence_store}.ts   ✅ 08/10
-├── src/{report, cli}.ts   ⏳ 09/10
+├── src/{report, cli}.ts   ✅ 09/10 (làm 08/10)
 ├── src/planner/{planner, mock_planner, codex_planner, api_planner, untrusted}.ts   ✅ 08/10
-├── src/tools/{read_case, inspect_ui, run_case, read_result, lookup_owned_record, cleanup_owned_record}.ts   ⏳ 09/10
-├── cases/EMP-CREATE-01/{case.json, emp-create.spec.ts}
+├── src/tools/{read_case, inspect_ui, run_case, read_result, lookup_owned_record, cleanup_owned_record, sandbox_client, fake, index}.ts   ✅
+├── cases/EMP-CREATE-01/{case.json, emp-create.spec.ts} + cases/playwright.config.ts   ✅
 ├── scenarios/scenarios.json
 └── tests/agent.test.ts
 ```
@@ -384,9 +388,11 @@ agent/
 | Q11 | `agent/src/planner/codex_planner.ts` | Cờ `codex exec --sandbox read-only --skip-git-repo-check -C` và định dạng output chưa chạy thử; mức cách ly thật `UNKNOWN`. **08/10: đã đưa Han 1 dòng lệnh, chờ output** | Chạy planner codex với 1 kịch bản trên máy có Codex |
 | Q12 | `ci/gitlab/aiqe-check.gitlab-ci.yml` | `CI_JOB_TOKEN` đọc được approvals không; Code Owners bắt buộc cần gói nào. **08/10: để `UNKNOWN`, chưa cần** | Hỏi admin GitLab của dự án |
 | (cũ) Q9 | `prompts/manual/05_…md` | Bảng field bị chép 2 nơi; có cần script kiểm tra 2 bản khớp nhau không | Thêm vào `check-skills.js` ở Đợt 2 nếu thấy lệch |
-| Q6 | `test-strategy` | Ước lượng theo phương pháp nào; metric nào được ghi `UNKNOWN` | Đợt 3 |
-| Q7 | `regression-selection` | Ai lập coverage map lần đầu | Đợt 3 |
-| Q8 | `jira-xray` | Công ty dùng TestRail hoặc Excel thì sao | Đợt 3 |
+| ~~Q6~~ | ~~`test-strategy`~~ | Đã chốt 08/10 (quyết định #37) | — |
+| ~~Q7~~ | ~~`regression-selection`~~ | Đã chốt 08/10 (quyết định #37); đề xuất của kit, dự án có quy trình riêng thì theo dự án | — |
+| Q8 | `jira-xray` | TestRail chưa hỗ trợ; Excel dùng `md_to_xlsx`. Mở lại khi có dự án dùng TestRail | Khi có dự án thật |
+| Q13 | `adapters/gemini/` | Gemini CLI có tự đọc `SKILL.md`, có hook trước tool không; chưa chạy thử với Gemini thật | Cài Gemini CLI, chạy 3 prompt routing |
+| Q14 | `agent/src/tools/sandbox_client.ts` | API `DELETE /api/v2/pim/employees` và chuyển trang sau Save của OrangeHRM chưa kiểm chứng (không ghi lên site dùng chung khi chưa có G1) | Han chạy luồng tạo nhân viên có G1 (checklist Đợt 3 mục 11) |
 
 ## 10. Bảng đếm file
 
@@ -395,10 +401,12 @@ agent/
 | Đợt 0 | 36 |
 | Đợt 1 | 59 |
 | Đợt 2 | 33 |
-| Đợt 3 | 49 |
-| **Kit 0.1.0** | **177** |
-| Agent 0.2.0 (`agent/` + `docs/agent_design.md`; đã có 20, còn ~11 ở 09/10) | 31 |
-| **Tổng** | **208** |
+| Đợt 3 | 49 ✅ |
+| **Kit 0.1.0** | **176** (đếm thật bằng `git ls-files`, 08/10) |
+| Agent 0.2.0 (`agent/` + `docs/agent_design.md`) | 35 ✅ |
+| **Tổng** | **211** |
+
+Lệch so với ước tính: kit 176 thay vì 177 (đếm thật, chênh 1 file so với cộng dồn các đợt; không thiếu file nào trong danh sách Đợt 3). Agent 35 thay vì 31: thêm `src/tools/sandbox_client.ts`, `fake.ts`, `index.ts`, `cases/playwright.config.ts`, `tests/tools.test.ts`.
 
 Thay đổi so với plan v4.2 (194 file kit):
 - −15: bỏ lệnh tắt Codex (quyết định #21)

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!-- Mobile: mặc định KHÔNG chạy song song (một thiết bị/emulator một session).
+     Nhiều thiết bị: mỗi thiết bị một <test> với tham số udid riêng. -->
+<suite name="aiqe-appium" parallel="none">
+  <test name="android">
+    <packages>
+      <package name="aiqe.tests"/>
+    </packages>
+  </test>
+</suite>

@@ -60,5 +60,14 @@
 - Các loại sự kiện gồm `command_execution`, `file_change`, `mcp_tool_call`, `assistant_message`…, **không có loại "skill"**. Nguồn: trang bên thứ ba (codex.danielvaughan.com), `PROVIDED`.
 - **Hệ quả:** eval chấm skill nào đã chạy bằng front-matter `produced_by` trong file output (xem `docs/SKILL_SPEC.md`), không dựa vào log của tool.
 
-## Gemini (Đợt 3)
-- Đọc `AGENTS.md` bằng cách đặt `"context": { "fileName": "AGENTS.md" }` trong `.gemini/settings.json`. Nguồn: tài liệu Gemini CLI (geminicli.com/docs, qua kết quả tìm kiếm). Kiểm tra lại ở Đợt 3.
+## Gemini CLI (beta, 09/10)
+Cách kit cài (`install.js --tool gemini`):
+- Ghép `AGENTS.md` + `adapters/gemini/GEMINI.md` vào khối của kit trong `~/.gemini/GEMINI.md` (file context toàn cục). Nội dung riêng của người dùng giữ nguyên.
+- Thêm `GEMINI.md`, `AGENTS.md` vào `context.fileName` của `~/.gemini/settings.json` (để repo có `AGENTS.md` cũng được đọc). Gỡ cài chỉ bỏ các tên kit đã thêm. Lưu ý: nếu trước đó giá trị là chuỗi, sau khi gỡ có thể thành mảng 1 phần tử (cùng nghĩa).
+- `context.fileName`: nguồn tài liệu Gemini CLI (geminicli.com/docs, qua kết quả tìm kiếm), `PROVIDED`. Định dạng settings cũ (khóa `contextFileName` ở cấp gốc) chưa hỗ trợ.
+
+Chưa kiểm chứng (`UNKNOWN`), nên kit **không** dựa vào:
+- Gemini có tự đọc `SKILL.md` trong một thư mục skill hay không → kit không chép skill; `GEMINI.md` dặn đọc `{{KIT}}/skills/<tên>/SKILL.md` theo bảng routing.
+- Hook trước khi chạy tool → kit **không cài hook**; luật đọc secret và sửa assertion trên Gemini chỉ là 📝.
+- Mức cách ly của `gemini --sandbox` trên Windows.
+Chưa chạy thử với Gemini CLI thật (máy dựng kit chưa cài).
