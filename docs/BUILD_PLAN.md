@@ -9,11 +9,12 @@
 
 | Đợt | Trạng thái | Ngày |
 |---|---|---|
+| **Kit 0.1.0** | ✅ **Chốt 10/10** (Han đã review Đợt 3 + agent). Lượt test gộp trên Codex: `evals/round_0.1.0.md`; lỗi tìm được sửa ở 0.1.1 | 10/10 |
 | 0: Nền móng | ✅ Đã duyệt | 06/10 |
 | 1: Manual | ✅ Dựng xong 8 skill (07/10) · chờ Han chạy pilot/eval trên Codex và duyệt | 06–07/10 |
 | 2: Automation + CI | ✅ Đã duyệt (08/10) · sửa 4 điểm từ pilot T2/T3 | 08/10 |
 | 3: Lead, tích hợp, đa stack | ✅ Dựng xong 49 file (làm sớm ngày 08/10 theo yêu cầu) · chờ Han duyệt (`docs/review_checklist_dot3.md`) | 09/10 |
-| Agent 0.2.0 | 🔄 Lõi + 6 tool + report + CLI xong (30 test) · luồng chỉ đọc chạy thật trên OrangeHRM · luồng ghi chờ G1 của Han (10/10) | 08–10/10 |
+| Agent 0.2.0 | 🔄 **0.2.0-rc.1**: lõi + 6 tool + report + CLI (30 test), luồng chỉ đọc chạy thật. Thành 0.2.0 khi luồng tạo nhân viên có G1 chạy thật (Q14) | 08–10/10 |
 
 ---
 
@@ -52,6 +53,7 @@
 | 30 🆕 | Sau pilot T1 (07/10): quan sát QA tự làm (kể cả kể lại trong prompt) là `DOM-OBSERVED`, thông tin từ người khác là `PROVIDED`; output test case tách **TC chạy được** và **mục thăm dò** (expected chưa biết, khóa `Q-*`); Priority theo Risk; cấm ký hiệu tắt tự đặt |
 | 32 🆕 | **Q9 (08/10):** `field_validation_15.md` là bản gốc; prompt 05 giữ bản sao; `check-skills.js` so 2 bảng, lệch thì báo lỗi. **Q10:** `output_dir` mặc định `<repo>/.aiqe/output/` (tương đối từ thư mục chứa `.aiqe/`); `new-project` tự thêm `.aiqe/` vào `.git/info/exclude`; `--output-outside` khi dự án yêu cầu |
 | 33 🆕 | Từ pilot T1 lần 4: tên người/record trong data mang prefix (`QA-r001-An`); `test-design-rbt` luôn có mục "Bước tiếp theo" (`check-tc` bắt lỗi khi thiếu) |
+| 38 🆕 | Sau pilot T3 (10/10): (1) `check-tc` chỉ nhận dòng tổng là dòng ngoài bảng bắt đầu bằng `**Tổng`/`Tổng:`; (2) mode `full` giữ đúng tên + số cột bảng như prompt, đủ mục bắt buộc từng bước (`test-design-rbt/references/full_mode_steps.md`); (3) `HYP-` chỉ cho hành vi đã quan sát, chưa quan sát → `Q-`, yêu cầu tài liệu không mã → `PRV-`; (4) màn đăng nhập luôn có 2 scenario bảo mật ở bước 4; (5) hook chặn mọi `--env-file` trừ `.env.sandbox`; (6) chốt kit 0.1.0, agent 0.2.0-rc.1; pilot Codex dừng tới khi chốt, sau đó 1 lượt gộp |
 | 37 🆕 | Đợt 3 (Q6–Q8): ước lượng ghi **cách tính + giả định**, không có cơ sở thì `UNKNOWN` (Q6); coverage map do QA phụ trách module lập lần đầu, AI chỉ dựng nháp `HYPOTHESIS` (Q7); TestRail/Excel chưa hỗ trợ, dùng `md_to_xlsx` (Q8) |
 | 36 🆕 | Đợt 3 + agent (08/10): (1) script Jira/Xray không dùng dotenv, người cấp biến qua `node --env-file=<file ngoài repo>`; hook `block-secret-read` chặn AI chạy lệnh có `--env-file` trỏ file `.env.*`; `xray_importer` mặc định **dry-run**, `--push` là G4 do người chạy; flaky ghi FAILED; không đính kèm trace/video; test không có `[KEY-n]` được liệt kê, không gửi. (2) Gemini beta: `--tool gemini` riêng (`all` = codex + claude), không chép skill, không có hook. (3) Agent: run dùng tool giả ghi nhãn "MÔ PHỎNG", không bao giờ `LOCAL-RUN`. (4) Selenium 4.50.0, TestNG 7.12.0, Appium java-client 11.0.0 (+ `selenium-support` vì java-client 11 không kéo theo), tra Maven Central 09/10 |
 | 35 🆕 | Sau pilot T2/T3 (08/10): (1) script kiểm tra là **cổng bắt buộc**: `check-tc`/`check-bug` chưa ĐẠT thì sửa và chạy lại, không báo xong, in nguyên văn dòng cuối (skill + `AGENTS.md`); (2) quy tắc BA/dev kể qua user, không có tên + ngày hoặc mã ticket → `PROVIDED` + Source `PRV-<MODULE>-NN` + câu hỏi; không `REQ-CONFIRMED`, không `HYP-`; (3) `check-tc` báo dòng tổng sai mẫu, số tổng khác số đếm, dòng bảng bị vỡ/thiếu ô; bỏ cảnh báo ngày DOM-OBSERVED khi ngày đã có ở front-matter/tiêu đề/dòng nguồn; (4) mode `full` qua skill gộp bước 1+2, chỉ dừng ở bước 2 và 4; prompt khai báo `<!-- aiqe-stop-in-skill: yes\|no -->`, `check-skills` so với SKILL.md. Eval `TDR-PRV-01/02`, `TDR-GATE-01`, `TDR-FULL-STOP-01` |
@@ -319,6 +321,18 @@ my-aiqe-kit/
 
 **Nghiệm thu:** đã đọc toàn bộ script Jira; routing ≥ 90% trên Codex; Han duyệt.
 
+### ĐỢT 4 (sau 0.1.0, chưa làm)
+
+Nguồn: Han đối chiếu với học phần AOCE (10/10). Chưa thiết kế chi tiết; làm sau khi chốt 0.1.0 và có kết quả lượt test gộp.
+
+| # | Việc | Chỗ sửa dự kiến | Nghiệm thu |
+|---|---|---|---|
+| 1 | Mỗi run agent ghi `kit_version`, `prompt_version`, `usage` (token/lượt gọi planner). Không có số liệu → `UNKNOWN`, **không ghi 0** | `agent/src/controller.ts` (`run_start`/`run_end`), `report.ts` | Test: planner mock không báo usage → report ghi `UNKNOWN` |
+| 2 | Template metric có **mẫu số** (ví dụ "12/40 TC P1 đã chạy", không chỉ "12") + template **risk register** (rủi ro, owner, biện pháp kiểm soát, hạn) | `templates/metrics.md`, `templates/risk_register.md`; `test-strategy` dùng | `check-*` hoặc self-check bắt metric thiếu mẫu số |
+| 3 | Template workflow **live smoke**: preflight (env sống, tài khoản test), `--grep @smoke`, **fail khi không có test nào chạy**, bước reconcile chạy với `always()` (dọn data, ghi kết quả kể cả khi fail), `concurrency` (không chạy chồng trên cùng env), upload artifact | `ci/github/live-smoke.yml` (+ GitLab nếu cần) | YAML hợp lệ; thử với suite rỗng → job fail |
+| 4 | Agent đọc **flow catalog** (danh sách case được phép, mỗi case một thư mục) thay vì cứng `EMP-CREATE-01`; case không có trong catalog → từ chối | `agent/config/flows.json`, `tool_manifest.json` (allow lấy từ catalog), `read_case`/`run_case` | Test: case lạ → `BLOCKED`, không gọi tool |
+| 5 | **Quarantine** test flaky có owner, rủi ro khi bỏ qua và test/kiểm tra thay thế, ngày hết hạn (quá hạn → quay lại suite hoặc xóa có lý do) | `rules/retry_and_wait.md`, `incident-triage`, template | Quarantine thiếu owner/hạn bị check báo lỗi |
+
 ---
 
 ## 6. Agent 0.2.0 (31 file: 30 trong `agent/` + `docs/agent_design.md`)
@@ -402,9 +416,9 @@ agent/
 | Đợt 1 | 59 |
 | Đợt 2 | 33 |
 | Đợt 3 | 49 ✅ |
-| **Kit 0.1.0** | **176** (đếm thật bằng `git ls-files`, 08/10) |
+| **Kit 0.1.0** | **178** (176 ngày 08/10 + `full_mode_steps.md`, `evals/round_0.1.0.md` ngày 10/10) |
 | Agent 0.2.0 (`agent/` + `docs/agent_design.md`) | 35 ✅ |
-| **Tổng** | **211** |
+| **Tổng** | **213** |
 
 Lệch so với ước tính: kit 176 thay vì 177 (đếm thật, chênh 1 file so với cộng dồn các đợt; không thiếu file nào trong danh sách Đợt 3). Agent 35 thay vì 31: thêm `src/tools/sandbox_client.ts`, `fake.ts`, `index.ts`, `cases/playwright.config.ts`, `tests/tools.test.ts`.
 

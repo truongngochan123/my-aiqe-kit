@@ -7,6 +7,8 @@
 
 ---START---
 
+> **Giữ đúng tên cột và số cột** của mọi bảng dưới đây (không gộp, bỏ, thêm, đổi tên cột). Đủ các mục `###` theo thứ tự; mục không có nội dung ghi "Không có (vì …)", không bỏ mục.
+
 Các câu trả lời Q&A của tôi:
 [Dán câu trả lời: Q1 → …, Q2 → …. Câu chưa có trả lời ghi "chưa có".]
 

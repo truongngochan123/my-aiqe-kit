@@ -38,7 +38,7 @@ description: Soát requirement có sẵn tìm chỗ mơ hồ, Not specified, r�
 ## Quy trình (mode B)
 1. **Cảnh báo ngay đầu output:** *"Requirement dựng ngược mô tả hành vi **hiện tại** của app. Hành vi hiện tại có thể **chứa bug**. Đây không phải requirement đã xác nhận."*
 2. Ghi lại theo `references/reverse_spec_format.md`: trang/màn hình → field → hành động → thông báo → luồng.
-3. Mỗi hành vi một dòng, mã `HYP-<MODULE>-NN`, với 3 cột bắt buộc:
+3. Mỗi hành vi **đã quan sát** một dòng, mã `HYP-<MODULE>-NN` (hành vi chưa ai quan sát thì không đánh `HYP-`, xem bước 4), với 3 cột bắt buộc:
    - **Quan sát:** nguồn + nhãn (`DOM-OBSERVED`, người quan sát, env, ngày).
    - **Đáng ngờ?:** AI **gợi ý** hành vi nào có thể là bug hoặc chưa hợp lý, kèm lý do (`AI-PROPOSAL`). Ví dụ: khớp "kỳ vọng hiển nhiên" trong `{{KIT}}/rules/bug_report.md` mục 1b.
    - **Quyết định:** **để trống** cho người điền (`Chấp nhận là requirement` / `Hỏi PO` / `Nghi bug`). AI không tự điền.

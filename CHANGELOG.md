@@ -1,9 +1,25 @@
 # CHANGELOG
 
 Mỗi version có 3 mục: **Thêm / Sửa / Bỏ**. Version theo SemVer, ghi trong file `VERSION`.
-Bản `-dev` là bản đang dựng, chưa chốt.
+Bản `-dev` là bản đang dựng, chưa chốt. Agent có version riêng trong `agent/package.json`.
 
-## 0.1.0-dev (đang dựng)
+## 0.1.0 (10/10/2026) · agent 0.2.0-rc.1
+
+Chốt sau khi Han review 2 commit Đợt 3 + agent. Lượt test gộp trên Codex: `evals/round_0.1.0.md`; lỗi tìm được sẽ sửa ở 0.1.1.
+Agent giữ `0.2.0-rc.1` cho tới khi luồng tạo nhân viên có G1 chạy thật (Q14).
+
+### Sửa (10/10)
+- `check-tc`: dòng tổng chỉ nhận dòng ngoài bảng bắt đầu bằng `**Tổng` / `Tổng:` (trước đây `\bTổng\b` khớp nhầm "tổng hợp"); không có thì báo "thiếu dòng tổng". Self-test 19/19.
+- `test-design-rbt` mode `full`: `references/full_mode_steps.md` (mục bắt buộc từng bước, giữ đúng tên + số cột bảng, gợi ý 2 scenario bảo mật cho màn đăng nhập); prompt 02/03/04 ghi rõ.
+- `HYP-` chỉ cho hành vi **đã quan sát**; chưa quan sát → câu hỏi `Q-`; yêu cầu trong tài liệu không có mã → `PRV-` (`id_conventions`, `test_design`, `requirement-analysis`, prompt 04/05).
+- Hook `block-secret-read`: chặn **mọi** `--env-file`/`--env-file-if-exists` trừ `.env.sandbox` (file token có thể đặt tên bất kỳ). 27/27 case.
+- `install.js`: nâng version thì xóa snapshot cũ trong `~/.aiqe/kit/` (trước đây bỏ sót, gỡ cài không xóa).
+
+### Thêm (10/10)
+- `docs/BUILD_PLAN.md`: mục "ĐỢT 4 (sau 0.1.0, chưa làm)" (5 việc từ đối chiếu học phần AOCE).
+- `evals/round_0.1.0.md`: danh sách test gộp theo ưu tiên + ước lượng lượt Codex.
+
+## Lịch sử dựng 0.1.0 (06–09/10)
 
 ### Thêm
 - Đợt 0 (06/10/2026): nền móng — `AGENTS.md`, `CLAUDE.md`, 8 rules, docs (BUILD_PLAN, SKILL_SPEC, threat model, tool support, checklist), adapter cho Codex và Claude, 2 hook dùng chung, script cài/gỡ/kiểm tra.

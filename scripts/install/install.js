@@ -481,6 +481,15 @@ function main() {
     if (TOOL === 'gemini') installGemini(state);
   }
   if (!DRY) { fs.mkdirSync(AIQE, { recursive: true }); fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2) + '\n', 'utf8'); }
+  // Nâng version (0.1.0-dev → 0.1.0): mọi hook/skill/AGENTS.md đã trỏ sang snapshot mới → xóa snapshot cũ,
+  // nếu không lệnh gỡ cài (chỉ biết version hiện tại) sẽ bỏ sót nó. Chỉ xóa thư mục nằm trong ~/.aiqe/kit/.
+  if (prev.snapshot && path.resolve(prev.snapshot) !== path.resolve(SNAPSHOT)) {
+    const rel = path.relative(path.join(AIQE, 'kit'), path.resolve(prev.snapshot));
+    if (rel && !rel.startsWith('..') && !path.isAbsolute(rel) && !rel.includes(path.sep)) {
+      log(`• Xóa snapshot cũ ${prev.snapshot} (đã thay bằng ${VERSION})`);
+      removePath(prev.snapshot);
+    }
+  }
   if (fs.existsSync(BACKUP)) log(`\nBackup: ${BACKUP}`);
   if (problems.length) { log('\nCần bạn xử lý:'); problems.forEach((p) => log('  - ' + p)); process.exitCode = 1; }
   else log('\nXong. Kiểm tra lại: install.ps1 -Verify');

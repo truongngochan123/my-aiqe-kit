@@ -7,6 +7,8 @@
 
 ---START---
 
+> **Giữ đúng tên cột và số cột** của mọi bảng dưới đây (không gộp, bỏ, thêm, đổi tên cột). Đủ các mục `###` theo thứ tự; mục không có nội dung ghi "Không có (vì …)", không bỏ mục.
+
 Dựa trên tài liệu và bối cảnh ở bước 1, phân tích yêu cầu.
 
 ### 1. Các luồng
@@ -15,7 +17,7 @@ Dựa trên tài liệu và bối cảnh ở bước 1, phân tích yêu cầu.
 - **Exception path:** lỗi, ngoại lệ (mất kết nối, timeout, sai định dạng, thao tác đồng thời, upload quá dung lượng…)
 
 ### 2. Điểm mờ
-Liệt kê, **mỗi điểm trích dẫn đoạn tài liệu liên quan** (hoặc ghi "tài liệu không nhắc tới"):
+**Mục này bắt buộc.** Liệt kê, **mỗi điểm trích dẫn đoạn tài liệu liên quan** (hoặc ghi "tài liệu không nhắc tới"):
 - **Thiếu:** ví dụ độ dài tối đa field, timeout, hành vi khi mất mạng, quy tắc phân quyền, định dạng ngày/SĐT, thông báo lỗi
 - **Mâu thuẫn:** hai yêu cầu trái nhau
 - **Hiểu được nhiều cách:** câu có thể hiểu theo 2 nghĩa trở lên

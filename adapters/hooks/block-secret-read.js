@@ -72,6 +72,15 @@ function evaluate(input) {
 
   if (tool === 'Bash' || tool === 'PowerShell' || tool === 'shell' || tool === 'local_shell') {
     const cmd = commandText(ti);
+    // Mọi --env-file (Node) nạp file vào biến môi trường của process: file token có thể đặt tên bất kỳ (jira.txt),
+    // nên chặn theo cờ chứ không theo tên file. Chỉ cho .env.sandbox (tài khoản test).
+    for (const m of cmd.matchAll(/--env-file(?:-if-exists)?(?:=|\s+)("[^"]*"|'[^']*'|[^\s;&|]+)/gi)) {
+      const file = normPath(m[1].replace(/^["']|["']$/g, ''));
+      if (!/(^|\/)\.env\.sandbox$/.test(file)) {
+        return block(HOOK, `lệnh nạp biến môi trường từ "${m[1]}" (--env-file).`,
+          'file env có thể chứa token. Đưa đúng 1 dòng lệnh cho người dùng tự chạy ở terminal riêng; chỉ .env.sandbox được dùng.');
+      }
+    }
     const hit = pathTokens(cmd).find(isSecretPath);
     if (hit) {
       return block(HOOK, `lệnh có đụng tới file nhạy cảm "${hit}".`,

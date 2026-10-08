@@ -50,7 +50,11 @@ Mỗi case in `PASS` hoặc `FAIL`. Lệnh thoát với mã 0 khi mọi case đ�
   {"hook":"block-secret-read","name":"Tool khác (Glob) cho qua","input":{"tool_name":"Glob","tool_input":{"pattern":"**/.env*"}},"expect":"allow"},
   {"hook":"block-secret-read","name":"AI chạy script Jira bằng --env-file=<.env.jira>","input":{"tool_name":"Bash","tool_input":{"command":"node --env-file=C:/Users/qa/.aiqe/secrets/.env.jira scripts/jira/jira_fetcher.js --issue KAN-1"}},"expect":"block"},
   {"hook":"block-secret-read","name":"AI đẩy Xray bằng --env-file <.env.jira> --push","input":{"tool_name":"PowerShell","tool_input":{"command":"node --env-file C:\\Users\\qa\\.aiqe\\secrets\\.env.jira scripts/jira/xray_importer.js --format playwright --file r.json --project KAN --push"}},"expect":"block"},
-  {"hook":"block-secret-read","name":"xray_importer dry-run không dùng secret thì cho qua","input":{"tool_name":"Bash","tool_input":{"command":"node scripts/jira/xray_importer.js --format playwright --file results.json --project KAN"}},"expect":"allow"}
+  {"hook":"block-secret-read","name":"xray_importer dry-run không dùng secret thì cho qua","input":{"tool_name":"Bash","tool_input":{"command":"node scripts/jira/xray_importer.js --format playwright --file results.json --project KAN"}},"expect":"allow"},
+  {"hook":"block-secret-read","name":"--env-file trỏ file token tên lạ (jira.txt)","input":{"tool_name":"Bash","tool_input":{"command":"node --env-file=D:/secrets/jira.txt scripts/jira/jira_fetcher.js --issue KAN-1"}},"expect":"block"},
+  {"hook":"block-secret-read","name":"--env-file có dấu nháy, đường dẫn có khoảng trắng","input":{"tool_name":"PowerShell","tool_input":{"command":"node --env-file \"C:\\My Docs\\keys.cfg\" app.js"}},"expect":"block"},
+  {"hook":"block-secret-read","name":"--env-file-if-exists cũng bị chặn","input":{"tool_name":"Bash","tool_input":{"command":"node --env-file-if-exists=config/creds.ini run.js"}},"expect":"block"},
+  {"hook":"block-secret-read","name":"--env-file=.env.sandbox (tài khoản test) cho qua","input":{"tool_name":"Bash","tool_input":{"command":"node --env-file=.env.sandbox --experimental-strip-types src/cli.ts run --scenario readonly --tools real --run-id RUN-20261010-01"}},"expect":"allow"}
 ]
 ```
 

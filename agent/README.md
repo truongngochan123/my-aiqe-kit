@@ -1,4 +1,4 @@
-# aiqe-agent 0.2.0 (đang dựng)
+# aiqe-agent 0.2.0-rc.1
 
 Agent chạy một case E2E **có kiểm soát**: planner (AI hoặc kịch bản) chỉ **đề xuất** hành động; controller kiểm tra guard, hỏi người duyệt khi cần, rồi mới gọi tool; mọi sự kiện ghi vào evidence chỉ ghi thêm.
 Thiết kế: `../docs/agent_design.md`.
@@ -9,7 +9,7 @@ Thiết kế: `../docs/agent_design.md`.
 | Lõi: controller, guard, state machine, evidence store, approval, planner mock/codex/api | 08/10 | ✅ |
 | 6 tool thật, báo cáo, CLI, case `EMP-CREATE-01` | 09/10 | ✅ 30 test đạt (tool dùng client/runner giả trong test) |
 | Luồng chỉ đọc trên OrangeHRM demo | 09/10 | ✅ chạy thật (`RUN-20261009-02`) |
-| Luồng tạo nhân viên trên OrangeHRM demo (cần G1) | 10/10 | ⏳ Han chạy |
+| Luồng tạo nhân viên trên OrangeHRM demo (cần G1) | 10/10 | ⏳ Han chạy; xong thì lên 0.2.0 |
 
 ## Cài và test
 ```powershell

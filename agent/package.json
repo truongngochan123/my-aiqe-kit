@@ -1,6 +1,6 @@
 {
   "name": "aiqe-agent",
-  "version": "0.2.0-dev",
+  "version": "0.2.0-rc.1",
   "private": true,
   "description": "Agent chạy test có kiểm soát của my-aiqe-kit (planner đề xuất, controller quyết định, người duyệt)",
   "type": "module",

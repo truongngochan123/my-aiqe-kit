@@ -7,21 +7,27 @@
 
 ---START---
 
+> **Giữ đúng tên cột và số cột** của mọi bảng dưới đây (không gộp, bỏ, thêm, đổi tên cột). Đủ các mục `###` theo thứ tự; mục không có nội dung ghi "Không có (vì …)", không bỏ mục.
+
 Từ kết quả phân rã ở bước 3, lập **ma trận truy vết** để chắc chắn mọi yêu cầu đều có scenario.
 
 ### 1. Truy vết yêu cầu
-Dùng **mã AC có sẵn** trong tài liệu (ví dụ `AC-CUS-01`). Yêu cầu nào tài liệu không đánh mã → đánh mã tạm `HYP-<MODULE>-NN` và ghi rõ là giả định. Quy tắc do BA/dev **kể lại qua tôi** mà chưa có tên + ngày hoặc mã ticket → mã `PRV-<MODULE>-NN`, nhãn `PROVIDED`, kèm câu hỏi xin tên BA + ngày hoặc mã ticket (không dùng `HYP-`, không `REQ-CONFIRMED`).
+Dùng **mã AC có sẵn** trong tài liệu (ví dụ `AC-CUS-01`). Yêu cầu có trong tài liệu nhưng không đánh mã → hỏi tôi mã; tạm đánh `PRV-<MODULE>-NN` kèm trích dẫn đoạn tài liệu. `HYP-<MODULE>-NN` **chỉ** cho hành vi đã quan sát trên app (có người, env, ngày); hành vi chưa quan sát → câu hỏi `Q-<MODULE>-NN`, không đánh `HYP-`. Quy tắc do BA/dev **kể lại qua tôi** mà chưa có tên + ngày hoặc mã ticket → mã `PRV-<MODULE>-NN`, nhãn `PROVIDED`, kèm câu hỏi xin tên BA + ngày hoặc mã ticket (không dùng `HYP-`, không `REQ-CONFIRMED`).
 
-| Mã AC/HYP | Module | Mô tả yêu cầu | Trích dẫn tài liệu |
+| Mã AC/PRV/HYP | Module | Mô tả yêu cầu | Trích dẫn tài liệu |
 |---|---|---|---|
 
 ### 2. Thiếu sót (gap)
-So lại với tài liệu gốc: chức năng chưa được map, điều kiện đầu vào chưa liệt kê, quy tắc nghiệp vụ bị bỏ sót. Báo cụ thể từng mục.
+So lại với tài liệu gốc: chức năng chưa được map, điều kiện đầu vào chưa liệt kê, quy tắc nghiệp vụ bị bỏ sót. Báo cụ thể từng mục. **Mục này bắt buộc**: không có gap thì ghi "Không có gap: đã đối chiếu <các phần tài liệu>".
 
 ### 3. Scenario mức cao
 Mỗi scenario 1 câu, tập trung: phân quyền/bảo mật · validation giao diện · logic nghiệp vụ · toàn vẹn dữ liệu · xử lý lỗi.
 
-| Mã AC/HYP | Module | Scenario ID | Mô tả scenario | Rủi ro đề xuất (`AI-PROPOSAL`) |
+Nếu có **màn đăng nhập**, luôn có 2 scenario bảo mật (kể cả khi tài liệu không nhắc; expected chưa có nguồn thì đưa thành câu hỏi):
+- Ô mật khẩu ẩn ký tự khi nhập.
+- Thông báo lỗi giống nhau khi sai username và khi sai password (không lộ username nào tồn tại).
+
+| Mã AC/PRV/HYP | Module | Scenario ID | Mô tả scenario | Rủi ro đề xuất (`AI-PROPOSAL`) |
 |---|---|---|---|---|
 
 ---

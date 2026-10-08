@@ -16,7 +16,7 @@ Mức rủi ro tôi đã chốt cho từng module:
 | Cột | Yêu cầu |
 |---|---|
 | TC ID | `TC-<MODULE>-<NNN>`, ví dụ `TC-CUS-001`, không trùng |
-| Source | Mã `AC-…` (hoặc `HYP-…`) mà TC kiểm tra |
+| Source | Mã `AC-…` (hoặc `PRV-…`, `HYP-…` của hành vi đã quan sát) mà TC kiểm tra |
 | Scenario | Ngắn, rõ mục đích |
 | Pre-condition | Tài khoản, quyền, dữ liệu có sẵn |
 | Steps | Đánh số `1. 2. 3.` |

@@ -95,13 +95,16 @@ function check(text) {
   const nQ = qTables.reduce((s, t) => s + t.rows.filter((r) => r.cells.some(Boolean)).length, 0);
 
   // 2. Dòng tổng
+  // Chỉ coi là dòng tổng khi dòng (ngoài bảng) BẮT ĐẦU bằng "**Tổng" hoặc "Tổng:" (en: Total).
+  // Không dùng \bTổng\b: khớp nhầm "tổng hợp", "tổng quan" (pilot T3, TC-PIM.v5.md dòng 99).
   const lines = text.split(/\r?\n/);
-  const ci = lines.findIndex((l) => RE.count.test(l));
+  const isTotalLine = (l) => !l.trim().startsWith('|') && /^\s*(\*\*\s*(Tổng|Total)\b|(Tổng|Total)\s*:)/i.test(l);
+  const ci = lines.findIndex(isTotalLine);
   if (ci === -1) {
-    const near = lines.findIndex((l) => /\b(Tổng|Total)\b/i.test(l) && /\d/.test(l));
-    E(near === -1 ? 1 : near + 1, `${near === -1 ? 'thiếu dòng tổng' : `dòng tổng sai mẫu ("${lines[near].trim().slice(0, 80)}")`}; phải đúng mẫu: "**Tổng:** N TC chạy được · M mục thăm dò · K câu hỏi"`);
-  }
-  else {
+    E(1, 'thiếu dòng tổng; phải có một dòng (ngoài bảng) đúng mẫu: "**Tổng:** N TC chạy được · M mục thăm dò · K câu hỏi"');
+  } else if (!RE.count.test(lines[ci])) {
+    E(ci + 1, `dòng tổng sai mẫu ("${lines[ci].trim().slice(0, 80)}"); phải đúng mẫu: "**Tổng:** N TC chạy được · M mục thăm dò · K câu hỏi"`);
+  } else {
     const m = lines[ci].match(RE.count);
     const N = Number(m[1] || m[4]); const M = Number(m[2] || m[5]);
     if (N !== nTc) E(ci + 1, `dòng tổng ghi ${N} TC chạy được nhưng bảng TC đếm được ${nTc} dòng`);
@@ -171,6 +174,7 @@ produced_by: test-design-rbt
 status: draft
 ---
 # Test cases: PIM
+Bảng tổng hợp 2 nhóm rủi ro, tổng quan 3 màn hình (câu có chữ "tổng" nhưng không phải dòng tổng).
 **Tổng:** 2 TC chạy được · 1 mục thăm dò · 1 câu hỏi
 
 | TC ID | Source | Scenario | Pre-condition | Steps | Expected | Test Data | Priority | Risk | Automatable | Auto Type | Tags |
@@ -217,6 +221,22 @@ status: draft
 1. Hỏi BA.
 `;
 const EXPECT_BAD2 = ['dòng tổng sai mẫu', 'REQ-CONFIRMED không có nguồn', 'dòng bảng bị vỡ', 'ô nhưng tiêu đề có'];
+// Không có dòng tổng, chỉ có câu "tổng hợp" và ô bảng chứa "Tổng" → phải báo THIẾU, không báo "sai mẫu" ở câu tổng hợp.
+const BAD3 = `---
+id: TC-PIM
+produced_by: test-design-rbt
+status: draft
+---
+# Test cases: PIM
+Phần tổng hợp 5 rủi ro chính ở dưới.
+
+| TC ID | Source | Scenario | Pre-condition | Steps | Expected | Test Data | Priority | Risk | Automatable | Auto Type | Tags |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| TC-PIM-001 | HYP-PIM-01 | Tổng: lương hiển thị đúng | Đăng nhập | 1. Mở Salary | 1. Tổng 2 khoản bằng 3000 | QA-r001-An | P2 | Medium | Yes | UI | @Regression |
+
+## 6. Bước tiếp theo
+1. Viết dòng tổng.
+`;
 
 const EXPECT_BAD = ['thiếu produced_by', 'ghi 3 TC chạy được nhưng bảng TC đếm được 2', 'TC-PIM-1', 'Source', 'ký hiệu tắt', 'Priority "P0"', 'Risk "Huge"',
   'test data mơ hồ', 'expected chưa biết', 'ID data "QA-r2"', 'gmail.com', 'gắn PROVIDED', 'Bước tiếp theo'];
@@ -238,7 +258,11 @@ function selfTest() {
     if (!hit) fail++;
     console.log(`${hit ? 'PASS' : 'FAIL'}  file mẫu SAI (2) bắt được: ${key}`);
   }
-  const total = 1 + EXPECT_BAD.length + EXPECT_BAD2.length;
+  const b3 = check(BAD3);
+  const ok3 = b3.errors.some((e) => e.includes('thiếu dòng tổng')) && !b3.errors.some((e) => e.includes('sai mẫu'));
+  if (!ok3) fail++;
+  console.log(`${ok3 ? 'PASS' : 'FAIL'}  câu "tổng hợp" / ô bảng có "Tổng" không bị coi là dòng tổng → báo thiếu dòng tổng`);
+  const total = 2 + EXPECT_BAD.length + EXPECT_BAD2.length;
   console.log(`\ncheck-tc self-test: ${total - fail}/${total} đúng`);
   process.exit(fail ? 1 : 0);
 }

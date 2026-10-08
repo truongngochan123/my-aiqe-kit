@@ -20,7 +20,7 @@ description: Viết hoặc review manual test case theo EP, BVA, Decision Table,
 | Mode | Khi nào | Cách chạy |
 |---|---|---|
 | `quick` (mặc định) | 1 tính năng, AC rõ | Sinh một lượt theo mục Quy trình |
-| `full` | Nhiều module, AC mơ hồ, cần đánh giá rủi ro | 6 bước theo `{{KIT}}/prompts/manual/01_context_and_roleplay.md` … `06_template_mapping.md`. Qua skill: **gộp bước 1+2** trong một lượt, **chỉ dừng ở bước 2 và bước 4** (Q&A, duyệt scenario); các bước khác chạy liền. Điểm dừng khai báo trong prompt bằng `<!-- aiqe-stop-in-skill: yes -->`, `check-skills.js` kiểm tra khớp |
+| `full` | Nhiều module, AC mơ hồ, cần đánh giá rủi ro | 6 bước theo `{{KIT}}/prompts/manual/01_context_and_roleplay.md` … `06_template_mapping.md`. Qua skill: **gộp bước 1+2** trong một lượt, **chỉ dừng ở bước 2 và bước 4** (Q&A, duyệt scenario); các bước khác chạy liền. Điểm dừng khai báo trong prompt bằng `<!-- aiqe-stop-in-skill: yes -->`, `check-skills.js` kiểm tra khớp. **Mục bắt buộc từng bước, giữ đúng tên + số cột bảng như prompt mẫu, gợi ý scenario login:** `references/full_mode_steps.md` |
 | `maintain` | Requirement đổi, **hoặc** luật của kit đổi | Requirement đổi: cần **2 phiên bản** requirement hoặc diff, không có → từ chối, hỏi user. Luật kit đổi: soát bộ TC cũ theo Self-check **hiện hành**. Output: TC giữ / sửa / chuyển sang mục thăm dò / lỗi thời (`status: deprecated`) / mới |
 | `review` | Soát bộ TC có sẵn | Chạy Self-check ở cuối file lên bộ TC, liệt kê lỗi theo dòng |
 
@@ -32,7 +32,8 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - Mode `maintain`: bộ TC cũ + requirement cũ và mới (hoặc diff).
 - **Thiếu AC có ID:** hỏi user. Phân biệt 2 loại (`{{KIT}}/rules/id_conventions.md` quy tắc 0a):
   - Quy tắc **người khác kể lại** ("BA nói…", "dev bảo…") mà không có tên + ngày hoặc mã ticket → Source `PRV-<MODULE>-NN`, nhãn `PROVIDED`, thêm câu hỏi `Q-*` xin tên BA + ngày hoặc mã ticket. **Không** `REQ-CONFIRMED`, **không** `HYP-`.
-  - Hành vi **dựng ngược từ quan sát app** → `HYP-<MODULE>-NN`, nhãn `DOM-OBSERVED`.
+  - Hành vi **đã quan sát** trên app (có người, env, ngày) → `HYP-<MODULE>-NN`, nhãn `DOM-OBSERVED`.
+  - Hành vi **chưa quan sát** (suy đoán, "thường thì…") → **không** `HYP-`: câu hỏi `Q-<MODULE>-NN` / mục thăm dò.
 
 ## Quy trình (quick)
 0. **Kiểm tra bộ TC cũ trước khi làm gì khác** (áp dụng cả mode `full`). Nếu `<output_dir>/testcases/` đã có file TC của **cùng module** (`TC-<MODULE>*.md`): **dừng, hỏi user**, chưa ghi file nào:
@@ -86,7 +87,8 @@ User chọn mode bằng lời: "viết TC quick cho…", "/test-design-rbt full 
 - [ ] Quy tắc người khác kể lại không có tên + ngày/ticket: `PROVIDED` + Source `PRV-*` + câu hỏi, không `REQ-CONFIRMED`/`HYP-`
 - [ ] Đã liệt kê field trước khi viết TC; field `Not specified` nằm trong danh sách câu hỏi, không bị tự đặt quy tắc
 - [ ] TC ID không trùng, đúng `{{KIT}}/rules/id_conventions.md`
-- [ ] Mọi TC có Source (`AC-` hoặc `HYP-`); mọi AC có ≥ 1 TC
+- [ ] Mọi TC có Source (`AC-`, `PRV-` hoặc `HYP-` đã quan sát); mọi AC có ≥ 1 TC
+- [ ] Mode `full`: đủ mục bắt buộc từng bước; bảng giữ đúng tên và số cột như prompt (`references/full_mode_steps.md`)
 - [ ] Steps và Expected đánh số khớp 1-1
 - [ ] Test Data cụ thể; không có "dữ liệu hợp lệ"; email `@example.com`; không PII thật
 - [ ] Mỗi field ≥ 1 positive + ≥ 2 negative/boundary, không gộp field

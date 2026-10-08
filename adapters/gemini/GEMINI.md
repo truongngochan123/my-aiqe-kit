@@ -7,6 +7,6 @@
 2. **Ghi `produced_by`** đúng tên skill đã đọc ở bước 1 (eval chấm routing bằng trường này).
 3. **Không có hook của kit trên Gemini.** Hai hook `block-secret-read`, `block-assertion-edit` **không** chạy ở đây, nên các luật sau chỉ là lời dặn (📝), hãy tự giữ:
    - Không đọc `.env*` (trừ `.env.sandbox`), `*.har`, `storageState*.json`, cookie, `~/.aiqe/secrets/`; không in biến môi trường chứa TOKEN/SECRET/PASSWORD.
-   - Không chạy lệnh có `--env-file` trỏ tới file token (ví dụ `.env.jira`): đưa lệnh cho người dùng tự chạy.
+   - Không chạy lệnh có `--env-file` (trừ `.env.sandbox`): file env có thể chứa token dù tên là gì; đưa lệnh cho người dùng tự chạy.
    - Không sửa assertion/expected/fixture/`.skip` khi chưa có G3.
 4. Khuyến nghị cho người dùng: chạy Gemini CLI với sandbox (`gemini --sandbox`) và chế độ hỏi trước khi chạy lệnh; mức cách ly thật trên máy: `UNKNOWN`.

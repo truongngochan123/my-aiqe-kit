@@ -17,7 +17,7 @@
 | TC ID | Source | Scenario | Pre-condition | Steps | Expected | Test Data | Priority | Risk | Automatable | Auto Type | Tags |
 ```
 - **TC ID:** theo `id_conventions.md` (mặc định `TC-<MODULE>-<NNN>`).
-- **Source:** mọi TC trỏ về ít nhất một `AC-*`. TC dựng từ reverse spec (requirement dựng ngược từ app) ghi `HYP-<id>`, **không** ghi `AC-`. Quy tắc do BA/dev kể lại qua user, chưa có tên + ngày hoặc mã ticket → `PRV-<MODULE>-NN` (nhãn `PROVIDED` + câu hỏi xin nguồn), **không** `HYP-`. Không có nguồn thì ghi `Not specified` và đưa vào danh sách câu hỏi.
+- **Source:** mọi TC trỏ về ít nhất một `AC-*`. TC dựng từ hành vi **đã quan sát** trên app ghi `HYP-<id>`, **không** ghi `AC-`; hành vi chưa quan sát → câu hỏi `Q-`, không phải TC. Quy tắc do BA/dev kể lại qua user, chưa có tên + ngày hoặc mã ticket → `PRV-<MODULE>-NN` (nhãn `PROVIDED` + câu hỏi xin nguồn), **không** `HYP-`. Không có nguồn thì ghi `Not specified` và đưa vào danh sách câu hỏi.
 - **Steps và Expected:** đánh số khớp 1-1.
 - **Test Data:** giá trị cụ thể (`QA-r042-emp01`), không viết "dữ liệu hợp lệ". Email dùng `@example.com`. **Tên người/tên record cũng mang prefix** (First Name `QA-r001-An`) để tìm và dọn được trên site dùng chung.
 - **Mỗi field có validation TC riêng**, không gộp nhiều field vào một TC.
