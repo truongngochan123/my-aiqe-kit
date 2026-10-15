@@ -46,17 +46,32 @@ function nextSteps(end: RunSummary | undefined, toolProblems: string[] = []): st
   return s.length ? s : ['Không có việc tồn.'];
 }
 
+export function formatUsage(usage: RunSummary['usage'] | undefined): string {
+  if (!usage || usage === 'UNKNOWN') return 'UNKNOWN';
+  if (typeof usage === 'string') return usage;
+  const parts: string[] = [];
+  if (usage.totalTokens !== undefined) parts.push(`total_tokens: ${usage.totalTokens}`);
+  if (usage.promptTokens !== undefined) parts.push(`prompt_tokens: ${usage.promptTokens}`);
+  if (usage.completionTokens !== undefined) parts.push(`completion_tokens: ${usage.completionTokens}`);
+  if (usage.plannerCalls !== undefined) parts.push(`planner_calls: ${usage.plannerCalls}`);
+  return parts.length ? parts.join(', ') : 'UNKNOWN';
+}
+
 export function buildReport(all: EvidenceRecord[], runId: string, chain: { ok: boolean; brokenAt?: number; reason?: string }): string {
   const recs = all.filter((r) => r.runId === runId);
   if (!recs.length) return `# Báo cáo run ${runId}\n\nKhông có bản ghi nào cho run này.\n`;
   const start = recs.find((r) => r.type === 'run_start')?.data as Record<string, any> | undefined;
   const end = recs.find((r) => r.type === 'run_end')?.data as RunSummary | undefined;
   const label = runLabel(end?.verdict, start?.simulated === true);
+  const kitVer = end?.kitVersion ?? start?.kitVersion ?? 'UNKNOWN';
+  const promptVer = end?.promptVersion ?? start?.promptVersion ?? 'UNKNOWN';
+  const usageStr = formatUsage(end?.usage);
   const out: string[] = [];
   out.push('---', 'produced_by: aiqe-agent', `run_id: ${runId}`, `case: ${start?.caseId ?? 'UNKNOWN'}`, `env: ${start?.env ?? 'UNKNOWN'}`,
-    `planner: ${start?.planner ?? 'UNKNOWN'}`, `result: "${label}"`, '---', '');
+    `planner: ${start?.planner ?? 'UNKNOWN'}`, `kit_version: ${kitVer}`, `prompt_version: ${promptVer}`, `usage: ${usageStr}`, `result: "${label}"`, '---', '');
   out.push(`# Báo cáo run ${runId}`, '');
   out.push(`**Kết quả:** \`${label}\`${end ? ` · trạng thái \`${end.state}\` · ${end.toolCalls} lần gọi tool` : ''}`);
+  out.push(`**Phiên bản:** kit \`${kitVer}\` · prompt \`${promptVer}\` · **Usage:** \`${usageStr}\``);
   out.push(`**Lý do:** ${end?.reason ?? 'Run chưa kết thúc (không có run_end)'}`);
   out.push(`**Chuỗi evidence:** ${chain.ok ? 'nguyên vẹn (hash khớp)' : `BỊ HỎNG tại bản ghi ${chain.brokenAt}: ${chain.reason}. Không dùng báo cáo này làm bằng chứng.`}`);
   if (start) out.push(`**Oracle:** \`${start.oracle?.id}\`, hash \`${String(start.oracleHash).slice(0, 12)}…\` (bất biến trong run; đổi cần G3 + run mới)`);

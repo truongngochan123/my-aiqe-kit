@@ -13,6 +13,7 @@ import { ScriptedApprovals } from '../src/approvals.ts';
 import { MockPlanner } from '../src/planner/mock_planner.ts';
 import { extractAction } from '../src/planner/codex_planner.ts';
 import { transition } from '../src/state_machine.ts';
+import { buildReport } from '../src/report.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const policy = JSON.parse(readFileSync(join(ROOT, 'config/policy.json'), 'utf8')) as Policy;
@@ -137,3 +138,31 @@ test('planner codex: lấy được JSON hành động cuối, kể cả object 
   assert.deepEqual(extractAction(out), { kind: 'finish', claim: 'fail', reason: 'b' });
   assert.equal(extractAction('không có json'), null);
 });
+
+test('Đợt 4 #1: planner mock không báo usage → report ghi UNKNOWN, không ghi 0', async () => {
+  const store = new EvidenceStore(join(mkdtempSync(join(tmpdir(), 'aiqe-agent-')), 'evidence.jsonl'));
+  const steps: Action[] = [{ kind: 'finish', claim: 'pass', reason: 'xong' }];
+  const c = new Controller({ policy, manifest, tools: {}, planner: new MockPlanner(steps), approvals: new ScriptedApprovals([]), store });
+  const out = await c.run({ runId: 'RUN-20261008-91', caseId: 'EMP-CREATE-01', env: scen.env, dataPrefix: scen.dataPrefix, oracle: scen.oracle });
+  assert.equal(out.usage, 'UNKNOWN');
+  const report = buildReport(store.readAll(), 'RUN-20261008-91', store.verify());
+  assert.ok(report.includes('usage: UNKNOWN'), 'frontmatter phải có usage: UNKNOWN');
+  assert.ok(report.includes('**Usage:** `UNKNOWN`'), 'body phải có **Usage:** `UNKNOWN`');
+  assert.ok(!report.includes('usage: 0'), 'tuyệt đối không ghi số 0');
+});
+
+test('Đợt 4 #4: case không có trong flow catalog → BLOCKED, không gọi tool', async () => {
+  const store = new EvidenceStore(join(mkdtempSync(join(tmpdir(), 'aiqe-agent-')), 'evidence.jsonl'));
+  let toolCalled = false;
+  const tools: Record<string, ToolExecutor> = {
+    read_case: async () => { toolCalled = true; return { status: 'ok', data: {} }; },
+  };
+  const c = new Controller({ policy, manifest, tools, planner: new MockPlanner([]), approvals: new ScriptedApprovals([]), store, catalog: ['EMP-CREATE-01'] });
+  const out = await c.run({ runId: 'RUN-20261008-92', caseId: 'CASE-LA-99', env: scen.env, dataPrefix: scen.dataPrefix, oracle: scen.oracle });
+  assert.equal(out.state, 'BLOCKED');
+  assert.equal(toolCalled, false, 'tool không bao giờ được gọi khi case không thuộc catalog');
+  assert.match(out.reason, /catalog/);
+  const rej = store.readAll().find((r) => r.type === 'run_rejected');
+  assert.ok(rej, 'phải ghi nhận run_rejected');
+});
+

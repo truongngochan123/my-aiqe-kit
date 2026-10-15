@@ -1,0 +1,25 @@
+{
+  "_note": "Bảng giá token tham chiếu (USD / 1M tokens). Dùng cho calc-cost.js và cost_ledger.md.",
+  "models": {
+    "gpt-4o": {
+      "promptPerMillion": 2.50,
+      "completionPerMillion": 10.00,
+      "cachedPromptPerMillion": 1.25
+    },
+    "claude-3-5-sonnet": {
+      "promptPerMillion": 3.00,
+      "completionPerMillion": 15.00,
+      "cachedPromptPerMillion": 0.30
+    },
+    "gemini-1.5-flash": {
+      "promptPerMillion": 0.075,
+      "completionPerMillion": 0.30,
+      "cachedPromptPerMillion": 0.01875
+    },
+    "mock": {
+      "promptPerMillion": 0.0,
+      "completionPerMillion": 0.0,
+      "cachedPromptPerMillion": 0.0
+    }
+  }
+}

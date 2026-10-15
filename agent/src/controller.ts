@@ -3,7 +3,7 @@
 // Invariant I1–I11: docs/agent_design.md mục 4.
 import { createHash } from 'node:crypto';
 import type {
-  Action, ApprovalScope, GuardResult, HistoryItem, Policy, RunContext, RunRequest, RunSummary,
+  Action, ApprovalScope, GuardResult, HistoryItem, PlannerUsage, Policy, RunContext, RunRequest, RunSummary,
   State, ToolExecutor, ToolResult, ToolSpec,
 } from './types.ts';
 import type { Planner } from './types.ts';
@@ -21,6 +21,9 @@ export interface ControllerDeps {
   approvals: ApprovalProvider;
   store: EvidenceStore;
   now?: () => number;
+  kitVersion?: string;
+  promptVersion?: string;
+  catalog?: string[];
 }
 
 const PHASE_STATE: Partial<Record<ToolSpec['phase'], State>> = { setup: 'SETUP', act: 'ACT', verify: 'VERIFY', cleanup: 'CLEANUP' };
@@ -30,24 +33,41 @@ export class Controller {
   readonly #d: ControllerDeps;
   readonly #manifest: Map<string, ToolSpec>;
   readonly #now: () => number;
+  readonly #kitVersion: string;
+  readonly #promptVersion: string;
+  readonly #catalog?: string[];
 
   constructor(deps: ControllerDeps) {
     this.#d = deps;
     this.#manifest = new Map(deps.manifest.map((t) => [t.name, t]));
     this.#now = deps.now ?? Date.now;
+    this.#kitVersion = deps.kitVersion ?? '0.1.0';
+    this.#promptVersion = deps.promptVersion ?? deps.planner.promptVersion ?? 'UNKNOWN';
+    this.#catalog = deps.catalog;
   }
 
   async run(req: RunRequest): Promise<RunSummary> {
     const { policy, store, planner } = this.#d;
+    const kitVersion = req.kitVersion ?? this.#kitVersion;
+    const promptVersion = req.promptVersion ?? this.#promptVersion;
     const ctx: RunContext = {
       ...req, state: 'PLANNED', oracleHash: hashOf(req.oracle), toolCalls: 0, blockedActions: 0,
       startedAt: this.#now(), approvals: [], createdRecords: [], writeOutcomeUnknown: false,
-      verifyPassed: null, cleanupDone: null, securityObservations: [],
+      verifyPassed: null, cleanupDone: null, securityObservations: [], plannerCalls: 0,
+      kitVersion, promptVersion,
     };
 
-    // Kiểm tra trước khi bắt đầu (I4, prefix, env). Bị từ chối thì KHÔNG ghi run_start, không chạy gì.
-    const pre = [checkRunId(req.runId, store.usedRunIds(), policy), checkDataPrefix(req.dataPrefix, policy),
-      inSandbox(req.env, policy) ? { ok: true } : { ok: false, code: 'ENV_NOT_SANDBOX', reason: `Env "${req.env}" không thuộc sandboxUrls` }];
+    // Kiểm tra trước khi bắt đầu (I4, prefix, env, catalog). Bị từ chối thì KHÔNG ghi run_start, không chạy gì.
+    const allowedCases = this.#catalog ?? this.#manifest.get('read_case')?.inputs?.caseId?.allow ?? this.#manifest.get('run_case')?.inputs?.caseId?.allow;
+    const caseCheck = allowedCases && !allowedCases.includes(req.caseId)
+      ? { ok: false, code: 'CASE_NOT_IN_CATALOG', reason: `Case "${req.caseId}" không có trong flow catalog` }
+      : { ok: true };
+    const pre = [
+      checkRunId(req.runId, store.usedRunIds(), policy),
+      checkDataPrefix(req.dataPrefix, policy),
+      inSandbox(req.env, policy) ? { ok: true } : { ok: false, code: 'ENV_NOT_SANDBOX', reason: `Env "${req.env}" không thuộc sandboxUrls` },
+      caseCheck,
+    ];
     const bad = pre.find((r) => !r.ok);
     if (bad) {
       store.append(req.runId, 'run_rejected', bad);
@@ -55,7 +75,12 @@ export class Controller {
       return this.#summary(ctx, 'inconclusive', bad.reason ?? 'bị từ chối');
     }
 
-    store.append(req.runId, 'run_start', { caseId: req.caseId, env: req.env, dataPrefix: req.dataPrefix, oracle: req.oracle, oracleHash: ctx.oracleHash, planner: planner.name, simulated: req.simulated === true });
+    store.append(req.runId, 'run_start', {
+      caseId: req.caseId, env: req.env, dataPrefix: req.dataPrefix,
+      oracle: req.oracle, oracleHash: ctx.oracleHash, planner: planner.name,
+      simulated: req.simulated === true, kitVersion, promptVersion,
+    });
+
     const history: HistoryItem[] = [];
     let everCreated = false;
     let lastObservation: string | undefined;
@@ -64,6 +89,7 @@ export class Controller {
       const budget = checkBudget(ctx, policy, this.#now());
       if (!budget.ok) return this.#stop(ctx, 'BLOCKED', budget);
 
+      ctx.plannerCalls++;
       const action = await planner.next({ runId: ctx.runId, caseId: ctx.caseId, state: ctx.state, history, lastObservation });
       store.append(ctx.runId, 'proposal', action);
 
@@ -216,8 +242,35 @@ export class Controller {
     return s;
   }
 
+  #getUsage(ctx: RunContext): PlannerUsage | 'UNKNOWN' {
+    const raw = this.#d.planner.getUsage?.();
+    if (!raw) return 'UNKNOWN';
+    const hasTokens = typeof raw.totalTokens === 'number' || typeof raw.promptTokens === 'number' || typeof raw.completionTokens === 'number';
+    if (!hasTokens && !raw.plannerCalls) return 'UNKNOWN';
+    return {
+      promptTokens: raw.promptTokens,
+      completionTokens: raw.completionTokens,
+      totalTokens: raw.totalTokens,
+      plannerCalls: raw.plannerCalls ?? ctx.plannerCalls,
+    };
+  }
+
   #summary(ctx: RunContext, verdict: RunSummary['verdict'], reason: string): RunSummary {
-    return { runId: ctx.runId, state: ctx.state, verdict, reason, toolCalls: ctx.toolCalls, createdRecords: [...ctx.createdRecords], securityObservations: [...ctx.securityObservations] };
+    const kitVersion = ctx.kitVersion ?? this.#kitVersion;
+    const promptVersion = ctx.promptVersion ?? this.#promptVersion;
+    const usage = this.#getUsage(ctx);
+    return {
+      runId: ctx.runId,
+      state: ctx.state,
+      verdict,
+      reason,
+      toolCalls: ctx.toolCalls,
+      createdRecords: [...ctx.createdRecords],
+      securityObservations: [...ctx.securityObservations],
+      kitVersion,
+      promptVersion,
+      usage,
+    };
   }
 
   async #exec(spec: ToolSpec, input: Record<string, unknown>, ctx: RunContext): Promise<ToolResult> {

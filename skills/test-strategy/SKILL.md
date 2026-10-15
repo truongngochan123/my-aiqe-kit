@@ -6,7 +6,7 @@ description: Lập test plan cho dự án/release (phạm vi, rủi ro, loại t
 # Test Strategy
 
 > Chuẩn: `{{KIT}}/rules/evidence_labels.md`, `{{KIT}}/rules/reporting_and_data.md`.
-> Mẫu: `{{KIT}}/templates/test_plan.md`, `{{KIT}}/templates/test_summary_report.md`. Bảng loại test: `references/test_types_matrix.md`.
+> Mẫu: `{{KIT}}/templates/test_plan.md`, `{{KIT}}/templates/test_summary_report.md`, `{{KIT}}/templates/metrics.md`, `{{KIT}}/templates/risk_register.md`. Bảng loại test: `references/test_types_matrix.md`.
 > Nguồn gốc: `TEST_STRATEGY.md` + workflow `generate_application_test_plan` của antigravity-testing-kit; **bỏ** phần tự khám phá app để đoán module (việc đó thuộc `requirement-analysis` mode reverse) và bỏ sinh automation skeleton.
 
 ## Khi dùng / Không dùng
@@ -33,7 +33,7 @@ description: Lập test plan cho dự án/release (phạm vi, rủi ro, loại t
 ## Quy trình
 **`plan`**
 1. Phạm vi trong/ngoài, mỗi dòng có nguồn (`AC-*`, cuộc họp ngày …, `PROVIDED`).
-2. Rủi ro theo module: cao/trung bình/thấp, **lý do có nguồn** (ảnh hưởng tiền, dữ liệu, nhiều người dùng, thay đổi nhiều). Mức rủi ro là `AI-PROPOSAL` cho tới khi lead duyệt.
+2. Rủi ro theo module: lập Risk Register theo `{{KIT}}/templates/risk_register.md` (mỗi rủi ro có ID, owner, biện pháp kiểm soát, hạn). Mức rủi ro là `AI-PROPOSAL` cho tới khi lead duyệt.
 3. Chọn loại test theo `references/test_types_matrix.md`. Loại trong mục "Để sau" của kit (performance, security chuyên sâu, a11y đầy đủ, UAT) ghi rõ **cần gì** để làm, không tự lên lịch.
 4. Môi trường + dữ liệu: env thuộc `sandbox_urls`; prefix data; người dọn data; SMS/email thật đã tắt chưa.
 5. Tiêu chí entry/exit/suspend: viết đo được ("0 bug S1 mở", "100% TC P1 đã chạy"). Ngưỡng là quyết định của lead: đề xuất, ghi `AI-PROPOSAL`.
@@ -41,7 +41,7 @@ description: Lập test plan cho dự án/release (phạm vi, rủi ro, loại t
 7. Unknowns + câu hỏi cho lead/PO; "Bước tiếp theo".
 
 **`close`**
-1. Đếm từ nguồn: TC chạy/chưa chạy, passed/failed/flaky/blocked, bug theo severity, requirement chưa có TC (trace index). Mỗi số ghi file nguồn.
+1. Đếm từ nguồn theo `{{KIT}}/templates/metrics.md`: mọi metric **bắt buộc có mẫu số** (định dạng `X/Y (Tỷ lệ %)`, ví dụ `12/40 TC P1 (30%)`), không ghi số đếm trơ trọi. TC chạy/chưa chạy, passed/failed/flaky/blocked, bug theo severity, requirement chưa có TC (trace index). Mỗi số ghi file nguồn.
 2. Nhãn kết quả: cao nhất là nhãn trong file run (`LOCAL-RUN`/`CI-RUN`/`MANUAL-RUN`). `RUN-PASSED` chỉ khi `server_review: yes` và run ghi SHA đã review.
 3. So từng tiêu chí exit của test plan: đạt / không đạt / không đủ bằng chứng.
 4. Đề xuất go / no-go / go có điều kiện, ghi `AI-PROPOSAL`, liệt kê rủi ro còn lại. **Người quyết định là QA lead + PO.**
@@ -58,9 +58,10 @@ description: Lập test plan cho dự án/release (phạm vi, rủi ro, loại t
 
 ## Self-check
 - [ ] Mỗi dòng phạm vi/rủi ro có nguồn hoặc ghi `UNKNOWN`
+- [ ] Bảng rủi ro có đủ Owner, biện pháp kiểm soát và hạn theo `{{KIT}}/templates/risk_register.md`
 - [ ] Ước lượng có cách tính và giả định; không có số không nguồn
 - [ ] Tiêu chí exit đo được, ghi `AI-PROPOSAL`
-- [ ] Mode `close`: mọi metric trỏ tới file nguồn; flaky/fail không bị bỏ
+- [ ] Mode `close`: mọi metric trỏ tới file nguồn và **có mẫu số** (X/Y, %); flaky/fail không bị bỏ
 - [ ] Không có `RUN-PASSED` khi `server_review` khác `yes`
 - [ ] Go/no-go ghi rõ người quyết định là lead + PO
 - [ ] Có Unknowns và "Bước tiếp theo"

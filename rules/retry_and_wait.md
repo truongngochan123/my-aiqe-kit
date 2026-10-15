@@ -49,3 +49,17 @@ Mọi nhánh dừng (hết budget, bị từ chối duyệt, cleanup fail, user 
 5. Nêu người phụ trách và bước tiếp theo
 
 Test pass nhưng cleanup fail thì **không** được ghi pass.
+
+## 7. Quy trình cách ly test flaky (Quarantine Protocol)
+
+Test flaky được đưa vào diện cách ly (Quarantine) để bảo vệ độ tin cậy của suite CI/CD nhưng **tuyệt đối không được bỏ mặc không người quản lý**. Mọi quyết định quarantine bắt buộc phải lập thẻ theo `templates/quarantine_record.md` với đầy đủ 4 thông tin:
+
+1. **Owner:** Kỹ sư QE chịu trách nhiệm triage và khắc phục nguyên nhân gốc rễ.
+2. **Rủi ro khi bỏ qua (Risk of Omission):** Nêu rõ vùng chức năng có thể bị lọt lỗi khi tạm ngưng test này trong CI.
+3. **Kiểm tra thay thế (Compensating Control):** Biện pháp kiểm tra tạm thời (chạy test thủ công, log alert, kiểm tra API định kỳ).
+4. **Hạn cách ly (Expiry Date):** Ngày hết hạn cách ly (tối đa không quá 14 ngày từ ngày lập).
+
+**Quy tắc xử lý khi đến hạn:**
+- *Quá hạn:* Test bắt buộc phải quay lại suite chính để cảnh báo nợ kỹ thuật, hoặc bị loại bỏ có lý do rõ ràng kèm **G3** (người duyệt).
+- Thẻ quarantine thiếu Owner hoặc thiếu Expiry Date bị coi là không hợp lệ và bị từ chối.
+

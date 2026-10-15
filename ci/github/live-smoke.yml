@@ -1,0 +1,129 @@
+# my-aiqe-kit · Template GitHub Actions: Live Smoke Test trên môi trường Sandbox/Staging.
+#
+# Chuẩn: docs/BUILD_PLAN.md Đợt 4 mục 3.
+# Chốt chặn an toàn:
+#   1. Preflight: Kiểm tra môi trường sống và biến môi trường trước khi chạy.
+#   2. Concurrency: Không chạy đè luồng trên cùng 1 env (tránh xung đột dữ liệu).
+#   3. Zero-test guard: Bắt buộc FAIL nếu không có test nào chạy (chống false positive khi grep nhầm tag).
+#   4. Reconcile step: Chạy với always() để dọn dẹp dữ liệu rác kể cả khi test fail hoặc timeout.
+#   5. Upload artifacts: Lưu lại vết Playwright trace và report.
+
+name: live-smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      env_url:
+        description: 'URL môi trường sandbox/staging cần test'
+        required: true
+        default: 'https://sandbox.example.com'
+      grep_tag:
+        description: 'Tag test cần chạy'
+        required: false
+        default: '@smoke'
+  schedule:
+    # Chạy định kỳ hàng ngày (ví dụ 06:00 UTC)
+    - cron: '0 6 * * *'
+
+concurrency:
+  group: live-smoke-${{ github.event.inputs.env_url || 'default-sandbox' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      BASE_URL: ${{ github.event.inputs.env_url || 'https://sandbox.example.com' }}
+      GREP_TAG: ${{ github.event.inputs.grep_tag || '@smoke' }}
+      # Cấu hình tài khoản test sandbox (truyền qua GitHub Secrets)
+      AIQE_SANDBOX_USER: ${{ secrets.AIQE_SANDBOX_USER }}
+      AIQE_SANDBOX_PASS: ${{ secrets.AIQE_SANDBOX_PASS }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      # 1. Preflight check: môi trường sống + tài khoản khả dụng
+      - name: Preflight Check (Env Availability)
+        shell: bash
+        run: |
+          echo "=== 1. PREFLIGHT CHECK ==="
+          echo "Target env: $BASE_URL"
+          if [ -z "$BASE_URL" ]; then
+            echo "::error::Thiếu BASE_URL."
+            exit 1
+          fi
+          # Ping HTTP/HTTPS kiểm tra môi trường khả dụng (timeout 10s)
+          status_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$BASE_URL" || echo "000")
+          echo "Mã HTTP phản hồi: $status_code"
+          if [ "$status_code" = "000" ] || [ "$status_code" -ge 500 ]; then
+            echo "::error::Môi trường $BASE_URL không phản hồi hoặc trả lỗi máy chủ ($status_code). Dừng smoke sớm."
+            exit 1
+          fi
+          echo "Preflight check đạt: Môi trường sống sẵn sàng."
+
+      # 2. Kiểm tra danh sách test và chống false-positive 0 test
+      - name: Check Smoke Test Count
+        id: test-count
+        shell: bash
+        run: |
+          echo "=== 2. KIỂM TRA SỐ LƯỢNG TEST VỚI GREP: $GREP_TAG ==="
+          # Liệt kê danh sách test khớp grep
+          list_output=$(npx playwright test --grep "$GREP_TAG" --list 2>&1 || true)
+          echo "$list_output"
+          # Đếm số test được phát hiện
+          count=$(echo "$list_output" | grep -E "^\s*\[" | wc -l || echo "0")
+          echo "Số lượng test phát hiện: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::CHỐT CHẶN BẬT: Không tìm thấy test nào khớp tag '$GREP_TAG'! Pipeline bắt buộc FAIL để chống false-positive."
+            exit 1
+          fi
+          echo "test_count=$count" >> "$GITHUB_OUTPUT"
+
+      # 3. Chạy Live Smoke Test
+      - name: Run Live Smoke Suite
+        shell: bash
+        run: |
+          echo "=== 3. CHẠY SUITE LIVE SMOKE ==="
+          npx playwright test --grep "$GREP_TAG"
+
+      # 4. Reconcile step: dọn dẹp dữ liệu test, chạy dù fail hay pass
+      - name: Reconcile & Cleanup Data
+        if: always()
+        shell: bash
+        run: |
+          echo "=== 4. RECONCILE & CLEANUP DATA ==="
+          echo "Kích hoạt bước reconcile dọn dẹp record do smoke run tạo..."
+          if [ -f "scripts/cleanup/reconcile-smoke.js" ]; then
+            node scripts/cleanup/reconcile-smoke.js || echo "::warning::Lỗi trong bước reconcile data."
+          else
+            echo "Không có script reconcile riêng; hoàn tất kiểm tra trạng thái."
+          fi
+
+      # 5. Upload Artifacts (Traces & Reports)
+      - name: Upload Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-smoke-report-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14

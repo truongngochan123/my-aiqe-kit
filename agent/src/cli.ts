@@ -21,11 +21,14 @@ import { createPlanner } from './planner/planner.ts';
 import { createFakeTools } from './tools/fake.ts';
 import { createRealTools } from './tools/index.ts';
 import { buildReport, runLabel } from './report.ts';
+import { loadFlowCatalog, applyCatalogToManifest } from './catalog.ts';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const readJson = <T>(p: string) => JSON.parse(readFileSync(join(ROOT, p), 'utf8')) as T;
 const policy = readJson<Policy>('config/policy.json');
-const manifest = readJson<{ tools: ToolSpec[] }>('config/tool_manifest.json').tools;
+const flows = loadFlowCatalog(join(ROOT, 'config/flows.json'));
+const manifestRaw = readJson<{ tools: ToolSpec[] }>('config/tool_manifest.json').tools;
+const manifest = applyCatalogToManifest(manifestRaw, flows);
 interface Scenario { description: string; approvals: boolean[]; steps: Action[]; toolResults: Record<string, ToolResult[]> }
 const scen = readJson<{ env: string; dataPrefix: string; oracle: OracleSpec; scenarios: Record<string, Scenario> }>('scenarios/scenarios.json');
 

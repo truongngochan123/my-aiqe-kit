@@ -94,9 +94,18 @@ export interface PlannerInput {
   lastObservation?: string; // đã bọc <untrusted>
 }
 
+export interface PlannerUsage {
+  promptTokens?: number;
+  completionTokens?: number;
+  totalTokens?: number;
+  plannerCalls?: number;
+}
+
 export interface Planner {
   readonly name: string;
+  readonly promptVersion?: string;
   next(input: PlannerInput): Promise<Action>;
+  getUsage?(): PlannerUsage | undefined;
 }
 
 export interface RunRequest {
@@ -106,6 +115,8 @@ export interface RunRequest {
   dataPrefix: string;     // ví dụ QA-r001
   oracle: OracleSpec;
   simulated?: boolean;   // tool giả (test/demo): không bao giờ được nhãn LOCAL-RUN
+  kitVersion?: string;
+  promptVersion?: string;
 }
 
 export interface RunContext extends RunRequest {
@@ -120,6 +131,7 @@ export interface RunContext extends RunRequest {
   verifyPassed: boolean | null;
   cleanupDone: boolean | null;
   securityObservations: string[];
+  plannerCalls: number;
 }
 
 export interface RunSummary {
@@ -130,4 +142,8 @@ export interface RunSummary {
   toolCalls: number;
   createdRecords: string[];
   securityObservations: string[];
+  kitVersion?: string;
+  promptVersion?: string;
+  usage?: PlannerUsage | 'UNKNOWN';
 }
+

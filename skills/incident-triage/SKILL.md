@@ -6,7 +6,7 @@ description: Phân loại vì sao test fail hoặc chạy lỗi (môi trường,
 # Incident Triage
 
 > Chuẩn: `{{KIT}}/rules/retry_and_wait.md`, `{{KIT}}/rules/agent_safety.md`, `{{KIT}}/rules/evidence_labels.md`.
-> Mẫu: `{{KIT}}/templates/incident_card.md`, `{{KIT}}/templates/retry_matrix.md`. Nguyên nhân flaky: `references/flaky_catalog.md`.
+> Mẫu: `{{KIT}}/templates/incident_card.md`, `{{KIT}}/templates/retry_matrix.md`, `{{KIT}}/templates/quarantine_record.md`. Nguyên nhân flaky: `references/flaky_catalog.md`.
 
 ## Khi dùng / Không dùng
 - **Dùng:** test (manual hoặc automation) fail mà **chưa biết vì sao**; test lúc pass lúc fail; agent/run bị timeout, kẹt, ghi dữ liệu không rõ kết quả.
@@ -38,7 +38,7 @@ description: Phân loại vì sao test fail hoặc chạy lỗi (môi trường,
    | Code test (locator, chờ, data test) | Locator không thấy element, timeout khi chờ, data trùng giữa test | `ui-automation` / `api-testing` (đề xuất sửa) |
    | Sản phẩm | Hành vi khác expected **có nguồn**, tái hiện bằng tay được | `bug-reporting` |
    | Data / cleanup / policy | Record cũ còn sót, thiếu quyền, cleanup fail, bị guard chặn | Người dùng / lead |
-4. **Flaky?** Chỉ kết luận flaky khi có ≥ 2 lần chạy cùng code, cùng env cho kết quả khác nhau. Dùng `references/flaky_catalog.md` để chọn discriminating check.
+4. **Flaky?** Chỉ kết luận flaky khi có ≥ 2 lần chạy cùng code, cùng env cho kết quả khác nhau. Dùng `references/flaky_catalog.md` để chọn discriminating check. Nếu đề xuất cách ly (quarantine) khỏi suite CI: lập thẻ theo `{{KIT}}/templates/quarantine_record.md` với đầy đủ 4 trường bắt buộc (Owner, Risk of Omission, Compensating Control, Expiry Date theo `{{KIT}}/rules/retry_and_wait.md` mục 7).
 5. **Ghi dữ liệu mà không rõ kết quả** (timeout sau khi bấm Lưu/gọi POST): trạng thái `OUTCOME_UNKNOWN`; **không** đề xuất tạo lại; chỉ đề xuất tra cứu chỉ-đọc theo ID của run (`{{KIT}}/rules/retry_and_wait.md` mục 4).
 6. **Quyết định** theo retry matrix (`{{KIT}}/templates/retry_matrix.md`):
    - Chạy lại thao tác chỉ đọc: được, có giới hạn.
@@ -74,3 +74,4 @@ description: Phân loại vì sao test fail hoặc chạy lỗi (môi trường,
 - [ ] Không đề xuất sửa assertion/expected để pass
 - [ ] Có lớp lỗi, độ tin cậy, unknowns, `next_skill`
 - [ ] Kết luận flaky có ≥ 2 lần chạy làm bằng chứng
+- [ ] Đề xuất quarantine (nếu có) đủ Owner, rủi ro bỏ qua, kiểm tra thay thế và hạn chót

@@ -31,10 +31,11 @@ export function nextAttemptId(runDir: string): string {
   return `a${used.length ? Math.max(...used) + 1 : 1}`;
 }
 
-export function makeRunCase(opts: { casesDir: string; runsDir: string; timeoutMs: number; runner?: Runner }): ToolExecutor {
+export function makeRunCase(opts: { casesDir: string; runsDir: string; timeoutMs: number; runner?: Runner; catalog?: string[] }): ToolExecutor {
   const runner = opts.runner ?? playwrightRunner;
   return async (input, ctx) => {
     const caseId = String(input.caseId);
+    if (opts.catalog && !opts.catalog.includes(caseId)) return { status: 'error', error: `Case "${caseId}" không có trong flow catalog` };
     const recordName = String(input.recordName);
     const runDir = join(opts.runsDir, ctx.runId);
     const attemptId = nextAttemptId(runDir);

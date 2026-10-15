@@ -3,6 +3,29 @@
 Mỗi version có 3 mục: **Thêm / Sửa / Bỏ**. Version theo SemVer, ghi trong file `VERSION`.
 Bản `-dev` là bản đang dựng, chưa chốt. Agent có version riêng trong `agent/package.json`.
 
+## 0.1.1-dev (12/10/2026) · Đợt 4: Chuẩn hóa độ tin cậy kiểm thử
+
+Triển khai trọn vẹn 5 hạng mục Đợt 4 theo đối chiếu học phần AOCE.
+
+### Thêm
+- `agent/config/flows.json`: Flow catalog cho phép agent chạy theo danh mục các test flow đã phê duyệt; `agent/src/catalog.ts` nạp và ánh xạ allowlist động.
+- `ci/github/live-smoke.yml`: Template workflow live smoke CI GitHub Actions với 5 chốt chặn: preflight check, concurrency lock, fail khi 0 test chạy, reconcile data với `always()`, upload artifact.
+- `templates/metrics.md`: Chuẩn hóa bảng metric kiểm thử bắt buộc có mẫu số (`X/Y, %`), không ghi số đơn lẻ thiếu bối cảnh.
+- `templates/risk_register.md`: Sổ theo dõi rủi ro kiểm thử có Risk ID, owner, biện pháp kiểm soát và hạn hoàn thành.
+- `templates/quarantine_record.md`: Thẻ cách ly test flaky với 4 thông tin bắt buộc (owner, risk of omission, compensating control, expiry date).
+- `agent/tests/agent.test.ts`: Thêm 2 unit test xác minh telemetry usage (`UNKNOWN` khi planner không báo, không ghi 0) và flow catalog (chặn case lạ ngoài catalog).
+
+### Sửa
+- `agent/src/types.ts`: Bổ sung kiểu `PlannerUsage`, các trường `kitVersion`, `promptVersion`, `usage` và `plannerCalls`.
+- `agent/src/controller.ts`: Ghi nhận `kitVersion`, `promptVersion` ở `run_start`/`run_end`, đếm lượt gọi planner và trích xuất usage (hoặc `UNKNOWN`), kiểm tra case thuộc flow catalog (chặn case lạ).
+- `agent/src/report.ts`: Xuất `kit_version`, `prompt_version`, `usage` trong front-matter và thân báo cáo (không ghi 0).
+- `agent/src/tools/read_case.ts`, `run_case.ts`, `index.ts`: Nhận catalog tùy chọn để kiểm tra tính hợp lệ của caseId.
+- `agent/src/cli.ts`: Nạp catalog từ `config/flows.json` và cập nhật tool manifest.
+- `rules/retry_and_wait.md`: Thêm mục 7 về Quy trình cách ly test flaky (Quarantine Protocol).
+- `skills/test-strategy/SKILL.md`: Tích hợp `templates/metrics.md` và `templates/risk_register.md` vào quy trình lập kế hoạch và đóng release.
+- `skills/incident-triage/SKILL.md`: Tích hợp lập thẻ `quarantine_record.md` khi phát hiện test flaky tái diễn.
+- `docs/BUILD_PLAN.md`: Đánh dấu hoàn tất 5 việc của Đợt 4.
+
 ## 0.1.0 (10/10/2026) · agent 0.2.0-rc.1
 
 Chốt sau khi Han review 2 commit Đợt 3 + agent. Lượt test gộp trên Codex: `evals/round_0.1.0.md`; lỗi tìm được sẽ sửa ở 0.1.1.

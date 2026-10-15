@@ -321,17 +321,17 @@ my-aiqe-kit/
 
 **Nghiệm thu:** đã đọc toàn bộ script Jira; routing ≥ 90% trên Codex; Han duyệt.
 
-### ĐỢT 4 (sau 0.1.0, chưa làm)
+### ĐỢT 4 (hoàn tất 12/10/2026) ✅
 
-Nguồn: Han đối chiếu với học phần AOCE (10/10). Chưa thiết kế chi tiết; làm sau khi chốt 0.1.0 và có kết quả lượt test gộp.
+Nguồn: Han đối chiếu với học phần AOCE (10/10). Triển khai đầy đủ 5 việc chuẩn hóa độ tin cậy.
 
 | # | Việc | Chỗ sửa dự kiến | Nghiệm thu |
 |---|---|---|---|
-| 1 | Mỗi run agent ghi `kit_version`, `prompt_version`, `usage` (token/lượt gọi planner). Không có số liệu → `UNKNOWN`, **không ghi 0** | `agent/src/controller.ts` (`run_start`/`run_end`), `report.ts` | Test: planner mock không báo usage → report ghi `UNKNOWN` |
-| 2 | Template metric có **mẫu số** (ví dụ "12/40 TC P1 đã chạy", không chỉ "12") + template **risk register** (rủi ro, owner, biện pháp kiểm soát, hạn) | `templates/metrics.md`, `templates/risk_register.md`; `test-strategy` dùng | `check-*` hoặc self-check bắt metric thiếu mẫu số |
-| 3 | Template workflow **live smoke**: preflight (env sống, tài khoản test), `--grep @smoke`, **fail khi không có test nào chạy**, bước reconcile chạy với `always()` (dọn data, ghi kết quả kể cả khi fail), `concurrency` (không chạy chồng trên cùng env), upload artifact | `ci/github/live-smoke.yml` (+ GitLab nếu cần) | YAML hợp lệ; thử với suite rỗng → job fail |
-| 4 | Agent đọc **flow catalog** (danh sách case được phép, mỗi case một thư mục) thay vì cứng `EMP-CREATE-01`; case không có trong catalog → từ chối | `agent/config/flows.json`, `tool_manifest.json` (allow lấy từ catalog), `read_case`/`run_case` | Test: case lạ → `BLOCKED`, không gọi tool |
-| 5 | **Quarantine** test flaky có owner, rủi ro khi bỏ qua và test/kiểm tra thay thế, ngày hết hạn (quá hạn → quay lại suite hoặc xóa có lý do) | `rules/retry_and_wait.md`, `incident-triage`, template | Quarantine thiếu owner/hạn bị check báo lỗi |
+| 1 | Mỗi run agent ghi `kit_version`, `prompt_version`, `usage` (token/lượt gọi planner). Không có số liệu → `UNKNOWN`, **không ghi 0** | `agent/src/controller.ts` (`run_start`/`run_end`), `report.ts` | Test: planner mock không báo usage → report ghi `UNKNOWN` ✅ |
+| 2 | Template metric có **mẫu số** (ví dụ "12/40 TC P1 đã chạy", không chỉ "12") + template **risk register** (rủi ro, owner, biện pháp kiểm soát, hạn) | `templates/metrics.md`, `templates/risk_register.md`; `test-strategy` dùng | `templates/metrics.md` & `risk_register.md` đã tạo; `test-strategy` cập nhật ✅ |
+| 3 | Template workflow **live smoke**: preflight (env sống, tài khoản test), `--grep @smoke`, **fail khi không có test nào chạy**, bước reconcile chạy với `always()` (dọn data, ghi kết quả kể cả khi fail), `concurrency` (không chạy chồng trên cùng env), upload artifact | `ci/github/live-smoke.yml` (+ GitLab nếu cần) | `ci/github/live-smoke.yml` hợp lệ có 5 chốt chặn ✅ |
+| 4 | Agent đọc **flow catalog** (danh sách case được phép, mỗi case một thư mục) thay vì cứng `EMP-CREATE-01`; case không có trong catalog → từ chối | `agent/config/flows.json`, `tool_manifest.json` (allow lấy từ catalog), `read_case`/`run_case` | Test: case lạ → `BLOCKED`, không gọi tool ✅ |
+| 5 | **Quarantine** test flaky có owner, rủi ro khi bỏ qua và test/kiểm tra thay thế, ngày hết hạn (quá hạn → quay lại suite hoặc xóa có lý do) | `rules/retry_and_wait.md`, `incident-triage`, template | `rules/retry_and_wait.md` mục 7, `templates/quarantine_record.md` ✅ |
 
 ---
 

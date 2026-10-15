@@ -1,0 +1,22 @@
+{
+  "_note": "Flow catalog: Danh mục các test flow và chuỗi liên hoàn (sequences) được cấp phép cho agent.",
+  "flows": [
+    {
+      "caseId": "EMP-CREATE-01",
+      "name": "Tạo nhân viên OrangeHRM PIM",
+      "path": "cases/EMP-CREATE-01",
+      "enabled": true,
+      "description": "Tạo nhân viên mới, kiểm tra xuất hiện trong danh sách, dọn dẹp sau khi kiểm tra"
+    }
+  ],
+  "sequences": [
+    {
+      "name": "employee_lifecycle",
+      "description": "Chu kỳ nhân viên: tạo mới và xác thực",
+      "enabled": true,
+      "flows": [
+        "EMP-CREATE-01"
+      ]
+    }
+  ]
+}
